@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.qmuiteam.qmui.widget.QMUITopBar
+        android:id="@+id/topbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/qmui_topbar_height"/>
+
+    <com.qmuiteam.qmui.widget.QMUIViewPager
+        android:layout_weight="1"
+        android:id="@+id/viewpager_home"
+        android:background="?attr/app_content_bg_color"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fitsSystemWindows="true"/>
+
+    <com.qmuiteam.qmui.widget.QMUITabSegment
+        android:id="@+id/tabs_home"
+        android:layout_gravity="bottom"
+        android:background="?attr/qmui_list_item_bg_with_border_top"
+        android:textSize="12sp"
+        app:qmui_tab_icon_position="top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/home_tab_height"/>
+
+
+</LinearLayout>

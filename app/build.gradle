@@ -1,0 +1,101 @@
+apply plugin: 'com.android.application'
+android {
+    signingConfigs {
+        key {
+            keyAlias 'huiyixitong'
+            keyPassword 'zhongbaikeji'
+            storeFile file('E:/apkstore/csclient/csclient.jks')
+            storePassword 'zhongbaikeji'
+        }
+    }
+    compileSdkVersion 26
+    defaultConfig {
+        applicationId "com.gzz100.zbh"
+        minSdkVersion 16
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        ndk {
+            abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
+        }
+    }
+    buildTypes {
+        release {
+            postprocessing {
+                removeUnusedCode false
+                removeUnusedResources false
+                obfuscate false
+                optimizeCode false
+                proguardFile 'proguard-rules.pro'
+            }
+        }
+        debug {
+            signingConfig signingConfigs.key
+        }
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs/jniLibs']
+        }
+    }
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'x86', 'armeabi-v7a'
+            universalApk true
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:support-v4:26.1.0'
+    compile project(path: ':qmui')
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    //选择日期
+    implementation 'com.contrarywind:Android-PickerView:3.2.7'
+    //QRcode 扫描
+    implementation 'cn.bingoogolapple:bga-qrcode-zxing:1.2.0'
+    implementation 'com.orhanobut:logger:2.1.1'
+    //滑动返回fragment
+    implementation 'me.yokeyword:fragmentation:1.2.4'
+    //滑动返回fragment
+    implementation 'me.yokeyword:fragmentation-swipeback:1.2.4'
+    //头像生成
+    implementation 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
+    implementation 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    //权限控制
+    implementation 'com.github.hotchemi:permissionsdispatcher:3.1.0'
+    annotationProcessor "com.github.hotchemi:permissionsdispatcher-processor:3.1.0"
+    //华为推送
+    implementation 'com.huawei.android.hms:push:2.5.3.302'
+    //图片框架
+    implementation 'com.github.bumptech.glide:glide:4.6.1'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.6.1'
+    //图片选择器
+    implementation 'com.zhihu.android:matisse:0.4.3'
+    //文件选择器
+    implementation 'com.droidninja:filepicker:2.1.3'
+    implementation 'com.tamic.novate:novate:1.5.2.3'
+    //toast
+    implementation 'com.github.GrenderG:Toasty:1.2.8'
+    implementation 'org.greenrobot:eventbus:3.1.1'
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.10'
+    implementation 'com.android.support:multidex:1.0.3'
+    implementation files('libs/MiPush_SDK_Client_3_5_2.jar')
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    implementation project(':floatingsearchview')
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support:cardview-v7:26.1.0'
+}

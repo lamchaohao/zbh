@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:paddingTop="24dp"
+              android:paddingBottom="24dp"
+              android:background="#E0E0E0"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+    <FrameLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:background="#9E9E9E"
+            android:layout_width="match_parent"
+            android:layout_gravity="center"
+            android:layout_height="1dp"/>
+        <TextView
+            android:id="@+id/tv_tips_state"
+            android:layout_gravity="center"
+            android:text="此时段以下会议室不能预约"
+            android:padding="8dp"
+            android:textSize="16sp"
+            android:background="#E0E0E0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tv_suggestion_state"
+        android:text="建议调整参会人数或时间"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:visibility="gone"
+        android:background="#E0E0E0"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

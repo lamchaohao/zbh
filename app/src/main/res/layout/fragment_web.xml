@@ -1,0 +1,254 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:background="#E0E0E0"
+              tools:context="com.gzz100.zbh.home.WebFragment">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="打横"/>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/btFile"
+                android:paddingLeft="36dp"
+                android:paddingRight="36dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/recycler_bg"
+                android:drawableLeft="@drawable/ic_insert_drive_file_black_24dp"
+                android:text="浏览文件"/>
+
+            <Button
+                android:id="@+id/bthost"
+                android:paddingLeft="36dp"
+                android:paddingRight="36dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/recycler_bg"
+                android:drawableLeft="@drawable/ic_person_black_24dp"
+                android:text="主持人"/>
+
+            <ImageView
+                android:id="@+id/btRotation"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/recycler_bg"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_screen_rotation_black_24dp"/>
+            <ImageView
+                android:id="@+id/btpause"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/recycler_bg"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_pause_circle_filled_black_24dp"/>
+            <ImageView
+                android:id="@+id/ivEdit"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/recycler_bg"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_mode_edit_black_24dp"/>
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
+    <TextView
+        android:layout_marginTop="16dp"
+        android:text="两行"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <LinearLayout
+
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_weight="1"
+            android:paddingLeft="36dp"
+            android:paddingRight="36dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/recycler_bg"
+            android:drawableLeft="@drawable/ic_insert_drive_file_black_24dp"
+            android:text="浏览文件"/>
+
+        <Button
+            android:layout_weight="1"
+            android:paddingLeft="36dp"
+            android:paddingRight="36dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/recycler_bg"
+            android:drawableLeft="@drawable/ic_person_black_24dp"
+            android:text="主持人"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/ivRotation2"
+            android:layout_weight="1"
+            android:padding="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/recycler_bg"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_screen_rotation_black_24dp"/>
+        <ImageView
+            android:id="@+id/ivpause2"
+            android:layout_weight="1"
+            android:padding="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/recycler_bg"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_pause_circle_filled_black_24dp"/>
+        <ImageView
+            android:id="@+id/ivedit2"
+            android:layout_weight="1"
+            android:padding="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/recycler_bg"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_mode_edit_black_24dp"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_marginTop="16dp"
+        android:text="收起"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <LinearLayout
+
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_weight="1"
+            android:paddingLeft="36dp"
+            android:paddingRight="36dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/recycler_bg"
+            android:drawableLeft="@drawable/ic_insert_drive_file_black_24dp"
+            android:text="浏览文件"/>
+
+        <Button
+            android:layout_weight="1"
+            android:paddingLeft="36dp"
+            android:paddingRight="36dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/recycler_bg"
+            android:drawableLeft="@drawable/ic_person_black_24dp"
+            android:text="主持人"/>
+
+        <ImageButton
+            android:id="@+id/ib_more"
+            android:padding="12dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_add_circle_outline_black_24dp"
+            android:background="@drawable/recycler_bg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <TextView
+        android:layout_marginTop="16dp"
+        android:text="点击展开"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <HorizontalScrollView
+            android:id="@+id/hsView"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:id="@+id/toolBar"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <Button
+                    android:paddingLeft="36dp"
+                    android:paddingRight="36dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/recycler_bg"
+                    android:drawableLeft="@drawable/ic_insert_drive_file_black_24dp"
+                    android:text="浏览文件"/>
+
+                <Button
+                    android:paddingLeft="36dp"
+                    android:paddingRight="36dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/recycler_bg"
+                    android:drawableLeft="@drawable/ic_person_black_24dp"
+                    android:text="主持人"/>
+                <ImageButton
+                    android:padding="12dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/recycler_bg"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_screen_rotation_black_24dp"/>
+                <ImageButton
+                    android:padding="12dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/recycler_bg"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_pause_circle_filled_black_24dp"/>
+                <ImageButton
+                    android:padding="12dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/recycler_bg"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_mode_edit_black_24dp"/>
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+
+        <ImageButton
+            android:id="@+id/ib_showMore"
+            android:padding="12dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_chevron_right_black_24dp"
+            android:background="@drawable/recycler_bg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+</LinearLayout>
