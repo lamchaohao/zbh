@@ -14,6 +14,10 @@ public class Common {
     public static String USER_PATH;
     public static String PUSH_TOKEN;
 
+    public static final int STATUS_ON=1;
+    public static final int STATUS_READY=2;
+    public static final int STATUS_END=3;
+
     public static void setUserPath(String userPath) {
         USER_PATH = userPath;
     }

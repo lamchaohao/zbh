@@ -31,7 +31,7 @@ public interface LoginService {
 
 
     @FormUrlEncoded
-    @POST("updateToken")
-    Observable<HttpResult<User>> updateUserName(@Field("userId") String userId, @Field("token") String token);
+    @POST("updateUserName")
+    Observable<HttpResult> updateUserName(@Field("userId") String userId, @Field("token") String token,@Field("userName")String userName);
 
 }

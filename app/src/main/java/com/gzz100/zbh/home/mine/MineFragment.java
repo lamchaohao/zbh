@@ -14,15 +14,23 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amulyakhare.textdrawable.TextDrawable;
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.account.LoginFragment;
 import com.gzz100.zbh.account.SearchCompFragment;
 import com.gzz100.zbh.account.User;
 import com.gzz100.zbh.account.X5Fragment;
 import com.gzz100.zbh.base.BaseFragment;
+import com.gzz100.zbh.data.entity.ApplyEntity;
+import com.gzz100.zbh.utils.DensityUtil;
+import com.gzz100.zbh.utils.TextHeadPicUtil;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -71,6 +79,7 @@ public class MineFragment extends BaseFragment {
         }
 
         unbinder = ButterKnife.bind(this, mRootView);
+        EventBus.getDefault().register(this);
         return mRootView;
     }
 
@@ -80,17 +89,31 @@ public class MineFragment extends BaseFragment {
         initView();
     }
 
+
     private void initView() {
         User user = User.getUserFromCache();
 
         mTvUserName.setText(user.getUserName());
         if (user.getCompanyId().equals("0")||user.getCompanyId()==null){
             mBtnJoinCompany.setVisibility(View.VISIBLE);
+            if (user.getApply()!=null){
+                StringBuffer sb=new StringBuffer("等待");
+                sb.append(user.getApply()
+                        .getCompanyNameX())
+                        .append("审核");
+                mTvStatu.setText(sb.toString());
+                mBtnJoinCompany.setVisibility(View.GONE);
+            }else {
+                mTvStatu.setText("你还没加入企业");
+                mBtnJoinCompany.setVisibility(View.VISIBLE);
+            }
         }else {
-            mTvStatu.setText(user.getCompanyName());
-            mBtnJoinCompany.setVisibility(View.GONE);
-        }
 
+            mBtnJoinCompany.setVisibility(View.GONE);
+            mTvStatu.setText(user.getCompanyName());
+        }
+        TextDrawable headPic = TextHeadPicUtil.getHeadPic(user.getUserName(),32, DensityUtil.dp2px(getContext(),64));
+        mIvCompPic.setImageDrawable(headPic);
 
     }
 
@@ -142,10 +165,11 @@ public class MineFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        EventBus.getDefault().unregister(this);
         unbinder.unbind();
     }
 
-    @OnClick({R.id.tv_about_mine, R.id.tv_setting_mine, R.id.tv_file_mine,R.id.tv_logout_mine,R.id.btn_joinCompany_mine})
+    @OnClick({R.id.rl_nameCard_mine,R.id.tv_about_mine, R.id.tv_setting_mine, R.id.tv_file_mine,R.id.tv_logout_mine,R.id.btn_joinCompany_mine})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.tv_about_mine:
@@ -163,8 +187,19 @@ public class MineFragment extends BaseFragment {
             case R.id.btn_joinCompany_mine:
                 startParentFragment(new SearchCompFragment());
                 break;
+            case R.id.rl_nameCard_mine:
+                startParentFragment(new NameCardFragment());
+                break;
 
         }
+    }
+
+    /**
+     * 在个人信息页面更改了用户名后信息更新
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onNameChange(ApplyEntity applyEntity){
+        initView();
     }
 
     private void logout() {
@@ -181,6 +216,7 @@ public class MineFragment extends BaseFragment {
                     @Override
                     public void onClick(QMUIDialog dialog, int index) {
                         if (User.logout()) {
+                            dialog.dismiss();
                             ((BaseFragment)getParentFragment()).startWithPop(new LoginFragment());
                         }
                     }

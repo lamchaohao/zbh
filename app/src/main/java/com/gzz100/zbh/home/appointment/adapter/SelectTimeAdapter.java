@@ -1,4 +1,4 @@
-package com.gzz100.zbh.adapter;
+package com.gzz100.zbh.home.appointment.adapter;
 
 import android.content.Context;
 import android.graphics.Color;

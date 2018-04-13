@@ -18,7 +18,6 @@ import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import es.dmoral.toasty.Toasty;
@@ -30,7 +29,7 @@ import es.dmoral.toasty.Toasty;
 
 public class AgendaAdapter extends RecyclerView.Adapter {
 
-    private List<Agenda> mAgendaList;
+    private ArrayList<Agenda> mAgendaList;
     private Context mContext;
     private OnItemClickListener mOnItemClickListener;
     private OnSelectCountChangeListener mOnSelectCountChangeListener;
@@ -62,7 +61,7 @@ public class AgendaAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int pos) {
-
+        //如果是添加的button
         if (getItemViewType(pos)==TYPE_ADD_BUTTON) {
 
             AddButtonHolder addHolder= (AddButtonHolder) holder;
@@ -77,18 +76,22 @@ public class AgendaAdapter extends RecyclerView.Adapter {
         final AgendaHolder viewHolder = (AgendaHolder) holder;
         final int position =pos;
         final Agenda agenda = mAgendaList.get(position);
+        //设置主讲人头像
         if (agenda.getStaff()!=null){
             viewHolder.ivSpeakerPic.setImageDrawable(TextHeadPicUtil.getHeadPic(agenda.getStaff().getUserName(),
                     headPicFontSize,headPicSize));
         }else {
             viewHolder.ivSpeakerPic.setImageResource(R.drawable.ic_add_circle_outline_black_24dp);
         }
+        //设置议程标题
         EditText editText = titleMap.get(agenda.hashCode());
         if (editText!=null){
             Logger.i("title="+editText.getText().toString()+", pos="+position);
             viewHolder.etAgendaTitle.setText(editText.getText());
         }else {
-            viewHolder.etAgendaTitle.setText("");
+            if (agenda.getAgendaName()!=null){
+                viewHolder.etAgendaTitle.setText(agenda.getAgendaName());
+            }
             Logger.i("editText==null"+", pos="+position);
         }
 
@@ -152,11 +155,19 @@ public class AgendaAdapter extends RecyclerView.Adapter {
         notifyItemInserted(mAgendaList.size());
     }
 
+    public void addAgendas(ArrayList<Agenda> agendaList){
+        if (agendaList!=null){
+            mAgendaList.addAll(agendaList);
+            notifyDataSetChanged();
+        }
+
+    }
+
     public void remove(int position,Agenda agenda){
         if (mAgendaList.size()>1) {
             mAgendaList.remove(position);
             notifyItemRemoved(position);
-            //防止错位,采用局部刷新位置,重新刷新viewholder 使得点击事件不粗乱
+            //防止错位,采用局部刷新位置,重新刷新viewholder 使得点击事件不错乱
             if (position != mAgendaList.size()) {
                 notifyItemRangeChanged(position, mAgendaList.size() - position);
             }
@@ -174,7 +185,7 @@ public class AgendaAdapter extends RecyclerView.Adapter {
         notifyItemChanged(pos);
     }
 
-    public List<Agenda> getAgendaList(){
+    public ArrayList<Agenda> getAgendaList(){
         for (Agenda agenda : mAgendaList) {
             EditText editText = titleMap.get(agenda.hashCode());
             agenda.setAgendaName(editText.getText().toString());

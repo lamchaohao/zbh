@@ -71,6 +71,7 @@
                 android:descendantFocusability="blocksDescendants"/>
 
             <RelativeLayout
+                android:id="@+id/rl_delegateBlock"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="8dp">
@@ -89,6 +90,7 @@
             </RelativeLayout>
 
             <LinearLayout
+                android:id="@+id/ll_delegates"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">

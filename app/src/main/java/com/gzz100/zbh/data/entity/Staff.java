@@ -1,10 +1,13 @@
 package com.gzz100.zbh.data.entity;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by Lam on 2018/3/14.
  */
 
-public class Staff {
+public class Staff implements Parcelable {
 
     /**
      * departmentName : 销售部3
@@ -102,4 +105,47 @@ public class Staff {
                 ", userId='" + userId + '\'' +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.departmentName);
+        dest.writeString(this.positionName);
+        dest.writeString(this.positionId);
+        dest.writeString(this.phone);
+        dest.writeString(this.departmentId);
+        dest.writeString(this.userName);
+        dest.writeString(this.userId);
+        dest.writeByte(this.isSelect ? (byte) 1 : (byte) 0);
+    }
+
+    public Staff() {
+    }
+
+    protected Staff(Parcel in) {
+        this.departmentName = in.readString();
+        this.positionName = in.readString();
+        this.positionId = in.readString();
+        this.phone = in.readString();
+        this.departmentId = in.readString();
+        this.userName = in.readString();
+        this.userId = in.readString();
+        this.isSelect = in.readByte() != 0;
+    }
+
+    public static final Parcelable.Creator<Staff> CREATOR = new Parcelable.Creator<Staff>() {
+        @Override
+        public Staff createFromParcel(Parcel source) {
+            return new Staff(source);
+        }
+
+        @Override
+        public Staff[] newArray(int size) {
+            return new Staff[size];
+        }
+    };
 }

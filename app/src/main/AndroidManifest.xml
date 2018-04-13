@@ -31,8 +31,9 @@
             android:value="appid=100198313">
         </meta-data>
 
-        <activity android:name=".MainActivity"
-                  android:launchMode="singleTop"
+        <activity
+            android:name=".MainActivity"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -152,6 +153,8 @@
             android:label="@string/title_activity_fullscreen"
             android:screenOrientation="landscape"
             android:theme="@style/FullscreenTheme">
+        </activity>
+        <activity android:name=".home.meetingadmin.fragment.PhotoActivity">
         </activity>
     </application>
 

@@ -1,6 +1,7 @@
 package com.gzz100.zbh.data.network.request;
 
 import com.gzz100.zbh.account.User;
+import com.gzz100.zbh.data.entity.DelegateEntity;
 import com.gzz100.zbh.data.entity.MeetingEntity;
 import com.gzz100.zbh.data.entity.MeetingInfoEntity;
 import com.gzz100.zbh.data.network.HttpResult;
@@ -55,5 +56,35 @@ public class MeetingRequest {
                 .subscribe(observer);
 
     }
+
+    public void getDelegates(Observer<HttpResult<List<DelegateEntity>>> observer, String meetingId){
+        User user = User.getUserFromCache();
+        mMeetingService.getDelegates(user.getUserId(),user.getToken(),meetingId,user.getCompanyId())
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+
+    }
+
+    public void addDelegate(Observer<HttpResult> observer, String meetingId,String userIdList){
+        User user = User.getUserFromCache();
+        mMeetingService.addDelegate(user.getUserId(),user.getToken(),meetingId,userIdList)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
+    public void cancleMeeting(Observer<HttpResult> observer, String meetingId){
+        User user = User.getUserFromCache();
+        mMeetingService.cancleMeeting(user.getUserId(),user.getToken(),meetingId)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+
+    }
+
 
 }

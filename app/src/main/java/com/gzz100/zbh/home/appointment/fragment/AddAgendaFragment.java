@@ -16,13 +16,14 @@ import com.gzz100.zbh.data.entity.Staff;
 import com.gzz100.zbh.home.appointment.adapter.AgendaAdapter;
 import com.gzz100.zbh.home.appointment.entity.Agenda;
 import com.gzz100.zbh.home.appointment.entity.StaffWrap;
+import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -44,8 +45,11 @@ public class AddAgendaFragment extends BaseBackFragment {
     private AgendaAdapter mAdapter;
     private Staff mStaff;
 
-    public static AddAgendaFragment newInstance() {
+    public static AddAgendaFragment newInstance(ArrayList<Agenda> agendaList) {
         AddAgendaFragment fragment = new AddAgendaFragment();
+        Bundle bundle=new Bundle();
+        bundle.putParcelableArrayList("agendaList",agendaList);
+        fragment.setArguments(bundle);
         return fragment;
     }
 
@@ -61,6 +65,21 @@ public class AddAgendaFragment extends BaseBackFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initView();
+        loadData();
+    }
+
+    private void loadData() {
+        if (getArguments()!=null) {
+            ArrayList<Agenda> agendaList = getArguments().getParcelableArrayList("agendaList");
+            if (agendaList.size()==0){
+                mAdapter.add();
+            }else {
+                for (Agenda agenda : agendaList) {
+                    Logger.i(agenda.getAgendaName()+", agendaID="+agenda.getStaff().getUserId());
+                }
+                mAdapter.addAgendas(agendaList);
+            }
+        }
     }
 
     private void initView() {
@@ -78,7 +97,7 @@ public class AddAgendaFragment extends BaseBackFragment {
         textButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<Agenda> agendaList = mAdapter.getAgendaList();
+                ArrayList<Agenda> agendaList = mAdapter.getAgendaList();
 
                 EventBus.getDefault().post(agendaList);
                 pop();
@@ -88,7 +107,7 @@ public class AddAgendaFragment extends BaseBackFragment {
         mRcvAgenda.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
         mAdapter = new AgendaAdapter(getContext());
         mRcvAgenda.setAdapter(mAdapter);
-        mAdapter.add();
+
         mAdapter.setOnItemClickListener(new AgendaAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position, Agenda agenda) {

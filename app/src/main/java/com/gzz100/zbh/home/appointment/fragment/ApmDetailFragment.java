@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 import com.bigkoo.pickerview.TimePickerView;
 import com.gzz100.zbh.R;
-import com.gzz100.zbh.adapter.SelectTimeAdapter;
+import com.gzz100.zbh.home.appointment.adapter.SelectTimeAdapter;
 import com.gzz100.zbh.base.BaseFragment;
 import com.gzz100.zbh.data.entity.MeetingEntity;
 import com.gzz100.zbh.data.entity.MeetingRoomEntity;
@@ -132,7 +132,7 @@ public class ApmDetailFragment extends BaseFragment {
     private List<Staff> mDelegateList;
     private Staff mHostStaff;
     private Staff mSummaryStaff;
-    private List<Agenda> mAddedAgendas;
+    private ArrayList<Agenda> mAddedAgendas;
     private long mStartTime;
     private long mEndTime;
 
@@ -164,7 +164,7 @@ public class ApmDetailFragment extends BaseFragment {
     }
 
     private void initMeetingRoom() {
-        GlideApp.with(getContext())
+        GlideApp.with(this)
                 .load(mMeetingRoomEntity.getMeetingPlacePic())
                 .placeholder((R.drawable.ic_insert_chart_blue_500_48dp))
                 .into(mIvRoom);
@@ -196,6 +196,7 @@ public class ApmDetailFragment extends BaseFragment {
             mRoomId = mMeetingRoomEntity.getMeetingPlaceId();
             Logger.i("room=" + mMeetingRoomEntity);
         }
+        mAddedAgendas = new ArrayList<>();
         mCopyStaffList = new ArrayList<>();
         mDelegateList = new ArrayList<>();
     }
@@ -352,7 +353,7 @@ public class ApmDetailFragment extends BaseFragment {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onAgendaAddedCallBack(List<Agenda> agendas) {
+    public void onAgendaAddedCallBack(ArrayList<Agenda> agendas) {
         mAddedAgendas = agendas;
         for (Agenda agenda : mAddedAgendas) {
             Logger.i("agendaName=" + agenda.getAgendaName());
@@ -440,7 +441,7 @@ public class ApmDetailFragment extends BaseFragment {
                 startFragment(MultiChosePersonFragment.newInstance(MultiChosePersonFragment.MultiChoices, RC_DELEGATE, delegateIds));
                 break;
             case R.id.rl_agenda_detail:
-                startFragment(AddAgendaFragment.newInstance());
+                startFragment(AddAgendaFragment.newInstance(mAddedAgendas));
                 break;
             case R.id.rl_summary_detail:
                 long summaryId = -1;

@@ -1,5 +1,6 @@
 package com.gzz100.zbh.data.network.service;
 
+import com.gzz100.zbh.data.entity.VoteDetailEntity;
 import com.gzz100.zbh.data.entity.VoteEntity;
 import com.gzz100.zbh.data.network.HttpResult;
 
@@ -20,5 +21,10 @@ public interface VoteService {
     @POST("getVoteList")
     Observable<HttpResult<List<VoteEntity>>> getVoteList(@Field("userId")String userId, @Field("token")String token,
                                                          @Field("meetingId")String meetingId);
+
+    @FormUrlEncoded
+    @POST("getVote")
+    Observable<HttpResult<VoteDetailEntity>> getVoteInfo(@Field("userId")String userId, @Field("token")String token,
+                                                         @Field("meetingId")String meetingId, @Field("voteId")String voteId);
 
 }

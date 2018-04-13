@@ -11,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gzz100.zbh.R;
-import com.gzz100.zbh.adapter.SelectTimeAdapter;
 import com.gzz100.zbh.data.entity.MeetingRoomEntity;
 import com.gzz100.zbh.utils.GlideApp;
 import com.gzz100.zbh.utils.TimeFormatUtil;

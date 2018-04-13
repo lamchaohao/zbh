@@ -1,6 +1,7 @@
 package com.gzz100.zbh.data.network.request;
 
 import com.gzz100.zbh.account.User;
+import com.gzz100.zbh.data.entity.ApplyEntity;
 import com.gzz100.zbh.data.entity.CompanyEntity;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.client.HttpClient;
@@ -34,7 +35,7 @@ public class CompanyRequest {
     }
 
     //申请加入公司
-    public void applyCompany(Observer<HttpResult> observer, String companyId){
+    public void applyCompany(Observer<HttpResult<ApplyEntity>> observer, String companyId){
         User user = User.getUserFromCache();
         mCompanyService.applyIntoCompany(user.getUserId(),user.getToken(),companyId)
                 .subscribeOn(Schedulers.io())
@@ -42,5 +43,26 @@ public class CompanyRequest {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(observer);
     }
+
+    //申请加入公司
+    public void quitCompany(Observer<HttpResult> observer){
+        User user = User.getUserFromCache();
+        mCompanyService.quitCompany(user.getUserId(),user.getToken(),user.getCompanyId())
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
+    public void cancelApplyCompany(Observer<HttpResult> observer){
+
+        User user = User.getUserFromCache();
+        mCompanyService.cancelApply(user.getUserId(),user.getToken(),user.getApply().getApplyId())
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
 
 }

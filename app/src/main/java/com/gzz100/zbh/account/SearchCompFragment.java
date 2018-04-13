@@ -18,13 +18,15 @@ import android.widget.Toast;
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.account.adapter.CompanyAdapter;
 import com.gzz100.zbh.base.BaseBackFragment;
+import com.gzz100.zbh.data.entity.ApplyEntity;
 import com.gzz100.zbh.data.entity.CompanyEntity;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.request.CompanyRequest;
 import com.gzz100.zbh.data.network.request.UserLoginRequest;
-import com.gzz100.zbh.home.root.HomeFragment;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,6 +76,80 @@ public class SearchCompFragment extends BaseBackFragment {
         mRcvCompanyList.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
         mRequest = new CompanyRequest();
 
+
+
+        mEtSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!TextUtils.isEmpty(s.toString())) {
+                    searchCompany(s.toString());
+                }
+            }
+        });
+
+        mAdapter.setOnApplyClickListener(new CompanyAdapter.OnApplyClickListener() {
+            @Override
+            public void onApplyClick(CompanyEntity companyEntity, int position) {
+                applyCompany(companyEntity);
+            }
+        });
+
+    }
+
+
+    private void applyCompany(final CompanyEntity companyEntity){
+
+        Observer<HttpResult<ApplyEntity>> applyObserver = new Observer<HttpResult<ApplyEntity>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(HttpResult<ApplyEntity> result) {
+                if (result.getCode()==1) {
+//                    updateUserData();
+                    Toasty.normal(getContext(),"申请成功,请等待审核").show();
+                    ApplyEntity applyMsg = result.getResult();
+                    User user = User.getUserFromCache();
+                    User.ApplyBean applyBean=new User.ApplyBean();
+
+                    applyBean.setApplyId(applyMsg.getApplyId());
+                    applyBean.setCompanyIdX(applyMsg.getCompanyId());
+                    applyBean.setCompanyNameX(applyMsg.getCompanyName());
+                    user.setApply(applyBean);
+                    User.save(user);
+
+                    EventBus.getDefault().post(applyMsg);
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Toasty.error(getContext(),e.getMessage()).show();
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        };
+        mRequest.applyCompany(applyObserver,companyEntity.getCompanyId());
+
+    }
+
+
+    private void searchCompany(String keyword){
         final Observer observer= new Observer<HttpResult<List<CompanyEntity>>>() {
             @Override
             public void onSubscribe(Disposable d) {
@@ -94,62 +170,12 @@ public class SearchCompFragment extends BaseBackFragment {
 
             @Override
             public void onComplete() {
-                Logger.i("onComplete");
             }
         };
 
-        mEtSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (!TextUtils.isEmpty(s.toString())) {
-                    mRequest.searchComp(observer,s.toString());
-                }
-            }
-        });
-
-
-        final Observer applyObserver = new Observer<HttpResult>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-
-            }
-
-            @Override
-            public void onNext(HttpResult result) {
-                if (result.getCode()==1) {
-                    updateUserData();
-                }
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Toasty.error(getContext(),e.getMessage()).show();
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-        };
-
-        mAdapter.setOnApplyClickListener(new CompanyAdapter.OnApplyClickListener() {
-            @Override
-            public void onApplyClick(CompanyEntity companyEntity, int position) {
-                mRequest.applyCompany(applyObserver,companyEntity.getCompanyId());
-            }
-        });
-
+        mRequest.searchComp(observer,keyword);
     }
+
 
     private void updateUserData(){
 
@@ -173,10 +199,9 @@ public class SearchCompFragment extends BaseBackFragment {
 
             @Override
             public void onComplete() {
-                startWithPop(HomeFragment.newInstance(true));
+                Toasty.normal(getContext(),"申请成功,请等待审核").show();
             }
         };
-
 
         UserLoginRequest.getInstance().updateToken(observer);
     }

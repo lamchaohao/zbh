@@ -1,6 +1,7 @@
 package com.gzz100.zbh.data.network.request;
 
 import com.gzz100.zbh.account.User;
+import com.gzz100.zbh.data.entity.VoteDetailEntity;
 import com.gzz100.zbh.data.entity.VoteEntity;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.client.HttpClient;
@@ -26,7 +27,7 @@ public class VoteRequest {
 
     }
 
-    public void getMessages(Observer<HttpResult<List<VoteEntity>>> observer, String meetingId){
+    public void getVoteList(Observer<HttpResult<List<VoteEntity>>> observer, String meetingId){
         User user = User.getUserFromCache();
         mVoteService.getVoteList(user.getUserId(),user.getToken(),meetingId)
                 .subscribeOn(Schedulers.io())
@@ -34,4 +35,16 @@ public class VoteRequest {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(observer);
     }
+
+    public void getVoteInfo(Observer<HttpResult<VoteDetailEntity>> observer, String meetingId, String voteId){
+        User user = User.getUserFromCache();
+        mVoteService.getVoteInfo(user.getUserId(),user.getToken(),meetingId,voteId)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
+
+
 }

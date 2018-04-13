@@ -23,7 +23,7 @@ public class VoteListAdapter extends RecyclerView.Adapter {
 
     private Context mContext;
     private List<VoteEntity> voteList;
-
+    private OnItemClickListener mOnItemClickListener;
     public VoteListAdapter(Context context, List<VoteEntity> voteList) {
         mContext = context;
         this.voteList = voteList;
@@ -36,10 +36,10 @@ public class VoteListAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
 
         VoteHolder voteHolder = (VoteHolder) holder;
-        VoteEntity voteEntity = voteList.get(position);
+        final VoteEntity voteEntity = voteList.get(position);
         SpannableStringBuilder ssb = new SpannableStringBuilder(voteEntity.getVoteName());
         int voteSelectableNum = voteEntity.getVoteSelectableNum();
         ssb.append("【");
@@ -61,6 +61,22 @@ public class VoteListAdapter extends RecyclerView.Adapter {
                 break;
         }
         voteHolder.tvStaus.setText(staus);
+        voteHolder.rootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mOnItemClickListener!=null){
+                    mOnItemClickListener.onItemClick(voteEntity,position);
+                }
+            }
+        });
+    }
+
+    public interface OnItemClickListener{
+        void onItemClick(VoteEntity vote,int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        mOnItemClickListener = onItemClickListener;
     }
 
     @Override
@@ -73,12 +89,13 @@ public class VoteListAdapter extends RecyclerView.Adapter {
         TextView tvStaus;
         TextView tvVoteName;
         TextView tvVoteDesc;
-
+        View rootView;
         public VoteHolder(View itemView) {
             super(itemView);
             tvStaus = itemView.findViewById(R.id.tv_vote_staus);
             tvVoteName = itemView.findViewById(R.id.tv_vote_name);
             tvVoteDesc = itemView.findViewById(R.id.tv_vote_desc);
+            rootView = itemView.findViewById(R.id.ll_rootview);
         }
     }
 }

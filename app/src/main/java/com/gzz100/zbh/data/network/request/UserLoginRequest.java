@@ -86,4 +86,13 @@ public class UserLoginRequest {
                 .subscribe(observer);
     }
 
+    public void updateUserName(Observer<HttpResult> observer,String theUserName){
+        User user = User.getUserFromCache();
+        mLoginService.updateUserName(user.getUserId(),user.getToken(),theUserName)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
 }

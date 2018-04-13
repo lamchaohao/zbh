@@ -12,13 +12,13 @@
         android:layout_height="wrap_content">
         <RelativeLayout
             android:padding="8dp"
+            android:id="@+id/rl_nameCard_mine"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <TextView
                 android:id="@+id/tv_userName_mine"
                 android:text="张小明"
                 android:textSize="26sp"
-                android:drawableRight="@drawable/ic_mode_edit_black_24dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
@@ -45,8 +45,8 @@
                 android:id="@+id/iv_mine_compPic"
                 android:layout_alignParentRight="true"
                 android:src="@mipmap/ic_launcher"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_width="64dp"
+                android:layout_height="64dp"/>
 
         </RelativeLayout>
 

@@ -1,5 +1,6 @@
 package com.gzz100.zbh.account;
 
+import com.google.gson.annotations.SerializedName;
 import com.gzz100.zbh.res.Common;
 import com.orhanobut.logger.Logger;
 
@@ -29,6 +30,12 @@ public class User implements Serializable {
     private String token;
     private boolean isLogin;
     private static User sUser;
+    /**
+     * apply : {"applyId":"12","companyId":"1","companyName":"中佰公司"}
+     */
+
+    private ApplyBean apply;
+
     //保存数据
     public static void save(User user){
         ObjectOutputStream fos=null;
@@ -194,6 +201,62 @@ public class User implements Serializable {
                 ", userId='" + userId + '\'' +
                 ", token='" + token + '\'' +
                 ", isLogin=" + isLogin +
+                ", apply=" + apply +
                 '}';
+    }
+
+    public ApplyBean getApply() {
+        return apply;
+    }
+
+    public void setApply(ApplyBean apply) {
+        this.apply = apply;
+    }
+
+    public static class ApplyBean implements Serializable{
+        /**
+         * applyId : 12
+         * companyId : 1
+         * companyName : 中佰公司
+         */
+
+        private String applyId;
+        @SerializedName("companyId")
+        private String companyIdX;
+        @SerializedName("companyName")
+        private String companyNameX;
+
+        public String getApplyId() {
+            return applyId;
+        }
+
+        public void setApplyId(String applyId) {
+            this.applyId = applyId;
+        }
+
+        public String getCompanyIdX() {
+            return companyIdX;
+        }
+
+        public void setCompanyIdX(String companyIdX) {
+            this.companyIdX = companyIdX;
+        }
+
+        public String getCompanyNameX() {
+            return companyNameX;
+        }
+
+        public void setCompanyNameX(String companyNameX) {
+            this.companyNameX = companyNameX;
+        }
+
+        @Override
+        public String toString() {
+            return "ApplyBean{" +
+                    "applyId='" + applyId + '\'' +
+                    ", companyIdX='" + companyIdX + '\'' +
+                    ", companyNameX='" + companyNameX + '\'' +
+                    '}';
+        }
     }
 }

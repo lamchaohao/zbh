@@ -48,7 +48,7 @@ public class MeetingParentFragment extends BaseFragment {
     protected View onCreateView(LayoutInflater inflater) {
         View view = inflater.inflate(R.layout.fragment_meeting_parent, null);
         unbinder = ButterKnife.bind(this, view);
-        return view;
+        return attachToSwipeBack(view);
     }
 
     @Override

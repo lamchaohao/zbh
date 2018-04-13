@@ -17,10 +17,13 @@ import android.widget.ImageView;
 
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.base.BaseFragment;
+import com.gzz100.zbh.data.entity.DelegateEntity;
 import com.gzz100.zbh.data.entity.DocumentEntity;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.request.DocumentRequest;
+import com.gzz100.zbh.data.network.request.MeetingRequest;
 import com.gzz100.zbh.home.meetingadmin.adapter.CatalogAdapter;
+import com.gzz100.zbh.home.meetingadmin.adapter.ChoseSpeakerAdapter;
 import com.gzz100.zbh.home.meetingadmin.adapter.DocumentAdapter;
 import com.gzz100.zbh.home.meetingadmin.adapter.PPTAdapter;
 import com.gzz100.zbh.utils.DensityUtil;
@@ -71,6 +74,7 @@ public class ShowFragment extends BaseFragment {
     private String mMeetingId;
     private List<DocumentEntity> mDocumentList;
     private List<String> picUrlList;
+    private List<DelegateEntity> delegateList;
     private CatalogAdapter mAdapter;
     private PPTAdapter mPptAdapter;
 
@@ -95,6 +99,7 @@ public class ShowFragment extends BaseFragment {
         if (getArguments() != null) {
             mMeetingId = getArguments().getString("meetingId");
         }
+        delegateList = new ArrayList<>();
         loadContent();
     }
 
@@ -111,6 +116,7 @@ public class ShowFragment extends BaseFragment {
                 loadDocumentData();
                 break;
             case R.id.bthost:
+                loadDelegates();
                 break;
             case R.id.btRotation:
                 Intent intent = new Intent(getContext(), FullscreenActivity.class);
@@ -133,6 +139,52 @@ public class ShowFragment extends BaseFragment {
         }
     }
 
+    private void loadDelegates() {
+        Observer<HttpResult<List<DelegateEntity>>> observer = new Observer<HttpResult<List<DelegateEntity>>>() {
+
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(HttpResult<List<DelegateEntity>> result) {
+                if (result.getResult()!=null){
+                    delegateList.clear();
+                    delegateList.addAll(result.getResult());
+                }
+
+                showDelegateList();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        };
+
+        MeetingRequest request=new MeetingRequest();
+        request.getDelegates(observer,mMeetingId);
+    }
+
+    private void showDelegateList() {
+        ChoseSpeakerAdapter adapter = new ChoseSpeakerAdapter(getContext(), delegateList);
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.item_recycler_view, null);
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
+        QMUIPopup popup = new QMUIPopup(getContext(), DIRECTION_BOTTOM);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+        recyclerView.setAdapter(adapter);
+
+        popup.setContentView(view);
+        popup.show(mBthost);
+    }
+
     private void loadDocumentData() {
 
         Observer<HttpResult<List<DocumentEntity>>> observer = new Observer<HttpResult<List<DocumentEntity>>>() {
@@ -145,6 +197,9 @@ public class ShowFragment extends BaseFragment {
             public void onNext(HttpResult<List<DocumentEntity>> listHttpResult) {
                 mDocumentList = listHttpResult.getResult();
                 if (mDocumentList != null) {
+                    if (mDocumentList.size()==0){
+                        Toasty.normal(getContext(),"暂无文件").show();
+                    }
                     showDocumentList(mDocumentList);
                 }
             }
@@ -243,26 +298,20 @@ public class ShowFragment extends BaseFragment {
             }else {
                 mRcvShowPPt.setVisibility(View.GONE);
                 mWebView.setVisibility(View.VISIBLE);
-//                mWebView.loadUrl(doc.getDocumentPath());
-                mWebView.loadUrl("http://192.168.1.168:8777/zbh-document/static/destFile/test/dsfa.html");
+                mWebView.loadUrl(doc.getDocumentPath());
                 picUrlList.clear();
-                picUrlList.addAll(doc.getPictureList());
-                mAdapter.notifyDataSetChanged();
-                mPptAdapter.notifyDataSetChanged();
-//                mWebView.setVisibility(View.GONE);
-//                mRcvShowPPt.setVisibility(View.VISIBLE);
-//                mRcvCatalog.setVisibility(View.VISIBLE);
+                if (doc.getPictureList()!=null){
+                    picUrlList.addAll(doc.getPictureList());
+                    mAdapter.notifyDataSetChanged();
+                    mPptAdapter.notifyDataSetChanged();
+                }
+
 
 
                 mAdapter.setOnItemClickListener(new CatalogAdapter.OnItemClickListener() {
                     @Override
                     public void onItemClick(final int pos, String url) {
-//                        mPptAdapter.setPositivePPt(pos);
                         mAdapter.setPositivePPt(pos);
-//                        mRcvShowPPt.smoothScrollToPosition(pos);
-//                        mRcvCatalog.smoothScrollToPosition(pos);
-//                        mRcvCatalog.setVisibility(View.GONE);
-//                        mFlMask.setVisibility(View.GONE);
                         callJS(pos+1);
                     }
 
@@ -282,7 +331,6 @@ public class ShowFragment extends BaseFragment {
                         mRcvCatalog.smoothScrollToPosition(pos+1);
                         mRcvCatalog.setVisibility(View.GONE);
                         mFlMask.setVisibility(View.GONE);
-
 
 
                     }

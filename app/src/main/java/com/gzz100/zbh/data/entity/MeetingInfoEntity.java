@@ -3,34 +3,33 @@ package com.gzz100.zbh.data.entity;
 import java.util.List;
 
 /**
+ *
  * Created by Lam on 2018/3/23.
  */
 
 public class MeetingInfoEntity {
 
+
     /**
-     * meetingName : 会议2
+     * meetingName : 文件会议
      * meetingStatus : 2
-     * meetingStartTime : 2017-10-12 10:30
-     * delegateList : [{"signInTime":"","delegateRole":1,"delegateId":"14","delegateName":"zsan张三"},{"signInTime":"2017-10-10 10:10","delegateRole":1,"delegateId":"2","delegateName":"xiaoliu2"},{"signInTime":"2017-10-10 10:10","delegateRole":2,"delegateId":"10","delegateName":"xiaoming"},{"signInTime":"2017-10-11 10:10","delegateRole":2,"delegateId":"3","delegateName":"xiaoliu3"},{"signInTime":"2017-10-12 10:10","delegateRole":2,"delegateId":"4","delegateName":"xiaoliu4"},{"signInTime":"2017-10-10 10:10","delegateRole":2,"delegateId":"5","delegateName":"lisi"}]
-     * meetingId : 2
-     * agendaList : [{"duration":50,"agendaName":"议程1","spearker":"zsan张三","agendaId":"1"},{"duration":40,"agendaName":"议程2","spearker":"lisi","agendaId":"2"},{"duration":30,"agendaName":"议程3","spearker":"zsan张三","agendaId":"3"},{"duration":70,"agendaName":"议程4","spearker":"zsan张三","agendaId":"4"},{"duration":60,"agendaName":"议程5","spearker":"zsan张三","agendaId":"5"},{"duration":60,"agendaName":"（*默认议程）","spearker":"zsan张三","agendaId":"7"}]
-     * meetingPlaceName : 会议室2
-     * voteList : [{"voteId":"1","meetingId":"2","voteName":"投票1","voteSelectableNum":1,"voteType":1,"voteDescription":"投票1描述","voteStatus":1},{"voteId":"2","meetingId":"2","voteName":"投票2","voteSelectableNum":2,"voteType":1,"voteDescription":"投票2描述","voteStatus":3},{"voteId":"3","meetingId":"2","voteName":"投票3","voteSelectableNum":1,"voteType":1,"voteDescription":"投票3描述","voteStatus":1}]
-     * currentUserSignInTime :
-     * delegateStatus : 2
-     * meetingEndTime : 2017-10-12 11:00
+     * meetingStartTime : 2018-04-02 09:30
+     * delegateList : [{"signInTime":null,"delegateRole":1,"delegateId":"1279","delegateName":"令狐冲","delegateStatus":1,"userId":"23"},{"signInTime":null,"delegateRole":2,"delegateId":"1280","delegateName":"刘德华","delegateStatus":1,"userId":"8"},{"signInTime":null,"delegateRole":2,"delegateId":"1281","delegateName":"令狐冲","delegateStatus":1,"userId":"23"},{"signInTime":null,"delegateRole":2,"delegateId":"1282","delegateName":"闻一多","delegateStatus":1,"userId":"4"},{"signInTime":null,"delegateRole":2,"delegateId":"1283","delegateName":"周济","delegateStatus":1,"userId":"25"},{"signInTime":null,"delegateRole":2,"delegateId":"1284","delegateName":"渣渣辉","delegateStatus":1,"userId":"6"},{"signInTime":null,"delegateRole":2,"delegateId":"1285","delegateName":"古天乐","delegateStatus":1,"userId":"5"},{"signInTime":null,"delegateRole":2,"delegateId":"1286","delegateName":"二狗子","delegateStatus":1,"userId":"1002"},{"signInTime":null,"delegateRole":2,"delegateId":"1287","delegateName":"黄药师","delegateStatus":1,"userId":"11"},{"signInTime":null,"delegateRole":2,"delegateId":"1288","delegateName":"黎明","delegateStatus":1,"userId":"9"},{"signInTime":null,"delegateRole":2,"delegateId":"1289","delegateName":"周伯通","delegateStatus":1,"userId":"1004"},{"signInTime":null,"delegateRole":2,"delegateId":"1290","delegateName":"王重阳","delegateStatus":1,"userId":"2"},{"signInTime":null,"delegateRole":2,"delegateId":"1291","delegateName":"洪七公","delegateStatus":1,"userId":"12"},{"signInTime":null,"delegateRole":2,"delegateId":"1292","delegateName":"牛顿","delegateStatus":1,"userId":"10"},{"signInTime":null,"delegateRole":2,"delegateId":"1293","delegateName":"谢逊","delegateStatus":1,"userId":"22"},{"signInTime":null,"delegateRole":2,"delegateId":"1294","delegateName":"晓红","delegateStatus":1,"userId":"1012"},{"signInTime":null,"delegateRole":2,"delegateId":"1295","delegateName":"阿基米德","delegateStatus":1,"userId":"1"},{"signInTime":null,"delegateRole":2,"delegateId":"1296","delegateName":"欧阳锋","delegateStatus":1,"userId":"21"}]
+     * creatorId : 6
+     * meetingId : 1038
+     * agendaList : [{"duration":null,"agendaName":"议程一","spearker":"刘德华","agendaId":"1020"}]
+     * meetingPlaceName : 会议室8
+     * voteList : [{"voteId":"2006","meetingId":"1038","voteName":"选出你喜欢的表情包","voteSelectableNum":2,"voteType":null,"voteDescription":"","voteStatus":2,"voteModel":2,"voteAnonymous":2},{"voteId":"2005","meetingId":"1038","voteName":"投票一","voteSelectableNum":1,"voteType":null,"voteDescription":"","voteStatus":3,"voteModel":2,"voteAnonymous":2}]
+     * meetingEndTime : 2018-04-02 10:00
      */
 
     private String meetingName;
     private int meetingStatus;
     private String meetingStartTime;
+    private String creatorId;
     private String meetingId;
     private String meetingPlaceName;
-    private String currentUserSignInTime;
-    private int delegateStatus;
     private String meetingEndTime;
-    private String creatorId;
     private List<DelegateListBean> delegateList;
     private List<AgendaListBean> agendaList;
     private List<VoteListBean> voteList;
@@ -59,6 +58,14 @@ public class MeetingInfoEntity {
         this.meetingStartTime = meetingStartTime;
     }
 
+    public String getCreatorId() {
+        return creatorId;
+    }
+
+    public void setCreatorId(String creatorId) {
+        this.creatorId = creatorId;
+    }
+
     public String getMeetingId() {
         return meetingId;
     }
@@ -75,22 +82,6 @@ public class MeetingInfoEntity {
         this.meetingPlaceName = meetingPlaceName;
     }
 
-    public String getCurrentUserSignInTime() {
-        return currentUserSignInTime;
-    }
-
-    public void setCurrentUserSignInTime(String currentUserSignInTime) {
-        this.currentUserSignInTime = currentUserSignInTime;
-    }
-
-    public int getDelegateStatus() {
-        return delegateStatus;
-    }
-
-    public void setDelegateStatus(int delegateStatus) {
-        this.delegateStatus = delegateStatus;
-    }
-
     public String getMeetingEndTime() {
         return meetingEndTime;
     }
@@ -105,14 +96,6 @@ public class MeetingInfoEntity {
 
     public void setDelegateList(List<DelegateListBean> delegateList) {
         this.delegateList = delegateList;
-    }
-
-    public String getCreatorId() {
-        return creatorId;
-    }
-
-    public void setCreatorId(String creatorId) {
-        this.creatorId = creatorId;
     }
 
     public List<AgendaListBean> getAgendaList() {
@@ -133,22 +116,26 @@ public class MeetingInfoEntity {
 
     public static class DelegateListBean {
         /**
-         * signInTime :
+         * signInTime : null
          * delegateRole : 1
-         * delegateId : 14
-         * delegateName : zsan张三
+         * delegateId : 1279
+         * delegateName : 令狐冲
+         * delegateStatus : 1
+         * userId : 23
          */
 
-        private String signInTime;
+        private Object signInTime;
         private int delegateRole;
         private String delegateId;
         private String delegateName;
+        private int delegateStatus;
+        private String userId;
 
-        public String getSignInTime() {
+        public Object getSignInTime() {
             return signInTime;
         }
 
-        public void setSignInTime(String signInTime) {
+        public void setSignInTime(Object signInTime) {
             this.signInTime = signInTime;
         }
 
@@ -175,26 +162,42 @@ public class MeetingInfoEntity {
         public void setDelegateName(String delegateName) {
             this.delegateName = delegateName;
         }
+
+        public int getDelegateStatus() {
+            return delegateStatus;
+        }
+
+        public void setDelegateStatus(int delegateStatus) {
+            this.delegateStatus = delegateStatus;
+        }
+
+        public String getUserId() {
+            return userId;
+        }
+
+        public void setUserId(String userId) {
+            this.userId = userId;
+        }
     }
 
     public static class AgendaListBean {
         /**
-         * duration : 50
-         * agendaName : 议程1
-         * spearker : zsan张三
-         * agendaId : 1
+         * duration : null
+         * agendaName : 议程一
+         * spearker : 刘德华
+         * agendaId : 1020
          */
 
-        private int duration;
+        private Object duration;
         private String agendaName;
         private String spearker;
         private String agendaId;
 
-        public int getDuration() {
+        public Object getDuration() {
             return duration;
         }
 
-        public void setDuration(int duration) {
+        public void setDuration(Object duration) {
             this.duration = duration;
         }
 
@@ -225,22 +228,26 @@ public class MeetingInfoEntity {
 
     public static class VoteListBean {
         /**
-         * voteId : 1
-         * meetingId : 2
-         * voteName : 投票1
-         * voteSelectableNum : 1
-         * voteType : 1
-         * voteDescription : 投票1描述
-         * voteStatus : 1
+         * voteId : 2006
+         * meetingId : 1038
+         * voteName : 选出你喜欢的表情包
+         * voteSelectableNum : 2
+         * voteType : null
+         * voteDescription :
+         * voteStatus : 2
+         * voteModel : 2
+         * voteAnonymous : 2
          */
 
         private String voteId;
         private String meetingId;
         private String voteName;
         private int voteSelectableNum;
-        private int voteType;
+        private Object voteType;
         private String voteDescription;
         private int voteStatus;
+        private int voteModel;
+        private int voteAnonymous;
 
         public String getVoteId() {
             return voteId;
@@ -274,11 +281,11 @@ public class MeetingInfoEntity {
             this.voteSelectableNum = voteSelectableNum;
         }
 
-        public int getVoteType() {
+        public Object getVoteType() {
             return voteType;
         }
 
-        public void setVoteType(int voteType) {
+        public void setVoteType(Object voteType) {
             this.voteType = voteType;
         }
 
@@ -297,22 +304,21 @@ public class MeetingInfoEntity {
         public void setVoteStatus(int voteStatus) {
             this.voteStatus = voteStatus;
         }
-    }
 
-    @Override
-    public String toString() {
-        return "MeetingInfoEntity{" +
-                "meetingName='" + meetingName + '\'' +
-                ", meetingStatus=" + meetingStatus +
-                ", meetingStartTime='" + meetingStartTime + '\'' +
-                ", meetingId='" + meetingId + '\'' +
-                ", meetingPlaceName='" + meetingPlaceName + '\'' +
-                ", currentUserSignInTime='" + currentUserSignInTime + '\'' +
-                ", delegateStatus=" + delegateStatus +
-                ", meetingEndTime='" + meetingEndTime + '\'' +
-                ", delegateList=" + delegateList +
-                ", agendaList=" + agendaList +
-                ", voteList=" + voteList +
-                '}';
+        public int getVoteModel() {
+            return voteModel;
+        }
+
+        public void setVoteModel(int voteModel) {
+            this.voteModel = voteModel;
+        }
+
+        public int getVoteAnonymous() {
+            return voteAnonymous;
+        }
+
+        public void setVoteAnonymous(int voteAnonymous) {
+            this.voteAnonymous = voteAnonymous;
+        }
     }
 }

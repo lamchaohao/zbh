@@ -1,5 +1,6 @@
 package com.gzz100.zbh.data.network.service;
 
+import com.gzz100.zbh.data.entity.DelegateEntity;
 import com.gzz100.zbh.data.entity.MeetingEntity;
 import com.gzz100.zbh.data.entity.MeetingInfoEntity;
 import com.gzz100.zbh.data.network.HttpResult;
@@ -13,6 +14,7 @@ import retrofit2.http.POST;
 
 /**
  * Created by Lam on 2018/3/19.
+ *
  */
 
 public interface MeetingService {
@@ -31,5 +33,20 @@ public interface MeetingService {
     @POST("getMeeting")
     Observable<HttpResult<MeetingInfoEntity>> getSingleMeetingInfo(@Field("userId")String userId, @Field("token")String token,
                                                                @Field("meetingId")String meetingid,@Field("companyId")String companyId);
+
+    @FormUrlEncoded
+    @POST("getDelegates")
+    Observable<HttpResult<List<DelegateEntity>>> getDelegates(@Field("userId")String userId, @Field("token")String token,
+                                                              @Field("meetingId")String meetingid, @Field("companyId")String companyId);
+
+
+    @FormUrlEncoded
+    @POST("addDelegate")
+    Observable<HttpResult> addDelegate(@Field("userId")String userId, @Field("token")String token,
+                                                              @Field("meetingId")String meetingid, @Field("userIdList")String userIdList);
+    @FormUrlEncoded
+    @POST("cancelMeeting")
+    Observable<HttpResult> cancleMeeting(@Field("userId")String userId, @Field("token")String token,
+                                       @Field("meetingId")String meetingid);
 
 }
