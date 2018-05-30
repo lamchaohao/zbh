@@ -30,7 +30,8 @@ public interface AppointmentService {
                                                      @Field("summaryId") String summaryId,
                                                      @Field("copyIdList") String copyIdList,
                                                      @Field("agendaList") String agendaList,
-                                                     @Field("delegateIdList") String delegateIdList);
+                                                     @Field("delegateIdList") String delegateIdList,
+                                                     @Field("notifyTime")String notifyTime);
 
     @FormUrlEncoded
     @POST("addDelegate")//添加参会人员

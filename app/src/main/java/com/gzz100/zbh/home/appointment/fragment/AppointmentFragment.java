@@ -3,6 +3,7 @@ package com.gzz100.zbh.home.appointment.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,6 +19,11 @@ import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.request.MeetingRoomRequest;
 import com.gzz100.zbh.home.appointment.adapter.RoomAdapter;
 import com.gzz100.zbh.utils.TimeFormatUtil;
+import com.qmuiteam.qmui.widget.QMUIEmptyView;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.header.FalsifyHeader;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -28,6 +34,7 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
@@ -41,30 +48,41 @@ public class AppointmentFragment extends BaseFragment {
     TextView mTvApmDuration;
     @BindView(R.id.tv_apm_select_people)
     TextView mTvApmSelectPeople;
-
+    @BindView(R.id.smartRefreshLayout)
+    SmartRefreshLayout mRefreshLayout;
     @BindView(R.id.rcv_apm_room)
     RecyclerView mRcvRoom;
+    @BindView(R.id.empty_view)
+    QMUIEmptyView mEmptyView;
     private RoomAdapter mAdapter;
+    private Unbinder unbinder;
+    private List<String> mHourList;
+    private List<List<String>> mMinuteWrapList;
 
 
     @Override
     protected View onCreateView(LayoutInflater inflater) {
         View view = inflater.inflate(R.layout.fragment_appointment, null);
-        ButterKnife.bind(this, view);
-        initView();
+        unbinder = ButterKnife.bind(this, view);
+
         return view;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        initVar();
+        initView();
+        loadRoomData();
     }
 
-    private void initView() {
-        mRcvRoom.setLayoutManager(new LinearLayoutManager(getContext()));
+    private void initVar() {
+        mHourList = new ArrayList<>();
+        mMinuteWrapList = new ArrayList<>();
+    }
 
-        MeetingRoomRequest request=new MeetingRoomRequest();
+    private void loadRoomData() {
+        MeetingRoomRequest request = new MeetingRoomRequest();
         Date time = Calendar.getInstance().getTime();
         String dateStr = TimeFormatUtil.formatDate(time);
 
@@ -81,25 +99,32 @@ public class AppointmentFragment extends BaseFragment {
 
             @Override
             public void onError(Throwable e) {
-
+                mRefreshLayout.finishRefresh(false);
             }
 
             @Override
             public void onComplete() {
-
+                mRefreshLayout.finishRefresh();
             }
         });
-        mAdapter = new RoomAdapter(getContext());
 
+    }
+
+    private void initView() {
+        mRcvRoom.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
+        mRcvRoom.setLayoutManager(new LinearLayoutManager(getContext()));
+        mAdapter = new RoomAdapter(getContext());
         mAdapter.setOnItemClickListener(new RoomAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(MeetingRoomEntity room, int position) {
                 if (room.isEnable()) {
-                    ((BaseFragment)getParentFragment())
-                            .startParentFragment(ApmDetailFragment.newInstance(room));
-                }else {
+                    ((BaseFragment) getParentFragment())
+                            .startParentFragment(ApmDetailFragment.newInstance(room.getMeetingPlaceId(),
+                                    room.getMeetingPlaceName(), room.getMeetingPlaceCapacity(),
+                                    room.getMeetingPlaceTab(), room.getMeetingPlacePic()));
+                } else {
                     int i = mAdapter.showTimetable(position);
-                    if (i!=-1){
+                    if (i != -1) {
                         mRcvRoom.smoothScrollToPosition(i);
                     }
                 }
@@ -107,12 +132,29 @@ public class AppointmentFragment extends BaseFragment {
             }
         });
         mRcvRoom.setAdapter(mAdapter);
+
+        mRefreshLayout.setRefreshHeader(new FalsifyHeader(getContext()));
+        mRefreshLayout.setEnableLoadMore(false);
+        mRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(RefreshLayout refreshLayout) {
+                loadRoomData();
+            }
+        });
     }
 
-    private void loadData(List<MeetingRoomEntity> roomList){
-        mAdapter.refreshData(roomList);
+    private void loadData(List<MeetingRoomEntity> roomList) {
+        if (roomList!=null){
+            mAdapter.refreshData(roomList);
+            if (roomList.size()==0){
+                mEmptyView.show();
+            }else {
+                mEmptyView.hide();
+            }
+        }else{
+            mEmptyView.show();
+        }
     }
-
 
 
     @OnClick({R.id.tv_apm_select_date, R.id.tv_apm_select_time, R.id.tv_apm_select_people})
@@ -124,8 +166,7 @@ public class AppointmentFragment extends BaseFragment {
                 TimePickerView pvTime = new TimePickerView.Builder(getContext(), new TimePickerView.OnTimeSelectListener() {
                     @Override
                     public void onTimeSelect(Date date, View v) {//选中事件回调
-                        mTvApmSelectDate.setText(TimeFormatUtil.formatDate(date));
-
+                        mTvApmSelectDate.setText(TimeFormatUtil.formatMonth(date));
                         showSelectTimeDialog();
                     }
                 }).setType(option)
@@ -143,7 +184,7 @@ public class AppointmentFragment extends BaseFragment {
                 peopleList.add("11-20人");
                 peopleList.add("21-30人");
                 peopleList.add("31-40人");
-                OptionsPickerView picker =new OptionsPickerView.Builder(getContext(), new OptionsPickerView.OnOptionsSelectListener() {
+                OptionsPickerView picker = new OptionsPickerView.Builder(getContext(), new OptionsPickerView.OnOptionsSelectListener() {
                     @Override
                     public void onOptionsSelect(int options1, int options2, int options3, View v) {
 
@@ -163,7 +204,7 @@ public class AppointmentFragment extends BaseFragment {
         durationList.add("60分钟");
         durationList.add("90分钟");
         durationList.add("120分钟");
-        OptionsPickerView picker =new OptionsPickerView.Builder(getContext(), new OptionsPickerView.OnOptionsSelectListener() {
+        OptionsPickerView picker = new OptionsPickerView.Builder(getContext(), new OptionsPickerView.OnOptionsSelectListener() {
             @Override
             public void onOptionsSelect(int options1, int options2, int options3, View v) {
                 mTvApmDuration.setText(durationList.get(options1));
@@ -174,38 +215,38 @@ public class AppointmentFragment extends BaseFragment {
     }
 
     private void showSelectTimeDialog() {
-        final List<String> hourList = new ArrayList<>();
-        final List<List<String>> wrapList = new ArrayList<>();
-        List<String> minuteList = new ArrayList<>();
-        // TODO: 2018/1/8 多次点击就有多次添加,多次添加后会出现选项重复
-        minuteList.add("00");
-        minuteList.add("15");
-        minuteList.add("30");
-        minuteList.add("45");
+        mHourList.clear();
+        mMinuteWrapList.clear();
+
         Calendar instance = Calendar.getInstance(Locale.CHINESE);
         int hour = instance.get(Calendar.HOUR_OF_DAY);
         int minute = instance.get(Calendar.MINUTE);
         for (int i = minute < 45 ? hour : hour + 1; i < 24; i++) {
-            hourList.add(i + "");
+            mHourList.add(i + "");
             if (i == hour) {
                 List<String> spMinuteList = new ArrayList<>();
                 if (minute > 30) {
                     spMinuteList.add("45");//前面已经判断了>45
-                    wrapList.add(spMinuteList);
+                    mMinuteWrapList.add(spMinuteList);
                 } else {
                     if (minute > 15) {
                         spMinuteList.add("30");
                         spMinuteList.add("45");
-                        wrapList.add(spMinuteList);
+                        mMinuteWrapList.add(spMinuteList);
                     } else {
                         spMinuteList.add("15");
                         spMinuteList.add("30");
                         spMinuteList.add("45");
-                        wrapList.add(spMinuteList);
+                        mMinuteWrapList.add(spMinuteList);
                     }
                 }
             } else {
-                wrapList.add(minuteList);
+                List<String> minuteList = new ArrayList<>();
+                minuteList.add("00");
+                minuteList.add("15");
+                minuteList.add("30");
+                minuteList.add("45");
+                mMinuteWrapList.add(minuteList);
             }
 
         }
@@ -214,25 +255,30 @@ public class AppointmentFragment extends BaseFragment {
             @Override
             public void onOptionsSelect(int options1, int option2, int options3, View v) {
                 //返回的分别是三个级别的选中位置
-                StringBuilder sb= new StringBuilder(mTvApmSelectDate.getText().toString());
+                StringBuilder sb = new StringBuilder(mTvApmSelectDate.getText().toString());
                 sb.append(" ");
-                sb.append(hourList.get(options1));
+                sb.append(mHourList.get(options1));
                 sb.append(":");
-                sb.append(wrapList.get(0).get(option2));
+                sb.append(mMinuteWrapList.get(options1).get(option2));
                 mTvApmSelectDate.setText(sb.toString());
-                startQueryData(sb.toString());
+
+                StringBuilder sbStartTime=new StringBuilder();
+                sbStartTime.append(Calendar.getInstance().get(Calendar.YEAR));
+                sbStartTime.append("-");
+                sbStartTime.append(mTvApmSelectDate.getText());
+                startQueryData(sbStartTime.toString());
 
             }
         }).setLabels("时", "分", "秒").build();
-        pvOptions.setPicker(hourList, wrapList);
+        pvOptions.setPicker(mHourList, mMinuteWrapList);
         pvOptions.show();
     }
 
     private void startQueryData(final String startTime) {
         // TODO: 2018/3/20
         //不能预约的会议室,要显示当天一整天的所有预约会议情况,而不是从指定的时间开始,不然前面的会议都看不到
-        MeetingRoomRequest request=new MeetingRoomRequest();
-        final String date = startTime.substring(0, 11);
+        MeetingRoomRequest request = new MeetingRoomRequest();
+        final String date = startTime.substring(0, 11);//截取日期 2018-05-26
         request.getAvailableMeetingRooms(new Observer<HttpResult<List<MeetingRoomEntity>>>() {
             @Override
             public void onSubscribe(Disposable d) {
@@ -242,7 +288,7 @@ public class AppointmentFragment extends BaseFragment {
             @Override
             public void onNext(HttpResult<List<MeetingRoomEntity>> result) {
                 List<MeetingRoomEntity> unaviailbleRooms = result.getResult();
-                mAdapter.setUnableRoomData(unaviailbleRooms,startTime);
+                mAdapter.setUnableRoomData(unaviailbleRooms, startTime);
             }
 
             @Override
@@ -254,13 +300,14 @@ public class AppointmentFragment extends BaseFragment {
             public void onComplete() {
 
             }
-        },date);
+        }, date);
 
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        unbinder.unbind();
     }
 
 

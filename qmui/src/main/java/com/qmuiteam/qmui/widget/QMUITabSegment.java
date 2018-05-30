@@ -211,7 +211,7 @@ public class QMUITabSegment extends HorizontalScrollView {
 
     private void init(Context context, AttributeSet attrs, int defStyleAttr) {
         String typefaceProviderName;
-        mDefaultSelectedColor = QMUIResHelper.getAttrColor(context, R.attr.qmui_config_color_blue);
+        mDefaultSelectedColor = QMUIResHelper.getAttrColor(context, R.attr.qmui_config_color_selected);
         mDefaultNormalColor = ContextCompat.getColor(context, R.color.qmui_config_color_gray_5);
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.QMUITabSegment, defStyleAttr, 0);
         mHasIndicator = array.getBoolean(R.styleable.QMUITabSegment_qmui_tab_has_indicator, true);

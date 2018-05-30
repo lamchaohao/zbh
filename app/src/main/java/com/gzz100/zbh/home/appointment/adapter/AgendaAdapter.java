@@ -2,6 +2,7 @@ package com.gzz100.zbh.home.appointment.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +24,7 @@ import java.util.Map;
 import es.dmoral.toasty.Toasty;
 
 /**
- * an adapter for add agenda
+ * an FileAdapter for add agenda
  * Created by Lam on 2018/2/6.
  */
 
@@ -157,6 +158,7 @@ public class AgendaAdapter extends RecyclerView.Adapter {
 
     public void addAgendas(ArrayList<Agenda> agendaList){
         if (agendaList!=null){
+            mAgendaList.clear();
             mAgendaList.addAll(agendaList);
             notifyDataSetChanged();
         }
@@ -188,6 +190,14 @@ public class AgendaAdapter extends RecyclerView.Adapter {
     public ArrayList<Agenda> getAgendaList(){
         for (Agenda agenda : mAgendaList) {
             EditText editText = titleMap.get(agenda.hashCode());
+            if (TextUtils.isEmpty(editText.getText().toString())) {
+                editText.setError("请输入议程名称");
+                return null;
+            }
+            if (agenda.getStaff()==null) {
+                Toasty.error(mContext,"请选择主讲人").show();
+                return null;
+            }
             agenda.setAgendaName(editText.getText().toString());
         }
         return mAgendaList;

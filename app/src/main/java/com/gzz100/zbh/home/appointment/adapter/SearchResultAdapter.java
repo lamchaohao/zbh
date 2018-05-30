@@ -60,7 +60,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter {
             });
         }else {
             viewHolder.tvStaffName.setText("没有查找到相关人员");
-            viewHolder.ivStaffPic.setImageResource(R.drawable.ic_message_primary_24dp);
+            viewHolder.ivStaffPic.setImageResource(R.drawable.ic_home_mine_normal);
             viewHolder.cbIsSelect.setVisibility(View.GONE);
             viewHolder.tvState.setVisibility(View.GONE);
         }

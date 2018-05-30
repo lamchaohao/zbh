@@ -5,6 +5,8 @@ import com.gzz100.zbh.data.network.HttpResult;
 import io.reactivex.Observable;
 import okhttp3.RequestBody;
 import retrofit2.http.Body;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
 
 /**
@@ -18,4 +20,13 @@ public interface FileUploadService {
 
     @POST("vote")
     Observable<HttpResult> uploadVote(@Body RequestBody body);
+
+    @FormUrlEncoded
+    @POST("deleteFileById")
+    Observable<HttpResult> deleteFile(@Field("userId")String userId,
+                                      @Field("token")String token,
+                                      @Field("meetingId")String meetingId,
+                                      @Field("documentId")String documentId);
+
+
 }

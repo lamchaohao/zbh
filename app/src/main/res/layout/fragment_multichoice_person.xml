@@ -8,10 +8,7 @@
     android:background="#EEEEEE"
     tools:context="com.gzz100.zbh.home.appointment.fragment.MultiChosePersonFragment">
 
-   <com.qmuiteam.qmui.widget.QMUITopBar
-       android:id="@+id/topbar"
-       android:layout_width="match_parent"
-       android:layout_height="?attr/qmui_topbar_height"/>
+   <include layout="@layout/widget_topbar"/>
    <FrameLayout
        android:layout_width="match_parent"
        android:layout_height="wrap_content">

@@ -1,7 +1,5 @@
 package com.gzz100.zbh.data.network.request;
 
-import android.Manifest;
-
 import com.google.gson.Gson;
 import com.gzz100.zbh.account.User;
 import com.gzz100.zbh.data.entity.FileUploadEntity;
@@ -23,7 +21,6 @@ import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import permissions.dispatcher.NeedsPermission;
 
 /**
  * Created by Lam on 2018/3/22.
@@ -49,7 +46,7 @@ public class UploadRequest {
             RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data; charset=utf-8"), file);
             String fileMD5 = MD5Utils.getFileMD5(file);
             Logger.i(fileMD5);
-            uploadList.add(new FileUploadEntity(1,1,fileMD5) );
+            uploadList.add(new FileUploadEntity(2,2,fileMD5) );
             builder.addFormDataPart("file",file.getName(),requestFile);
         }
         Gson gson=new Gson();
@@ -105,6 +102,16 @@ public class UploadRequest {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(observer);
 
+    }
+
+
+    public void deleteFile(Observer<HttpResult> observer,String meetingId,String documentId){
+        User user= User.getUserFromCache();
+        mFileUploadService.deleteFile(user.getUserId(),user.getToken(),meetingId,documentId)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
     }
 
 

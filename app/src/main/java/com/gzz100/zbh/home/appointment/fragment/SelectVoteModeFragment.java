@@ -1,6 +1,8 @@
 package com.gzz100.zbh.home.appointment.fragment;
 
 
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,16 +25,28 @@ public class SelectVoteModeFragment extends BaseBackFragment {
     @BindView(R.id.cv_multichoice)
     CardView mCvMultichoice;
 
-    public SelectVoteModeFragment() {
-        // Required empty public constructor
-    }
-
 
     @Override
     protected View onCreateView(LayoutInflater inflater) {
         View inflate = inflater.inflate(R.layout.fragment_select_vote_mode, null, false);
         ButterKnife.bind(this,inflate);
         return attachToSwipeBack(inflate);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        initTopbar();
+    }
+
+    private void initTopbar() {
+        mTopbar.setTitle("选择模式");
+        mTopbar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pop();
+            }
+        });
     }
 
     @Override

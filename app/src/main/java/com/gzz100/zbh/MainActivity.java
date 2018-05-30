@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
+import com.githang.statusbar.StatusBarCompat;
 import com.gzz100.zbh.account.StartupFragment;
 import com.gzz100.zbh.base.BaseFragmentActivity;
 import com.gzz100.zbh.home.root.HomeFragment;
@@ -28,7 +29,9 @@ public class MainActivity extends BaseFragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+//        StatusBarCompat.setStatusBarColor(this,getResources().getColor(R.color.colorTopbar));
+//        StatusBarCompat.translucentStatusBar(this, true);
+        StatusBarCompat.setStatusBarColor(this, getResources().getColor(R.color.colorTopbar), true);
         if (findFragment(HomeFragment.class) == null) {
             loadRootFragment(R.id.containersId, new StartupFragment());
         }

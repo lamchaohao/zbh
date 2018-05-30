@@ -34,6 +34,10 @@ public class TextHeadPicUtil {
 
     private static String getHeadPicName(String userName){
         String picName=null;
+        if (userName==null){
+
+            return "";
+        }
         if (userName.length()>2){
             picName = userName.substring(userName.length()-2, userName.length());
         }else {
@@ -42,7 +46,7 @@ public class TextHeadPicUtil {
         return picName;
     }
 
-    private static int getColor(String userName){
+    public static int getColor(String userName){
         ColorGenerator generator = ColorGenerator.MATERIAL;
         return generator.getColor(userName);
     }

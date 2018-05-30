@@ -36,7 +36,7 @@ public class AgendaInfoAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         AgendaHolder viewHolder = (AgendaHolder) holder;
         MeetingInfoEntity.AgendaListBean agenda = agendaList.get(position);
-        viewHolder.tvSpeaker.setText("主讲人: "+agenda.getSpearker());
+        viewHolder.tvSpeaker.setText("主讲人: "+agenda.getSpeaker());
         int index = position+1;
         viewHolder.tvAgendaName.setText("议程"+index+": "+agenda.getAgendaName());
     }

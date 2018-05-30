@@ -20,9 +20,13 @@ import com.gzz100.zbh.data.network.request.VoteRequest;
 import com.gzz100.zbh.home.meetingadmin.adapter.VoteOptionAdapter;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 
+import java.util.ArrayList;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
+import es.dmoral.toasty.Toasty;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
@@ -62,6 +66,8 @@ public class VoteFragment extends BaseBackFragment {
     String mVoteId;
     private String mHostId;
     private VoteDetailEntity mVoteEntity;
+    private VoteOptionAdapter mAdapter;
+    private VoteRequest mRequest;
 
 
     public static VoteFragment newInstance(String meetingId,String voteId,String hostId){
@@ -89,12 +95,12 @@ public class VoteFragment extends BaseBackFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        loadInitalData();
+        initTopbar();
         loadData();
 
     }
 
-    private void loadInitalData() {
+    private void initTopbar() {
         mTopbar.setTitle("投票");
         mTopbar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
             @Override
@@ -120,7 +126,7 @@ public class VoteFragment extends BaseBackFragment {
 
             @Override
             public void onError(Throwable e) {
-
+                Toasty.error(_mActivity,e.getMessage()).show();
             }
 
             @Override
@@ -129,13 +135,13 @@ public class VoteFragment extends BaseBackFragment {
             }
         };
 
-        VoteRequest request=new VoteRequest();
-        request.getVoteInfo(observer,mMeetingId,mVoteId);
+        mRequest = new VoteRequest();
+        mRequest.getVoteInfo(observer,mMeetingId,mVoteId);
 
     }
 
     private void initView(VoteDetailEntity vote) {
-
+        initRecyclerView();
         initBottomButton();
         mTvVoteName.setText(vote.getVoteName());
 //        mTvVoteStaus.setText();
@@ -161,15 +167,25 @@ public class VoteFragment extends BaseBackFragment {
                 mTvVoteStaus.setText("已结束");
                 break;
         }
-        tvMaxSelection.setText("可选项:"+vote.getVoteSelectableNum());
-        mTvVoteSummary.setText(vote.getVoterNum()+"人 已投");
+        StringBuilder sb=new StringBuilder();
+        sb.append(vote.getVoterNum());
+        sb.append("人 已投");
+        StringBuffer selectSB=new StringBuffer();
+        selectSB.append("可选项:");
+        selectSB.append(vote.getVoteSelectableNum());
+        tvMaxSelection.setText(selectSB.toString());
+        mTvVoteSummary.setText(sb.toString());
 
+
+    }
+
+    private void initRecyclerView() {
         mRcvVote.setLayoutManager(new LinearLayoutManager(getContext()));
         mRcvVote.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
-        VoteOptionAdapter adapter = new VoteOptionAdapter(getContext(),vote);
-        mRcvVote.setAdapter(adapter);
+        mAdapter = new VoteOptionAdapter(getContext(),mVoteEntity);
+        mRcvVote.setAdapter(mAdapter);
 
-        adapter.setOnVoteItemClickListener(new VoteOptionAdapter.OnVoteItemClickListener() {
+        mAdapter.setOnVoteItemClickListener(new VoteOptionAdapter.OnVoteItemClickListener() {
 
             @Override
             public void onPicClick(String url, View view) {
@@ -186,43 +202,150 @@ public class VoteFragment extends BaseBackFragment {
 
     private void initBottomButton() {
         User user = User.getUserFromCache();
+        mTvVoteStart.setVisibility(View.GONE);
         switch (mVoteEntity.getVoteStatus()) {
             case STATUS_ON:
                 boolean hasVoted = false;
+                //已投票
                 for (String id : mVoteEntity.getVoterIdList()) {
                     if (user.getUserId().equals(id)){
+                        //1.如果已投票id列表存在用户id
                         hasVoted = true;
-                        //1.1如果已投票id列表存在用户id
-                        if (user.getUserId().equals(mHostId)){
-                            //1.1.1如果该用户是主持人
-                            mBtnVoteComfirm.setVisibility(View.VISIBLE);
-                            mBtnVoteComfirm.setText("结束投票");
-                        }else {
-                            //1.1.2该用户不是主持人且已投票
-                            mBtnVoteComfirm.setVisibility(View.GONE);
-                            mVoteEntity.setVoteStatus(STATUS_END);
-                        }
-
+                        mVoteEntity.setVoteStatus(STATUS_END);
+                        mAdapter.notifyDataSetChanged();
+                        mBtnVoteComfirm.setText("已投票");
+                        mVoteEntity.setVoteStatus(STATUS_END);
                     }
-
+                }
+                if (!hasVoted) {
+                    //2.未投票
+                    mBtnVoteComfirm.setVisibility(View.VISIBLE);
+                    mBtnVoteComfirm.setText("投票");
+                }
+                //开始投票按钮.主持人控制
+                if (user.getUserId().equals(mHostId)){
+                    mTvVoteStart.setVisibility(View.VISIBLE);
+                    mTvVoteStart.setText("结束投票");
                 }
                 break;
             case STATUS_READY:
                 if (user.getUserId().equals(mHostId)){
                     //2.1未开始 主持人可以编辑投票
                     mBtnVoteComfirm.setText("编辑投票");
+                    mTvVoteStart.setVisibility(View.VISIBLE);
+                    mTvVoteStart.setText("开始投票");
                 }else {
                     //2.2未开始 参会人员不可投票
-                    mBtnVoteComfirm.setVisibility(View.GONE);
+                    mBtnVoteComfirm.setText("未开始");
                 }
                 break;
             case STATUS_END:
-                mBtnVoteComfirm.setVisibility(View.GONE);
+                mBtnVoteComfirm.setText("已结束");
+                mTvVoteStart.setVisibility(View.GONE);
                 break;
         }
 
     }
 
+    @OnClick(R.id.btn_vote_comfirm)
+    void onComfirmBtnClick(View view){
+        String btnText = mBtnVoteComfirm.getText().toString();
+        if (btnText.equals("投票")){
+            StringBuilder optionIdSb=new StringBuilder();
+            optionIdSb.append("[");
+            ArrayList<VoteDetailEntity.VoteOptionListBean> selectedItem = mAdapter.getSelectedItem();
+            int i =0;
+            for (VoteDetailEntity.VoteOptionListBean voteOption : selectedItem) {
+                i++;
+                optionIdSb.append(voteOption.getVoteOptionId());
+                if (i!=selectedItem.size()){
+                    optionIdSb.append(",");
+                }
+            }
+            optionIdSb.append("]");
+
+            mRequest.uploadVoteResult(new Observer<HttpResult>() {
+                @Override
+                public void onSubscribe(Disposable d) {
+
+                }
+
+                @Override
+                public void onNext(HttpResult result) {
+                    mBtnVoteComfirm.setText("已投票");
+                    loadData();
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    Toasty.error(_mActivity,e.getMessage()).show();
+                }
+
+                @Override
+                public void onComplete() {
+
+                }
+            },optionIdSb.toString(),mVoteId);
+
+        }
+    }
+
+    @OnClick(R.id.tv_vote_start)
+    void onStartVoteClick(View view){
+
+        String tvStr = mTvVoteStart.getText().toString();
+        if (tvStr.equals("开始投票")) {
+
+            mRequest.startVote(new Observer<HttpResult>() {
+                @Override
+                public void onSubscribe(Disposable d) {
+
+                }
+
+                @Override
+                public void onNext(HttpResult result) {
+                    mTvVoteStart.setText("结束投票");
+                    mBtnVoteComfirm.setText("投票");
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    Toasty.error(_mActivity,e.getMessage()).show();
+                }
+
+                @Override
+                public void onComplete() {
+
+                }
+            },mVoteId);
+
+
+        }else if (tvStr.equals("结束投票")){
+            mRequest.endVote(new Observer<HttpResult>() {
+                @Override
+                public void onSubscribe(Disposable d) {
+
+                }
+
+                @Override
+                public void onNext(HttpResult result) {
+                    mTvVoteStart.setText("已结束");
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    Toasty.error(_mActivity,e.getMessage()).show();
+                }
+
+                @Override
+                public void onComplete() {
+
+                }
+            },mVoteId);
+
+        }
+
+    }
 
     private void transition(String url, View view) {
 

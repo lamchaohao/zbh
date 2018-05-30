@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.base.BaseFragment;
@@ -129,7 +130,7 @@ public class GuideFragment extends BaseFragment {
 
             @Override
             public void onError(Throwable e) {
-
+                Toast.makeText(_mActivity, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
 
             @Override

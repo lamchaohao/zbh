@@ -75,7 +75,7 @@ public class AddAgendaFragment extends BaseBackFragment {
                 mAdapter.add();
             }else {
                 for (Agenda agenda : agendaList) {
-                    Logger.i(agenda.getAgendaName()+", agendaID="+agenda.getStaff().getUserId());
+                    Logger.i(agenda.getAgendaName()+", getUserName="+agenda.getStaff().getUserName());
                 }
                 mAdapter.addAgendas(agendaList);
             }
@@ -98,7 +98,9 @@ public class AddAgendaFragment extends BaseBackFragment {
             @Override
             public void onClick(View v) {
                 ArrayList<Agenda> agendaList = mAdapter.getAgendaList();
-
+                if (agendaList==null){
+                    return;
+                }
                 EventBus.getDefault().post(agendaList);
                 pop();
             }

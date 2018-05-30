@@ -19,15 +19,15 @@ public interface MeetingRoomService {
     @FormUrlEncoded
     @POST("getMeetingRooms")
     Observable<HttpResult<List<MeetingRoomEntity>>> getMeetingRooms(@Field("userId")String userId, @Field("token")String token,
-                                                                    @Field("companyId")int companyId);
+                                                                    @Field("companyId")String companyId);
     @FormUrlEncoded
     @POST("getMeetingRooms")
     Observable<HttpResult<List<MeetingRoomEntity>>> getAvailableRooms(@Field("userId")String userId, @Field("token")String token,//不带时间, 带时间
-                                                                    @Field("companyId")int companyId,@Field("startTime")String startTime);
+                                                                    @Field("companyId")String companyId,@Field("startTime")String startTime);
     @FormUrlEncoded
     @POST("getMeetingRooms")
     Observable<HttpResult<List<MeetingRoomEntity>>> getMeetingListByRoomId(@Field("userId")String userId, @Field("token")String token,//不带时间, 带时间
-                                                                           @Field("companyId")int companyId,@Field("meetingPlaceId")String roomId,
+                                                                           @Field("companyId")String companyId,@Field("meetingPlaceId")String roomId,
                                                                            @Field("startTime")String startTime);
 
 }

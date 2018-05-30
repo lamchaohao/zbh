@@ -28,7 +28,7 @@ public class MeetingRoomRequest {
 
     public void getMeetingRooms(Observer<HttpResult<List<MeetingRoomEntity>>> observer){
         User user = User.getUserFromCache();
-        meetingRoomService.getMeetingRooms(user.getUserId(),user.getToken(),Integer.parseInt(user.getCompanyId()))
+        meetingRoomService.getMeetingRooms(user.getUserId(),user.getToken(),user.getCompanyId())
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -37,7 +37,7 @@ public class MeetingRoomRequest {
 
     public void getAvailableMeetingRooms(Observer<HttpResult<List<MeetingRoomEntity>>> observer,String date){
         User user = User.getUserFromCache();
-        meetingRoomService.getAvailableRooms(user.getUserId(),user.getToken(),Integer.parseInt(user.getCompanyId()),date)
+        meetingRoomService.getAvailableRooms(user.getUserId(),user.getToken(),user.getCompanyId(),date)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -46,13 +46,10 @@ public class MeetingRoomRequest {
 
     public void getMeetingListByRoomId(Observer<HttpResult<List<MeetingRoomEntity>>> observer,String roomId,String startTime){
         User user = User.getUserFromCache();
-        meetingRoomService.getMeetingListByRoomId(user.getUserId(),user.getToken(),Integer.parseInt(user.getCompanyId()),roomId,startTime)
+        meetingRoomService.getMeetingListByRoomId(user.getUserId(),user.getToken(),user.getCompanyId(),roomId,startTime)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(observer);
     }
-
-
-
 }

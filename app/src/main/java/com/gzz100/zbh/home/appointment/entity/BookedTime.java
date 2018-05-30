@@ -30,7 +30,7 @@ public class BookedTime {
         Calendar start = Calendar.getInstance();
         start.setTimeInMillis(startTime);
         Calendar end = Calendar.getInstance();
-        start.setTimeInMillis(endTime);
+        end.setTimeInMillis(endTime);
         this.startTime = start;
         this.endTime = end;
     }

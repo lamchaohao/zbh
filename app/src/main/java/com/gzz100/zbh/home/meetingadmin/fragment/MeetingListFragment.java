@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -13,6 +14,19 @@ import com.gzz100.zbh.data.entity.MeetingEntity;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.request.MeetingRequest;
 import com.gzz100.zbh.home.meetingadmin.adapter.MeetingListAdapter;
+import com.gzz100.zbh.home.root.HomeFragment;
+import com.gzz100.zbh.res.Common;
+import com.qmuiteam.qmui.widget.QMUIEmptyView;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.footer.FalsifyFooter;
+import com.scwang.smartrefresh.layout.header.FalsifyHeader;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +41,19 @@ import io.reactivex.disposables.Disposable;
  */
 public class MeetingListFragment extends BaseFragment {
 
+    @BindView(R.id.prl_refresh)
+    SmartRefreshLayout mRefreshLayout;
     @BindView(R.id.rcv_meetinglist)
     RecyclerView mRcvMeetinglist;
+    @BindView(R.id.emptyView)
+    QMUIEmptyView mEmptyView;
     View mRootView;
     private List<MeetingEntity> mMeetings;
     private MeetingListAdapter mAdapter;
     private boolean isCreator;
+    private MeetingRequest mRequest;
+
+    private int offset=0;
 
     public static MeetingListFragment getNewInstance(boolean isCreator){
         Bundle bundle = new Bundle();
@@ -46,6 +67,7 @@ public class MeetingListFragment extends BaseFragment {
     protected View onCreateView(LayoutInflater inflater) {
         mRootView = inflater.inflate(R.layout.fragment_meeting_list, null);
         ButterKnife.bind(this, mRootView);
+        EventBus.getDefault().register(this);
         return mRootView;
     }
 
@@ -56,11 +78,15 @@ public class MeetingListFragment extends BaseFragment {
         loadData();
     }
 
+
+
     private void initVar() {
         if (getArguments()!=null) {
             isCreator = getArguments().getBoolean("isCreator");
         }
+        mRequest = new MeetingRequest();
     }
+
 
 
     private void loadData(){
@@ -74,44 +100,158 @@ public class MeetingListFragment extends BaseFragment {
             @Override
             public void onNext(HttpResult<List<MeetingEntity>> result) {
                 List<MeetingEntity> meetingList = result.getResult();
-                mMeetings.addAll(meetingList);
-                mAdapter.notifyDataSetChanged();
+                offset=meetingList.size();
+                if (meetingList!=null){
+                    mMeetings.clear();
+                    mMeetings.addAll(meetingList);
+                    mAdapter.notifyDataSetChanged();
+                    if (mMeetings.size()==0){
+                        mEmptyView.show();
+                    }else {
+                        mEmptyView.hide();
+                    }
+                }else {
+                    mEmptyView.show();
+                }
             }
 
             @Override
             public void onError(Throwable e) {
-
+                mRefreshLayout.finishRefresh();
             }
 
             @Override
             public void onComplete() {
-
+                mRefreshLayout.finishRefresh();
             }
         };
-        MeetingRequest request=new MeetingRequest();
+
         if (isCreator){
-            request.getMyCreatedMeeting(observer,0,20);
+            mRequest.getMyCreatedMeeting(observer,0,20);
         }else {
-            request.getMeetingList(observer,0,20);
+            mRequest.getMeetingList(observer,0,20);
         }
     }
 
     private void initView() {
+       initRefreshLayout();
         mRcvMeetinglist.setLayoutManager(new LinearLayoutManager(getContext()));
-//        for (int i =0;i<15;i++){
-//            metingBeans.add(new MetingBean("每周例会","科研会议室","14:30","16:00"));
-//        }
         mMeetings = new ArrayList();
         mAdapter = new MeetingListAdapter(getContext(), mMeetings);
         mRcvMeetinglist.setAdapter(mAdapter);
         mAdapter.setOnItemClickListener(new MeetingListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int pos) {
-                ((BaseFragment) getParentFragment().getParentFragment())
-                        .startFragment(MeetingParentFragment.getNewInstance(mMeetings.get(pos).getMeetingId(),mMeetings.get(pos).getMeetingName()));
-
+               dealOnMeetingItemClick(pos);
             }
         });
     }
 
+    private void dealOnMeetingItemClick(int pos) {
+        MeetingEntity meetingEntity = mMeetings.get(pos);
+        if(meetingEntity.getMeetingStatus()== Common.STATUS_END){
+            if (getParentFragment()!=null) {
+                ((BaseFragment) getParentFragment())
+                        .startParentFragment(
+                                FinishedMeetingFragment.getNewInstance
+                                        (meetingEntity.getMeetingId(),meetingEntity.getMeetingName()));
+            }
+//
+        }else {
+            if (getParentFragment()!=null) {
+                long groupId=0;
+                if (!TextUtils.isEmpty(meetingEntity.getMimcTopicId())) {
+                    groupId = Long.parseLong(meetingEntity.getMimcTopicId());
+                }
+                ((BaseFragment) getParentFragment())
+                        .startParentFragment(
+                                MeetingParentFragment.getNewInstance
+                                        (meetingEntity.getMeetingId(),meetingEntity.getMeetingName(), groupId));
+            }
+
+//            Intent intent = new Intent(_mActivity, MeetingParentActivity.class);
+//            intent.putExtra("meetingId",meetingEntity.getMeetingId());
+//            intent.putExtra("meetingName",meetingEntity.getMeetingName());
+//            if (TextUtils.isEmpty(meetingEntity.getMimcTopicId())) {
+//                intent.putExtra("groupId",0);
+//            }else {
+//                intent.putExtra("groupId",Long.parseLong(meetingEntity.getMimcTopicId()));
+//            }
+//            startActivity(intent);
+
+        }
+    }
+
+    private void initRefreshLayout() {
+        mRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(RefreshLayout refreshLayout) {
+                loadData();
+            }
+        });
+
+        mRefreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(RefreshLayout refreshLayout) {
+                loadMore();
+            }
+        });
+
+        mRefreshLayout.setRefreshHeader(new FalsifyHeader(getContext()));
+        mRefreshLayout.setRefreshFooter(new FalsifyFooter(getContext()));
+    }
+
+    private void loadMore() {
+        Observer<HttpResult<List<MeetingEntity>>> observer = new Observer<HttpResult<List<MeetingEntity>>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(HttpResult<List<MeetingEntity>> result) {
+                List<MeetingEntity> meetingList = result.getResult();
+                offset+=meetingList.size();
+                if (meetingList!=null){
+                    mMeetings.addAll(meetingList);
+                    mAdapter.notifyDataSetChanged();
+                }else {
+                    mEmptyView.show();
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                mRefreshLayout.finishLoadMore();
+            }
+
+            @Override
+            public void onComplete() {
+                mRefreshLayout.finishLoadMore();
+            }
+        };
+
+        if (isCreator){
+            mRequest.getMyCreatedMeeting(observer,offset,20);
+        }else {
+            mRequest.getMeetingList(observer,offset,20);
+        }
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onPage(HomeFragment.HomePage page){
+        switch (page) {
+            case meeting:
+                loadData();
+                break;
+
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBus.getDefault().unregister(this);
+    }
 }

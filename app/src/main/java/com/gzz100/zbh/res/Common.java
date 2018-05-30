@@ -13,10 +13,21 @@ public class Common {
     public static final String NumRegEx="^1((3[0-9]|4[57]|5[0-35-9]|7[0678]|8[0-9])\\d{8}$)";//手机号码正则表达式
     public static String USER_PATH;
     public static String PUSH_TOKEN;
+    public static final String AUTHORITIES="com.gzz100.fileprovider";
 
     public static final int STATUS_ON=1;
     public static final int STATUS_READY=2;
     public static final int STATUS_END=3;
+    public static final int STATUS_PAUSE=4;
+
+    public static final int ROLE_HOST=1;
+    public static final int ROLE_SPEAKER=2;
+    public static final int ROLE_DELEGATE=3;
+
+    public static final String CheckCode_signIn= "signIn";
+    public static final String CheckCode_UpdatePhone= "updatePhone";
+    public static final String CheckCode_UpdatePsw= "updatePsw";
+
 
     public static void setUserPath(String userPath) {
         USER_PATH = userPath;

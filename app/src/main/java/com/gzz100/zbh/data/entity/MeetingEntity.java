@@ -22,6 +22,12 @@ public class MeetingEntity {
     private String meetingId;
     private String meetingPlaceName;
     private String meetingEndTime;
+    private String mimcTopicId;
+    /**
+     * meetingApplyStatus : 4
+     */
+
+    private int meetingApplyStatus;
 
     public String getMeetingName() {
         return meetingName;
@@ -69,5 +75,21 @@ public class MeetingEntity {
 
     public void setMeetingEndTime(String meetingEndTime) {
         this.meetingEndTime = meetingEndTime;
+    }
+
+    public int getMeetingApplyStatus() {
+        return meetingApplyStatus;
+    }
+
+    public void setMeetingApplyStatus(int meetingApplyStatus) {
+        this.meetingApplyStatus = meetingApplyStatus;
+    }
+
+    public String getMimcTopicId() {
+        return mimcTopicId;
+    }
+
+    public void setMimcTopicId(String mimcTopicId) {
+        this.mimcTopicId = mimcTopicId;
     }
 }

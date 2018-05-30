@@ -49,7 +49,12 @@ public class LoginFragment extends BaseFragment {
     protected View onCreateView(LayoutInflater inflater) {
         View root = inflater.inflate(R.layout.fragment_login, null);
         ButterKnife.bind(this, root);
+        initTopbar();
         return root;
+    }
+
+    private void initTopbar() {
+        mTopbar.setTitle("登录");
     }
 
 
@@ -124,5 +129,11 @@ public class LoginFragment extends BaseFragment {
         };
         String encodedStr = MD5Utils.getEncodedStr(psw);
         UserLoginRequest.getInstance().login(observer,phone,encodedStr);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        hideSoftInput();
     }
 }

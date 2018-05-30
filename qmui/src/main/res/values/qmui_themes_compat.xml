@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppRootTheme.Compat" parent="Theme.AppCompat.Light" />
+    <style name="AppRootTheme.Compat" parent="Theme.AppCompat.DayNight.DarkActionBar" />
     <style name="AppBaseTheme.Compat" parent="AppRootTheme.Compat" >
         <item name="android:listDivider">@drawable/qmui_divider</item>
         <item name="android:listViewStyle">@style/ListView.Compat</item>
@@ -23,6 +23,7 @@
         <!--**********************************************
         *                qmui common color               *
         **********************************************-->
+        <item name="qmui_config_color_selected">@color/qmui_config_color_blue</item>
         <item name="qmui_config_color_blue">@color/qmui_config_color_blue</item>
         <item name="qmui_config_color_red">@color/qmui_config_color_red</item>
         <item name="qmui_config_color_separator">@color/qmui_config_color_separator</item>

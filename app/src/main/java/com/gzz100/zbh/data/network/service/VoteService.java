@@ -27,4 +27,18 @@ public interface VoteService {
     Observable<HttpResult<VoteDetailEntity>> getVoteInfo(@Field("userId")String userId, @Field("token")String token,
                                                          @Field("meetingId")String meetingId, @Field("voteId")String voteId);
 
+    @FormUrlEncoded
+    @POST("uploadVoteResult")
+    Observable<HttpResult> uploadVoteResult(@Field("userId")String userId, @Field("token")String token,
+                                                         @Field("voteOptionIdList")String voteOptionIdList, @Field("voteId")String voteId);
+
+    @FormUrlEncoded
+    @POST("startVote")
+    Observable<HttpResult> startVote(@Field("userId")String userId, @Field("token")String token,
+                                             @Field("voteId")String voteId);
+    @FormUrlEncoded
+    @POST("endVote")
+    Observable<HttpResult> endVote(@Field("userId")String userId, @Field("token")String token,
+                                     @Field("voteId")String voteId);
+
 }

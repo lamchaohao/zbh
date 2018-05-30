@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.utils.GlideApp;
@@ -51,19 +52,19 @@ public class CatalogAdapter extends RecyclerView.Adapter {
                 .placeholder(R.drawable.ic_insert_chart_blue_500_48dp)
                 .into(picHolder.imageView);
         if (positivePPt==position) {
-            picHolder.rootView.setBackgroundColor(getContext().getResources().getColor(R.color.colorPrimary));
+            picHolder.rootView.setBackgroundColor(getContext().getResources().getColor(R.color.black_select));
         }else {
             picHolder.rootView.setBackgroundColor(getContext().getResources().getColor(R.color.black_mask));
         }
         if (mOnItemClickListener!=null){
-            picHolder.imageView.setOnClickListener(new View.OnClickListener() {
+            picHolder.rootView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
                     mOnItemClickListener.onItemClick(position,picUrlList.get(position));
                 }
             });
-            picHolder.imageView.setOnLongClickListener(new View.OnLongClickListener() {
+            picHolder.rootView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
                     mOnItemClickListener.onLongClick(position,picUrlList.get(position));
@@ -71,6 +72,10 @@ public class CatalogAdapter extends RecyclerView.Adapter {
                 }
             });
         }
+        StringBuilder indexSb=new StringBuilder();
+        int index=position+1;
+        indexSb.append(index).append("/").append(picUrlList.size());
+        picHolder.tvIndex.setText(indexSb.toString());
     }
 
     public void setPositivePPt(int activePos) {
@@ -96,9 +101,11 @@ public class CatalogAdapter extends RecyclerView.Adapter {
     static class PicHolder extends RecyclerView.ViewHolder{
         ImageView imageView;
         View rootView;
+        TextView tvIndex;
         public PicHolder(View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.image_view);
+            tvIndex = itemView.findViewById(R.id.tv_catalogIndex);
             rootView = itemView.findViewById(R.id.rootView);
         }
     }

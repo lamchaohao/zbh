@@ -19,7 +19,6 @@ import com.gzz100.zbh.R;
 import com.gzz100.zbh.account.LoginFragment;
 import com.gzz100.zbh.account.SearchCompFragment;
 import com.gzz100.zbh.account.User;
-import com.gzz100.zbh.account.X5Fragment;
 import com.gzz100.zbh.base.BaseFragment;
 import com.gzz100.zbh.data.entity.ApplyEntity;
 import com.gzz100.zbh.utils.DensityUtil;
@@ -50,6 +49,8 @@ public class MineFragment extends BaseFragment {
 
     @BindView(R.id.tv_userName_mine)
     TextView mTvUserName;
+    @BindView(R.id.tv_job_mine)
+    TextView mTvjob;
     @BindView(R.id.tv_statu_mine)
     TextView mTvStatu;
     @BindView(R.id.tv_file_mine)
@@ -59,6 +60,8 @@ public class MineFragment extends BaseFragment {
     Button mBtnJoinCompany;
     @BindView(R.id.iv_mine_compPic)
     ImageView mIvCompPic;
+    @BindView(R.id.tv_star_mine)
+    TextView mTvStar;
     @BindView(R.id.tv_about_mine)
     TextView mTvAbout;
     @BindView(R.id.tv_setting_mine)
@@ -103,16 +106,18 @@ public class MineFragment extends BaseFragment {
                         .append("审核");
                 mTvStatu.setText(sb.toString());
                 mBtnJoinCompany.setVisibility(View.GONE);
+                mTvjob.setVisibility(View.GONE);
             }else {
                 mTvStatu.setText("你还没加入企业");
                 mBtnJoinCompany.setVisibility(View.VISIBLE);
             }
         }else {
-
             mBtnJoinCompany.setVisibility(View.GONE);
             mTvStatu.setText(user.getCompanyName());
+            mTvjob.setVisibility(View.VISIBLE);
+            mTvjob.setText(user.getPositionName());
         }
-        TextDrawable headPic = TextHeadPicUtil.getHeadPic(user.getUserName(),32, DensityUtil.dp2px(getContext(),64));
+        TextDrawable headPic = TextHeadPicUtil.getHeadPic(user.getUserName(),48, DensityUtil.dp2px(getContext(),64));
         mIvCompPic.setImageDrawable(headPic);
 
     }
@@ -126,13 +131,13 @@ public class MineFragment extends BaseFragment {
 
     @NeedsPermission({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE})
     public void showFile() {
-        startParentFragment(new X5Fragment());
-        Logger.i("showCamera");
+        startParentFragment(new MineFileFragment());
+        Logger.i("showFile");
     }
 
     // 向用户说明为什么需要这些权限（可选）
     @OnShowRationale({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE})
-    void showRationaleForCamera(final PermissionRequest request) {
+    void showInfoForPermissionRequest(final PermissionRequest request) {
         new AlertDialog.Builder(getContext())
                 .setMessage("需要开启读写外部存储权限才能浏览文件")
                 .setPositiveButton("允许", new DialogInterface.OnClickListener() {
@@ -169,13 +174,14 @@ public class MineFragment extends BaseFragment {
         unbinder.unbind();
     }
 
-    @OnClick({R.id.rl_nameCard_mine,R.id.tv_about_mine, R.id.tv_setting_mine, R.id.tv_file_mine,R.id.tv_logout_mine,R.id.btn_joinCompany_mine})
+    @OnClick({R.id.tv_star_mine,R.id.rl_nameCard_mine,R.id.tv_about_mine, R.id.tv_setting_mine, R.id.tv_file_mine,R.id.tv_logout_mine,R.id.btn_joinCompany_mine})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.tv_about_mine:
-                startParentFragment(WebViewFragment.newInstance());
+                startParentFragment(new AboutFragment());
                 break;
             case R.id.tv_setting_mine:
+                startParentFragment(new SettingFragment());
                 break;
             case R.id.tv_file_mine:
                 //点击后开始权限询问,同意后执行showFile()
@@ -189,6 +195,9 @@ public class MineFragment extends BaseFragment {
                 break;
             case R.id.rl_nameCard_mine:
                 startParentFragment(new NameCardFragment());
+                break;
+            case R.id.tv_star_mine:
+                startParentFragment(new MineStarFragment());
                 break;
 
         }

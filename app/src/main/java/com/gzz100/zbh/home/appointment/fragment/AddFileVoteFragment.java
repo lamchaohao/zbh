@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gzz100.zbh.R;
@@ -61,8 +62,8 @@ import permissions.dispatcher.RuntimePermissions;
 public class AddFileVoteFragment extends BaseBackFragment {
     @BindView(R.id.topbar)
     QMUITopBar mTopbar;
-    @BindView(R.id.rl_file)
-    RelativeLayout mRlFile;
+    @BindView(R.id.tv_addFile)
+    TextView mTvAddFile;
     @BindView(R.id.rcv_selectedDocs)
     RecyclerView mRcvSelectDoc;
     @BindView(R.id.rl_vote)
@@ -124,13 +125,25 @@ public class AddFileVoteFragment extends BaseBackFragment {
         mAdapter.setOnItemClickListener(new SelectedDocsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(File file) {
-                HashMap<String,String> configValue = new HashMap<>();
-                //“true”表示是进入打开方式选择界面，如果不设置或设置为“false” ，则进入 miniqb 浏览器模式。
-                configValue.put("style","1");
-                configValue.put("local","false");
-                configValue.put("topBarBgColor","#2196F3");
-                QbSdk.openFileReader(getContext(),file.getAbsolutePath(),configValue,null);
+                if (file==null){
+                    AddFileVoteFragmentPermissionsDispatcher.showSelectFileWithPermissionCheck(AddFileVoteFragment.this);
+                }else {
+                    HashMap<String,String> configValue = new HashMap<>();
+                    //“true”表示是进入打开方式选择界面，如果不设置或设置为“false” ，则进入 miniqb 浏览器模式。
+                    configValue.put("style","1");
+                    configValue.put("local","false");
+                    configValue.put("topBarBgColor","#2196F3");
+                    QbSdk.openFileReader(getContext(),file.getAbsolutePath(),configValue,null);
 
+                }
+
+            }
+
+            @Override
+            public void onItemClose(int position) {
+                mDocPaths.remove(position);
+                docFileList.remove(position);
+                mAdapter.notifyDataSetChanged();
             }
         });
         mVoteWrapList = new ArrayList<>();
@@ -201,10 +214,10 @@ public class AddFileVoteFragment extends BaseBackFragment {
         Toast.makeText(getContext(), "用户把你打入冷宫", Toast.LENGTH_SHORT).show();
     }
 
-    @OnClick({R.id.rl_file, R.id.rl_vote, R.id.bt_next_detail})
+    @OnClick({R.id.tv_addFile, R.id.rl_vote, R.id.bt_next_detail})
     public void onViewClicked(View view) {
         switch (view.getId()) {
-            case R.id.rl_file:
+            case R.id.tv_addFile:
                 AddFileVoteFragmentPermissionsDispatcher.showSelectFileWithPermissionCheck(this);
                 break;
             case R.id.rl_vote:

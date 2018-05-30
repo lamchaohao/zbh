@@ -48,10 +48,11 @@ public class AppointmentRequest {
     public void addMeeting(Observer<HttpResult<MeetingEntity>> observer, String meetingname,
                            String meetingPlaceId, String startTime,
                            String endTime, String hostId,
-                           String summaryId, String copyIdList, String agendaList, String delegateIdList){
+                           String summaryId, String copyIdList, String agendaList, String delegateIdList,String notifyTime){
         User user = User.getUserFromCache();
         mAppointmentService.addMeeting(user.getUserId(),user.getToken(),
-                meetingname,meetingPlaceId,user.getCompanyId(),startTime,endTime,hostId,summaryId,copyIdList,agendaList,delegateIdList)
+                meetingname,meetingPlaceId,user.getCompanyId(),startTime,endTime,hostId,summaryId,
+                copyIdList,agendaList,delegateIdList,notifyTime)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

@@ -3,6 +3,7 @@ package com.gzz100.zbh.home.meetingadmin.adapter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.view.View;
 
 import com.gzz100.zbh.base.BaseFragment;
 
@@ -17,6 +18,11 @@ public class MeetingTabAdapter extends FragmentPagerAdapter {
     public MeetingTabAdapter(FragmentManager manager, List<BaseFragment> fragmentList) {
         super(manager);
         mFragmentList = fragmentList;
+    }
+
+    @Override
+    public boolean isViewFromObject(View view, Object object) {
+        return view == ((Fragment) object).getView();
     }
 
     @Override

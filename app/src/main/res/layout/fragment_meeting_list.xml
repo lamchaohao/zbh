@@ -2,11 +2,30 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
              tools:context=".home.meetingadmin.fragment.MeetingListFragment">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rcv_meetinglist"
+    <com.scwang.smartrefresh.layout.SmartRefreshLayout
+        android:id="@+id/prl_refresh"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="match_parent">
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <com.qmuiteam.qmui.widget.QMUIEmptyView
+                android:id="@+id/emptyView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="?attr/qmui_topbar_height"
+                android:background="@color/qmui_config_color_white"
+                app:qmui_title_text="暂无会议"/>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rcv_meetinglist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </FrameLayout>
+
+    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 
 </FrameLayout>

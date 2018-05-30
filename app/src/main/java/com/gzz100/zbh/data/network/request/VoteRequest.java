@@ -45,6 +45,31 @@ public class VoteRequest {
                 .subscribe(observer);
     }
 
+    public void uploadVoteResult(Observer<HttpResult> observer, String voteOptionIdList, String voteId){
+        User user = User.getUserFromCache();
+        mVoteService.uploadVoteResult(user.getUserId(),user.getToken(),voteOptionIdList,voteId)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
 
+    public void startVote(Observer<HttpResult> observer,String voteId){
+        User user = User.getUserFromCache();
+        mVoteService.startVote(user.getUserId(),user.getToken(),voteId)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
+    public void endVote(Observer<HttpResult> observer,String voteId){
+        User user = User.getUserFromCache();
+        mVoteService.endVote(user.getUserId(),user.getToken(),voteId)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
 
 }

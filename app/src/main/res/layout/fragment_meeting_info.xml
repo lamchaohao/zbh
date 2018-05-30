@@ -33,8 +33,9 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:background="#2196F3"
+                    android:textColor="@color/colorWhite"
                     android:padding="5dp"
-                    android:text="开始会议"/>
+                    android:text="加载中"/>
 
             </RelativeLayout>
 
@@ -43,21 +44,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="主持人: 张小明"/>
+                android:text="主持人: none"/>
 
             <TextView
                 android:id="@+id/tv_info_meetingPlace"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="会议地点: 会议室一"/>
+                android:text="会议地点: none"/>
 
             <TextView
                 android:id="@+id/tv_info_meetingTime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="会议时间: 2018-3-19 11:43-13:30"/>
+                android:text="会议时间: null"/>
 
             <View
                 android:layout_width="match_parent"
@@ -86,7 +87,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:text="0/10签到"/>
+                    android:text="0/0签到"/>
             </RelativeLayout>
 
             <LinearLayout

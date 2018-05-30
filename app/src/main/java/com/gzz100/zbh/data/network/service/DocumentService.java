@@ -22,5 +22,11 @@ public interface DocumentService {
                                                                  @Field("meetingId")String meetingId);
 
 
+    @FormUrlEncoded
+    @POST("deleteFileById")
+    Observable<HttpResult> deleteFile(@Field("userId")String userId,@Field("token")String token,
+                                      @Field("meetingId")String meetingId,
+                                      @Field("documentId")String documentId);
+
 
 }

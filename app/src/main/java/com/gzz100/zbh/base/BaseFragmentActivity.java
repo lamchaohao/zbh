@@ -1,7 +1,11 @@
 package com.gzz100.zbh.base;
 
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+
+import com.gzz100.zbh.res.SpeedHorizontalAnimator;
+
 import me.yokeyword.fragmentation.SupportActivity;
-import me.yokeyword.fragmentation.anim.DefaultHorizontalAnimator;
 import me.yokeyword.fragmentation.anim.FragmentAnimator;
 
 /**
@@ -18,9 +22,22 @@ public abstract class BaseFragmentActivity extends SupportActivity {
         // 设置默认Fragment动画  默认竖向(和安卓5.0以上的动画相同)
 //        return super.onCreateFragmentAnimator();
         // 设置横向(和安卓4.x动画相同)
-        return new DefaultHorizontalAnimator();
-//        return new SpeedHorizontalAnimator();
+//        return new DefaultHorizontalAnimator();
+//        return new NonAnimator();
+        return new SpeedHorizontalAnimator();
         // 设置自定义动画
 //        return new FragmentAnimator(enter,exit,popEnter,popExit);
+    }
+
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

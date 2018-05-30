@@ -1,8 +1,10 @@
 package com.gzz100.zbh.push;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.TextUtils;
 
+import com.gzz100.zbh.home.message.MsgActivity;
 import com.gzz100.zbh.res.Common;
 import com.orhanobut.logger.Logger;
 import com.xiaomi.mipush.sdk.ErrorCode;
@@ -40,6 +42,7 @@ public class PushReceiver extends PushMessageReceiver {
         } else if(!TextUtils.isEmpty(message.getUserAccount())) {
             mUserAccount=message.getUserAccount();
         }
+        Logger.i("PassThroughMessage message.titile ="+message.getTitle()+",message="+message.toString());
     }
     @Override
     public void onNotificationMessageClicked(Context context, MiPushMessage message) {
@@ -51,6 +54,17 @@ public class PushReceiver extends PushMessageReceiver {
         } else if(!TextUtils.isEmpty(message.getUserAccount())) {
             mUserAccount=message.getUserAccount();
         }
+
+        Logger.i("message.titile ="+message.getTitle()+",message="+message.toString());
+
+        Intent intent = new Intent();
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        String title = message.getTitle();
+        String description = message.getDescription();
+        intent.putExtra("title",title);
+        intent.putExtra("description",description);
+        intent.setClass(context, MsgActivity.class);
+        context.startActivity(intent);
     }
     @Override
     public void onNotificationMessageArrived(Context context, MiPushMessage message) {

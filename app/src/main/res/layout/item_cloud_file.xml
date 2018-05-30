@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_margin="8dp"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:src="@mipmap/ic_launcher"
+            android:id="@+id/iv_FileIcon"
+            android:layout_width="56dp"
+            android:layout_height="56dp"/>
+
+        <ImageView
+            android:id="@+id/iv_removeFile"
+            android:src="@drawable/ic_delete_forever_red_500_36dp"
+            android:layout_gravity="bottom|right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_docName"
+        android:gravity="center"
+        android:maxLines="3"
+        android:ellipsize="end"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

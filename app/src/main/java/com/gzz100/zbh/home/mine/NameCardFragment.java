@@ -49,6 +49,8 @@ public class NameCardFragment extends BaseBackFragment {
     @BindView(R.id.btn_quit_company)
     Button mBtnQuitCompany;
     Unbinder unbinder;
+    @BindView(R.id.tv_name_depart)
+    TextView mTvDepartName;
     private User mUser;
     private EditText mEditText;
 
@@ -85,9 +87,10 @@ public class NameCardFragment extends BaseBackFragment {
     private void initView() {
 
         mUser = User.getUserFromCache();
-        if (mUser.getCompanyName()!=null){
+        if (mUser.getCompanyName() != null) {
             mTvCompanyName.setText(mUser.getCompanyName());
             mTvNamePosition.setText(mUser.getPositionName());
+            mTvDepartName.setText(mUser.getDepartmentName());
         }
         mTvUserNameMine.setText(mUser.getUserName());
         TextDrawable headPic = TextHeadPicUtil.getHeadPic(mUser.getUserName());
@@ -95,12 +98,12 @@ public class NameCardFragment extends BaseBackFragment {
 
         if (mUser.getCompanyId().equals("0")) {
             mBtnQuitCompany.setVisibility(View.GONE);
-        }else {
+        } else {
             mBtnQuitCompany.setVisibility(View.VISIBLE);
         }
     }
 
-    @OnClick({R.id.btn_quit_company,R.id.rl_userName})
+    @OnClick({R.id.btn_quit_company, R.id.rl_userName})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_quit_company:
@@ -146,14 +149,14 @@ public class NameCardFragment extends BaseBackFragment {
                 .addAction(0, "退出", QMUIDialogAction.ACTION_PROP_NEGATIVE, new QMUIDialogAction.ActionListener() {
                     @Override
                     public void onClick(QMUIDialog dialog, int index) {
-                       dialog.dismiss();
-                       quitPost();
+                        dialog.dismiss();
+                        quitPost();
                     }
                 })
                 .show();
     }
 
-    private void quitPost(){
+    private void quitPost() {
 
         Observer<HttpResult> observer = new Observer<HttpResult>() {
             @Override
@@ -163,7 +166,7 @@ public class NameCardFragment extends BaseBackFragment {
 
             @Override
             public void onNext(HttpResult result) {
-                if (result.getCode()==1) {
+                if (result.getCode() == 1) {
                     User user = User.getUserFromCache();
                     user.setCompanyId("0");
                     User.save(user);
@@ -187,12 +190,12 @@ public class NameCardFragment extends BaseBackFragment {
 
     }
 
-    private void updateNamePost(){
+    private void updateNamePost() {
         final String theNewUserName = mEditText.getText().toString();
-        UserLoginRequest request=UserLoginRequest.getInstance();
+        UserLoginRequest request = UserLoginRequest.getInstance();
 
 
-        Observer<HttpResult> observer=new Observer<HttpResult>() {
+        Observer<HttpResult> observer = new Observer<HttpResult>() {
             @Override
             public void onSubscribe(Disposable d) {
 
@@ -200,7 +203,7 @@ public class NameCardFragment extends BaseBackFragment {
 
             @Override
             public void onNext(HttpResult result) {
-                if (result.getCode()==1) {
+                if (result.getCode() == 1) {
                     User user = User.getUserFromCache();
                     user.setUserName(theNewUserName);
                     User.save(user);
@@ -220,10 +223,9 @@ public class NameCardFragment extends BaseBackFragment {
             }
         };
 
-        request.updateUserName(observer,theNewUserName);
+        request.updateUserName(observer, theNewUserName);
 
     }
-
 
 
     @Override

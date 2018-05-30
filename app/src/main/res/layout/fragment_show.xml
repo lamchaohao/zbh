@@ -4,8 +4,40 @@
              android:layout_height="match_parent"
               android:orientation="vertical"
              tools:context="com.gzz100.zbh.home.meetingadmin.fragment.ShowFragment">
-    <include layout="@layout/sub_tools"/>
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/iv_catalog_switch"
+            android:src="@drawable/ic_menu_primary_24dp"
+            android:padding="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/btFile"
+            android:paddingLeft="36dp"
+            android:paddingRight="36dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/recycler_bg"
+            android:drawableLeft="@drawable/ic_insert_drive_file_black_24dp"
+            android:text="浏览文件"/>
+
+
+        <ImageView
+            android:id="@+id/btRotation"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="@drawable/recycler_bg"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:src="@drawable/ic_screen_rotation_black_24dp"/>
+
+
+    </LinearLayout>
 
     <FrameLayout
         android:orientation="horizontal"
@@ -13,21 +45,10 @@
         android:layout_height="match_parent">
 
 
-        <FrameLayout
-            android:orientation="vertical"
+        <com.tencent.smtt.sdk.WebView
+            android:id="@+id/webView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/rcv_showPPt"
-                android:src="@mipmap/ic_launcher"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-            <com.tencent.smtt.sdk.WebView
-                android:id="@+id/webView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-        </FrameLayout>
+            android:layout_height="match_parent"/>
 
         <FrameLayout
             android:background="#48424242"
@@ -35,23 +56,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:id="@+id/iv_catalog_switch"
-                android:src="@drawable/ic_menu_primary_24dp"
-                android:padding="12dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rcv_content"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"/>
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/rcv_content"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"/>
-
-        </LinearLayout>
 
     </FrameLayout>
 

@@ -16,24 +16,25 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bigkoo.pickerview.TimePickerView;
+import com.google.gson.Gson;
 import com.gzz100.zbh.R;
-import com.gzz100.zbh.home.appointment.adapter.SelectTimeAdapter;
-import com.gzz100.zbh.base.BaseFragment;
+import com.gzz100.zbh.account.User;
+import com.gzz100.zbh.base.BaseBackFragment;
 import com.gzz100.zbh.data.entity.MeetingEntity;
 import com.gzz100.zbh.data.entity.MeetingRoomEntity;
 import com.gzz100.zbh.data.entity.Staff;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.request.AppointmentRequest;
 import com.gzz100.zbh.data.network.request.MeetingRoomRequest;
+import com.gzz100.zbh.home.appointment.adapter.SelectTimeAdapter;
 import com.gzz100.zbh.home.appointment.entity.Agenda;
 import com.gzz100.zbh.home.appointment.entity.StaffWrap;
-import com.gzz100.zbh.home.appointment.entity.TimeBlock;
+import com.gzz100.zbh.home.root.HomeFragment;
 import com.gzz100.zbh.utils.DensityUtil;
 import com.gzz100.zbh.utils.GlideApp;
 import com.gzz100.zbh.utils.TextHeadPicUtil;
 import com.gzz100.zbh.utils.TimeFormatUtil;
 import com.orhanobut.logger.Logger;
-import com.qmuiteam.qmui.util.QMUIResHelper;
 import com.qmuiteam.qmui.widget.QMUITabSegment;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 
@@ -58,7 +59,7 @@ import es.dmoral.toasty.Toasty;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
-public class ApmDetailFragment extends BaseFragment {
+public class ApmDetailFragment extends BaseBackFragment {
 
 
     @BindView(R.id.rcv_apm_detail_time)
@@ -98,6 +99,8 @@ public class ApmDetailFragment extends BaseFragment {
     ImageView mIvSummaryPic;
     @BindView(R.id.rl_summary_detail)
     RelativeLayout mRlSummary;
+    @BindView(R.id.tv_remind)
+    TextView tvRemindTime;
     @BindView(R.id.bt_next_detail)
     Button mBtNext;
     @BindView(R.id.tv_delegateSum)
@@ -122,7 +125,6 @@ public class ApmDetailFragment extends BaseFragment {
     RelativeLayout mRlRemind;
 
     private String mRoomId;
-    private MeetingRoomEntity mMeetingRoomEntity;
     private SelectTimeAdapter mAdapter;
     public static final int RC_HOST = 366;
     public static final int RC_DELEGATE = 367;
@@ -135,11 +137,18 @@ public class ApmDetailFragment extends BaseFragment {
     private ArrayList<Agenda> mAddedAgendas;
     private long mStartTime;
     private long mEndTime;
+    private boolean mHasInitRoom;
+    private String mRemindTimeStr;
 
-    public static ApmDetailFragment newInstance(MeetingRoomEntity room) {
+
+    public static ApmDetailFragment newInstance(String roomId,String roomName,int capacity,String tab,String picUrl) {
         Bundle args = new Bundle();
         ApmDetailFragment fragment = new ApmDetailFragment();
-        args.putParcelable("room", room);
+        args.putString("roomId", roomId);
+        args.putString("roomName",roomName);
+        args.putInt("capacity",capacity);
+        args.putString("tab",tab);
+        args.putString("picUrl",picUrl);
         fragment.setArguments(args);
         return fragment;
     }
@@ -150,27 +159,31 @@ public class ApmDetailFragment extends BaseFragment {
         View inflate = inflater.inflate(R.layout.fragment_apm_detail, null);
         unbinder = ButterKnife.bind(this, inflate);
         EventBus.getDefault().register(this);
-        return inflate;
+        return attachToSwipeBack(inflate);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         initVar();
         initTopbar();
-        initMeetingRoom();
+
         initRecyclerView();
         loadData(TimeFormatUtil.formatDate(System.currentTimeMillis()));
         initTabs();
     }
 
-    private void initMeetingRoom() {
-        GlideApp.with(this)
-                .load(mMeetingRoomEntity.getMeetingPlacePic())
+    private void shouldinitMeetingRoom(MeetingRoomEntity roomEntity) {
+
+        if (mHasInitRoom) {
+            return;
+        }
+        GlideApp.with(_mActivity)
+                .load(roomEntity.getMeetingPlacePic())
                 .placeholder((R.drawable.ic_insert_chart_blue_500_48dp))
                 .into(mIvRoom);
-        mTvRoomName.setText(mMeetingRoomEntity.getMeetingPlaceName());
-        mTvCapcityRoom.setText(mMeetingRoomEntity.getMeetingPlaceCapacity()+"人");
-        String[] tabs = mMeetingRoomEntity.getMeetingPlaceTab().split("、");
+        mTvRoomName.setText(roomEntity.getMeetingPlaceName());
+        mTvCapcityRoom.setText(roomEntity.getMeetingPlaceCapacity()+"人");
+        String[] tabs = roomEntity.getMeetingPlaceTab().split("、");
         int size = tabs.length;
 
         switch (size) {
@@ -187,22 +200,38 @@ public class ApmDetailFragment extends BaseFragment {
                 mTvTag1Room.setVisibility(View.VISIBLE);
                 mTvTag1Room.setText(tabs[0]);
         }
+        mHasInitRoom = true;
     }
 
 
     private void initVar() {
         if (getArguments() != null) {
-            mMeetingRoomEntity = getArguments().getParcelable("room");
-            mRoomId = mMeetingRoomEntity.getMeetingPlaceId();
-            Logger.i("room=" + mMeetingRoomEntity);
+            mRoomId = getArguments().getString("roomId");
+            MeetingRoomEntity roomEntity=new MeetingRoomEntity();
+            String roomName = getArguments().getString("roomName");
+            String tab = getArguments().getString("tab");
+            int capacity = getArguments().getInt("capacity");
+            String picUrl = getArguments().getString("picUrl");
+            roomEntity.setMeetingPlaceName(roomName);
+            roomEntity.setMeetingPlaceTab(tab);
+            roomEntity.setMeetingPlacePic(picUrl);
+            roomEntity.setMeetingPlaceCapacity(capacity);
+            shouldinitMeetingRoom(roomEntity);
         }
         mAddedAgendas = new ArrayList<>();
         mCopyStaffList = new ArrayList<>();
         mDelegateList = new ArrayList<>();
+        //创建会议时候, 默认把自己作为参会人员
+        Staff staff = new Staff();
+        User user = User.getUserFromCache();
+        staff.setUserName(user.getUserName());
+        staff.setUserId(user.getUserId());
+        mDelegateList.add(staff);
     }
 
     private void initTopbar() {
         mTopbar.setTitle("预约会议");
+        onRemindTimeChange("no");
     }
 
     private void initTabs() {
@@ -212,10 +241,10 @@ public class ApmDetailFragment extends BaseFragment {
                 pop();
             }
         });
-        int normalColor = QMUIResHelper.getAttrColor(getActivity(), R.attr.qmui_config_color_black);
-        int selectColor = QMUIResHelper.getAttrColor(getActivity(), R.attr.qmui_config_color_blue);
-        mTabSegment.setDefaultNormalColor(normalColor);
-        mTabSegment.setDefaultSelectedColor(selectColor);
+//        int normalColor = QMUIResHelper.getAttrColor(getActivity(), R.attr.qmui_config_color_black);
+//        int selectColor = QMUIResHelper.getAttrColor(getActivity(), R.attr.qmui_config_color_blue);
+//        mTabSegment.setDefaultNormalColor(normalColor);
+//        mTabSegment.setDefaultSelectedColor(selectColor);
         QMUITabSegment.Tab todayTabs = new QMUITabSegment.Tab("今天");
         QMUITabSegment.Tab tomorrowTab = new QMUITabSegment.Tab("明天");
         QMUITabSegment.Tab dayAfterTomrwTab = new QMUITabSegment.Tab("后天");
@@ -273,16 +302,23 @@ public class ApmDetailFragment extends BaseFragment {
 
     private void showSelectTimeDialog() {
         boolean[] option = new boolean[]{true, true, true, false, false, false};//显示类型 默认全部显示
+        Calendar endDate = Calendar.getInstance();
+        int m = endDate.get(Calendar.MONTH);
+        m++;
+        if (m>=12){
+            m=0;
+        }
+        endDate.set(Calendar.MONTH,m);
         TimePickerView pvTime = new TimePickerView.Builder(getContext(), new TimePickerView.OnTimeSelectListener() {
             @Override
             public void onTimeSelect(Date date, View v) {//选中事件回调
-                Logger.i("date=" + date);
+                String formatDate = TimeFormatUtil.formatDate(date);
+                loadData(formatDate);
             }
         }).setType(option)
+                .setRangDate(Calendar.getInstance(),endDate)
                 .build();
-        //注：根据需求来决定是否使用该方法（一般是精确到秒的情况），
-        // 此项可以在弹出选择器的时候重新设置当前时间，
-        // 避免在初始化之后由于时间已经设定，导致选中时间与当前时间不匹配的问题。
+
         pvTime.setDate(Calendar.getInstance());
         pvTime.show();
     }
@@ -300,8 +336,11 @@ public class ApmDetailFragment extends BaseFragment {
             public void onNext(HttpResult<List<MeetingRoomEntity>> result) {
                 List<MeetingRoomEntity> roomEntities = result.getResult();
                 if (roomEntities.size() == 1) {
+                    shouldinitMeetingRoom(roomEntities.get(0));
                     List<MeetingRoomEntity.MeetingListBean> meetingList = roomEntities.get(0).getMeetingList();
                     mAdapter.setBookedTime(meetingList);
+                }else {
+                    mAdapter.resetSelect();
                 }
             }
 
@@ -324,30 +363,34 @@ public class ApmDetailFragment extends BaseFragment {
         mAdapter = new SelectTimeAdapter(getContext());
         mRcvApmDetailTime.setAdapter(mAdapter);
 
-//        mAdapter.setBookedTime(bookedTimes);
-        mAdapter.setOnItemClickListener(new SelectTimeAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(TimeBlock timeBlock) {
-
-            }
-        });
         int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         int pos = (hour - 7) * 5;
         mRcvApmDetailTime.smoothScrollToPosition(pos + 15);
         mAdapter.setOnBookTimeChangeListener(new SelectTimeAdapter.OnBookTimeChangeListener() {
             @Override
             public void onBookTimeChange(long startTime, long endTime) {
-                Calendar calendar = Calendar.getInstance();
-                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-                calendar.setTimeInMillis(startTime);
-                String start = sdf.format(calendar.getTime());
-                calendar.setTimeInMillis(endTime);
-                String end = sdf.format(calendar.getTime());
-                mStartTime = startTime;
-                mEndTime = endTime;
-                mTvTime.setText(start + " - " + end);
-                long cost = (endTime - startTime) / 60000;
-                mTvTimeHowlong.setText(cost + "分钟");
+                if (startTime==0){
+                    mTvDate.setText("请选择时间");
+                    mTvTime.setVisibility(View.GONE);
+                    mTvTimeHowlong.setVisibility(View.GONE);
+                }else {
+                    mTvTime.setVisibility(View.VISIBLE);
+                    mTvTimeHowlong.setVisibility(View.VISIBLE);
+                    Calendar calendar = Calendar.getInstance();
+                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                    calendar.setTimeInMillis(startTime);
+                    String start = sdf.format(calendar.getTime());
+                    mTvDate.setText(TimeFormatUtil.formatDate(calendar.getTime()));
+                    calendar.setTimeInMillis(endTime);
+                    String end = sdf.format(calendar.getTime());
+                    mStartTime = startTime;
+                    mEndTime = endTime;
+
+                    mTvTime.setText(start + " - " + end);
+                    long cost = (endTime - startTime) / 60000;
+                    mTvTimeHowlong.setText(cost + "分钟");
+                }
+
             }
         });
     }
@@ -415,11 +458,39 @@ public class ApmDetailFragment extends BaseFragment {
         }
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        EventBus.getDefault().unregister(this);
-        unbinder.unbind();
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRemindTimeChange(String time){
+        mRemindTimeStr = time;
+        String tvTimeShow="";
+        switch (time) {
+            case "15":
+                tvTimeShow = "15分钟";
+                break;
+            case "30":
+                tvTimeShow = "30分钟";
+                break;
+            case "60":
+                tvTimeShow = "60分钟";
+                break;
+            case "120":
+                tvTimeShow = "2小时";
+                break;
+            case "1d":
+                tvTimeShow = "1天";
+                break;
+            case "2d":
+                tvTimeShow = "2天";
+                break;
+            case "7d":
+                tvTimeShow = "1周";
+                break;
+            case "no":
+                tvTimeShow = "不提醒";
+                break;
+        }
+
+        tvRemindTime.setText(tvTimeShow);
     }
 
     @OnClick({R.id.rl_host, R.id.rl_delegate_detail, R.id.rl_agenda_detail,R.id.rl_remind,
@@ -458,8 +529,8 @@ public class ApmDetailFragment extends BaseFragment {
                 startFragment(MultiChosePersonFragment.newInstance(MultiChosePersonFragment.MultiChoices, RC_COPY, copyToIds));
                 break;
             case R.id.rl_remind:
-//                startFragment(new RemindTimeFragment());
-                startFragment(AddFileVoteFragment.newInstance("1038"));
+                startFragment(RemindTimeFragment.newInstance(mRemindTimeStr));
+//                startFragment(AddFileVoteFragment.newInstance("1038"));
                 break;
             case R.id.bt_next_detail:
                 addMeeting();
@@ -480,6 +551,7 @@ public class ApmDetailFragment extends BaseFragment {
             @Override
             public void onNext(HttpResult<MeetingEntity> result) {
                 Logger.i(result.getCode() + "," + result.getResult().toString());
+                EventBus.getDefault().post(HomeFragment.HomePage.meeting);
                 startWithPop(AddFileVoteFragment.newInstance(result.getResult().getMeetingId()));
             }
 
@@ -497,42 +569,59 @@ public class ApmDetailFragment extends BaseFragment {
 
         String startTime = TimeFormatUtil.formatDateAndTime(mStartTime);
         String endTime = TimeFormatUtil.formatDateAndTime(mEndTime);
-        JSONArray jsonArray = new JSONArray();
+        JSONArray agendaJsonArray = new JSONArray();
         try {
             for (int i = 0; i < mAddedAgendas.size(); i++) {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("agendaName", mAddedAgendas.get(i).getAgendaName());
                 jsonObject.put("userId", mAddedAgendas.get(i).getStaff().getUserId());
-                jsonArray.put(i, jsonObject);
+                agendaJsonArray.put(i, jsonObject);
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        Logger.i(jsonArray.toString());
+        Logger.i(agendaJsonArray.toString());
 
-        StringBuilder delegateIdList = new StringBuilder("[");
+        Gson gson=new Gson();
+        String[] delegateIdArr=new String[mDelegateList.size()];
+//        StringBuilder delegateIdList = new StringBuilder("[");
         for (int i = 0; i < mDelegateList.size(); i++) {
-            delegateIdList.append(mDelegateList.get(i).getUserId());
-            if (i != mDelegateList.size() - 1) {
-                delegateIdList.append(",");
-            } else {
-                delegateIdList.append("]");
-            }
+//            if (mDelegateList.get(i).getUserId().equals(mHostStaff.getUserId())){
+//                //如果参会人员中包含主持人
+//                delegateIdList.append("]");
+//                continue;
+//            }else {
+//                delegateIdList.append(mDelegateList.get(i).getUserId());
+//            }
+            delegateIdArr[i] = mDelegateList.get(i).getUserId();
+//            if (i != mDelegateList.size() - 1) {
+//                delegateIdList.append(",");
+//            } else {
+//                delegateIdList.append("]");
+//            }
         }
-        StringBuilder copyIdList = new StringBuilder("[");
-        for (int i = 0; i < mDelegateList.size(); i++) {
-            copyIdList.append(mDelegateList.get(i).getUserId());
-            if (i != mDelegateList.size() - 1) {
-                copyIdList.append(",");
-            } else {
-                copyIdList.append("]");
-            }
+        String delegateIdJson = gson.toJson(delegateIdArr);
+        Logger.i("delegateIdList:" + delegateIdJson);
+//        StringBuilder copyIdList = new StringBuilder("[");
+        String[] copyIdArr=new String[mCopyStaffList.size()];
+        for (int i = 0; i < mCopyStaffList.size(); i++) {
+//            copyIdList.append(mCopyStaffList.get(i).getUserId());
+//            if (i != mCopyStaffList.size() - 1) {
+//                copyIdList.append(",");
+//            } else {
+//                copyIdList.append("]");
+//            }
+            copyIdArr[i]=mCopyStaffList.get(i).getUserId();
+
         }
 
-        Logger.i("delegateIdList:" + delegateIdList.toString());
+        String copyIdJson = gson.toJson(copyIdArr);
+        Logger.i("copyIdJson="+copyIdJson);
+
         request.addMeeting(observer, mEtMeetingName.getText().toString(),
                 mRoomId, startTime, endTime, mHostStaff.getUserId(),
-                mSummaryStaff.getUserId(), copyIdList.toString(), jsonArray.toString(), delegateIdList.toString());
+                mSummaryStaff.getUserId(), copyIdJson, agendaJsonArray.toString(),
+                delegateIdJson,mRemindTimeStr);
 
     }
 
@@ -561,4 +650,13 @@ public class ApmDetailFragment extends BaseFragment {
         }
         return true;
     }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBus.getDefault().unregister(this);
+        unbinder.unbind();
+    }
+
 }

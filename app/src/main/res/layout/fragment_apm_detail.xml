@@ -4,11 +4,11 @@
                 android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              android:background="@drawable/recycler_bg"
               tools:context=".home.appointment.fragment.ApmDetailFragment">
-    <com.qmuiteam.qmui.widget.QMUITopBar
-        android:id="@+id/topbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/qmui_topbar_height"/>
+
+    <include layout="@layout/widget_topbar"/>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -40,6 +40,8 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:padding="12dp"
+                android:showDividers="end"
+                android:divider="@color/colorGray"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView
@@ -69,10 +71,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
             </LinearLayout>
-            <View
-                android:background="@color/colorGray"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"/>
+            <!--<com.gzz100.zbh.widget.DividerView-->
+                <!--android:paddingLeft="16dp"-->
+                <!--android:paddingRight="16dp"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="2dp"/>-->
             <LinearLayout
                 android:padding="12dp"
                 android:orientation="horizontal"
@@ -100,7 +103,7 @@
 
             <RelativeLayout
                 android:id="@+id/rl_host"
-                android:padding="12dp"
+                style="@style/apmDetailRelative"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView
@@ -126,7 +129,7 @@
             </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/rl_delegate_detail"
-                android:padding="12dp"
+                style="@style/apmDetailRelative"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView
@@ -161,7 +164,7 @@
 
             <RelativeLayout
                 android:id="@+id/rl_agenda_detail"
-                android:padding="12dp"
+                style="@style/apmDetailRelative"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView
@@ -184,7 +187,7 @@
             </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/rl_copy_detail"
-                android:padding="12dp"
+                style="@style/apmDetailRelative"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView
@@ -219,7 +222,7 @@
             </HorizontalScrollView>
             <RelativeLayout
                 android:id="@+id/rl_summary_detail"
-                android:padding="12dp"
+                style="@style/apmDetailRelative"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView
@@ -244,7 +247,7 @@
             </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/rl_remind"
-                android:padding="12dp"
+                style="@style/apmDetailRelative"
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -253,8 +256,14 @@
                     android:textSize="16sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
-
+                <TextView
+                    android:id="@+id/tv_remind"
+                    android:text="请选择"
+                    android:layout_toLeftOf="@id/iv_arrow_remind"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
                 <ImageView
+                    android:id="@+id/iv_arrow_remind"
                     android:layout_alignParentRight="true"
                     android:src="@drawable/ic_keyboard_arrow_right_black_24dp"
                     android:layout_width="wrap_content"
@@ -264,7 +273,11 @@
                 android:id="@+id/bt_next_detail"
                 android:textColor="@color/colorWhite"
                 android:text="发起会议"
-                android:background="@color/colorTopbar"
+                android:layout_marginTop="40dp"
+                android:layout_marginBottom="40dp"
+                android:layout_marginLeft="36dp"
+                android:layout_marginRight="36dp"
+                android:background="@drawable/bg_btn_round_conner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
         </LinearLayout>

@@ -5,22 +5,65 @@
               android:orientation="vertical"
              tools:context=".home.appointment.fragment.RemindTimeFragment">
 
-    <com.qmuiteam.qmui.widget.QMUITopBar
-        android:id="@+id/topbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/qmui_topbar_height"/>
+    <include layout="@layout/widget_topbar"/>
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="?attr/qmui_topbar_height"
-        android:background="@color/qmui_config_color_background">
+   <RadioGroup
+       android:id="@+id/rdg_remind"
+       android:layout_margin="8dp"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content">
 
-        <com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView
-            android:id="@+id/groupListView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+       <RadioButton
+           android:id="@+id/none_notify"
+           android:text="无提醒"
+           android:padding="8dp"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"/>
 
-    </ScrollView>
+       <RadioButton
+           android:id="@+id/min15_notify"
+           android:text="提前15分钟"
+           android:padding="8dp"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"/>
+       <RadioButton
+           android:id="@+id/min30_notify"
+           android:text="提前30分钟"
+           android:padding="8dp"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"/>
+       <RadioButton
+           android:id="@+id/hour1_notify"
+           android:text="提前1小时"
+           android:padding="8dp"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"/>
+       <RadioButton
+           android:id="@+id/hour2_notify"
+           android:text="提前2小时"
+           android:padding="8dp"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"/>
+       <RadioButton
+           android:id="@+id/day1_notify"
+           android:text="提前1天"
+           android:padding="8dp"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"/>
+       <RadioButton
+           android:id="@+id/day2_notify"
+           android:text="提前2天"
+           android:padding="8dp"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"/>
+       <RadioButton
+           android:id="@+id/week1_notify"
+           android:text="提前1周"
+           android:padding="8dp"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"/>
+
+
+   </RadioGroup>
 
 </LinearLayout>

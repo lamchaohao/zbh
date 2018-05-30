@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <include layout="@layout/widget_topbar"/>
+
+    <ImageView
+        android:src="@mipmap/ic_launcher"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:text="中佰会2.0"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/tv_check_update"
+        android:text="检查更新"
+        android:padding="16dp"
+        android:background="@drawable/recycler_bg"
+        android:drawableRight="@drawable/ic_keyboard_arrow_right_black_24dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/tv_version_info"
+        android:padding="16dp"
+        android:text="版本介绍"
+        android:background="@drawable/recycler_bg"
+        android:drawableRight="@drawable/ic_keyboard_arrow_right_black_24dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/tv_feedback"
+        android:padding="16dp"
+        android:text="意见反馈"
+        android:background="@drawable/recycler_bg"
+        android:drawableRight="@drawable/ic_keyboard_arrow_right_black_24dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+
+</LinearLayout>

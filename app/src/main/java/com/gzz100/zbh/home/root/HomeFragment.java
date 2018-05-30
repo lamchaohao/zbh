@@ -3,11 +3,12 @@ package com.gzz100.zbh.home.root;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
@@ -24,6 +25,11 @@ import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIResHelper;
 import com.qmuiteam.qmui.widget.QMUITabSegment;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.qmuiteam.qmui.widget.QMUIViewPager;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +51,7 @@ public class HomeFragment extends BaseFragment {
     @BindView(R.id.topbar)
     QMUITopBar mTopBar;
     @BindView(R.id.viewpager_home)
-    ViewPager mViewpagerHome;
+    QMUIViewPager mViewpagerHome;
     @BindView(R.id.tabs_home)
     QMUITabSegment mTabSegment;
     private List<BaseFragment> mFragmentList;
@@ -64,6 +70,7 @@ public class HomeFragment extends BaseFragment {
     protected View onCreateView(LayoutInflater inflater) {
         View inflate = inflater.inflate(R.layout.fragment_home, null);
         ButterKnife.bind(this, inflate);
+        EventBus.getDefault().register(this);
         return inflate;
     }
 
@@ -137,33 +144,38 @@ public class HomeFragment extends BaseFragment {
         mTabSegment.setDefaultNormalColor(normalColor);
         mTabSegment.setDefaultSelectedColor(selectColor);
         QMUITabSegment.Tab apm = new QMUITabSegment.Tab(
-                ContextCompat.getDrawable(getContext(), R.drawable.ic_today_grey_700_24dp),
-                ContextCompat.getDrawable(getContext(), R.drawable.ic_today_primary_24dp),
+                ContextCompat.getDrawable(getContext(), R.drawable.ic_home_appointment_normal),
+                ContextCompat.getDrawable(getContext(), R.drawable.ic_home_appointment_selected),
                 "预约", false
         );
         QMUITabSegment.Tab meeting = new QMUITabSegment.Tab(
-                ContextCompat.getDrawable(getContext(), R.drawable.ic_work_grey_700_24dp),
-                ContextCompat.getDrawable(getContext(), R.drawable.ic_work_primary_24dp),
+                ContextCompat.getDrawable(getContext(), R.drawable.ic_home_meeting_normal),
+                ContextCompat.getDrawable(getContext(), R.drawable.ic_home_meeting_selected),
                 "会议", false
         );
         QMUITabSegment.Tab message = new QMUITabSegment.Tab(
-                ContextCompat.getDrawable(getContext(), R.drawable.ic_message_grey_700_24dp),
-                ContextCompat.getDrawable(getContext(), R.drawable.ic_message_primary_24dp),
+                ContextCompat.getDrawable(getContext(), R.drawable.ic_home_message_normal),
+                ContextCompat.getDrawable(getContext(), R.drawable.ic_home_message_selected),
                 "消息", false
         );
         QMUITabSegment.Tab mine = new QMUITabSegment.Tab(
-                ContextCompat.getDrawable(getContext(), R.drawable.ic_person_grey_700_24dp),
-                ContextCompat.getDrawable(getContext(), R.drawable.ic_person_primary_24dp),
+                ContextCompat.getDrawable(getContext(), R.drawable.ic_home_mine_normal),
+                ContextCompat.getDrawable(getContext(), R.drawable.ic_home_mine_selected),
                 "我的", false
         );
 
         QMUITabSegment.Tab guide = new QMUITabSegment.Tab(
-                ContextCompat.getDrawable(getContext(), R.drawable.ic_message_grey_700_24dp),
-                ContextCompat.getDrawable(getContext(), R.drawable.ic_message_primary_24dp),
+                ContextCompat.getDrawable(getContext(), R.drawable.ic_home_message_normal),
+                ContextCompat.getDrawable(getContext(), R.drawable.ic_home_message_selected),
                 "主页", false
         );
 
-        message.showSignCountView(getContext(),3);
+        apm.setTextColor(getResources().getColor(R.color.colorTextNormal),getResources().getColor(R.color.colorTextSelected));
+        guide.setTextColor(getResources().getColor(R.color.colorTextNormal),getResources().getColor(R.color.colorTextSelected));
+        message.setTextColor(getResources().getColor(R.color.colorTextNormal),getResources().getColor(R.color.colorTextSelected));
+        mine.setTextColor(getResources().getColor(R.color.colorTextNormal),getResources().getColor(R.color.colorTextSelected));
+//        message.showSignCountView(getContext(),102);
+        meeting.setTextColor(getResources().getColor(R.color.colorTextNormal),getResources().getColor(R.color.colorTextSelected));
         if (mIsJoined) {
             mTabSegment.addTab(apm)
                     .addTab(meeting)
@@ -171,34 +183,66 @@ public class HomeFragment extends BaseFragment {
                     .addTab(mine);
         }else {
             mTabSegment.addTab(guide)
+                    .addTab(message)
                     .addTab(mine);
         }
 
     }
 
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void getColor(){
+
+    }
+
     private void initPagers() {
+        mViewpagerHome.setOffscreenPageLimit(3);
         mFragmentList = new ArrayList<>();
         if (mIsJoined) {
             mFragmentList.add(new ApmRootFragment());
             mFragmentList.add(new MeetingPreviewFragment());
-            mFragmentList.add(new MessageFragment());
+
         }else {
             mFragmentList.add(new GuideFragment());
         }
 
-
+        mFragmentList.add(new MessageFragment());
         mFragmentList.add(new MineFragment());
 
         mPagerAdapter = new HomeAdapter(getChildFragmentManager(),mFragmentList);
         mViewpagerHome.setAdapter(mPagerAdapter);
         mPagerAdapter.notifyDataSetChanged();
         mTabSegment.setupWithViewPager(mViewpagerHome, false);
+
+    }
+
+    public enum HomePage{
+        appointment,meeting,message,mine
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onPage(HomePage page){
+        switch (page) {
+            case mine:
+                mTabSegment.selectTab(3);
+                break;
+            case meeting:
+                mTabSegment.selectTab(1);
+                break;
+            case message:
+                mTabSegment.selectTab(2);
+                break;
+            case appointment:
+                mTabSegment.selectTab(0);
+                break;
+        }
     }
 
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        EventBus.getDefault().unregister(this);
         Logger.i("OnDestroy");
     }
 }

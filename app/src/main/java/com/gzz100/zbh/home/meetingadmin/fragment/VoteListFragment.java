@@ -18,9 +18,14 @@ import com.gzz100.zbh.data.network.request.VoteRequest;
 import com.gzz100.zbh.home.appointment.entity.VoteWrap;
 import com.gzz100.zbh.home.appointment.fragment.SelectVoteModeFragment;
 import com.gzz100.zbh.home.meetingadmin.adapter.VoteListAdapter;
+import com.gzz100.zbh.res.Common;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.QMUIEmptyView;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.header.ClassicsHeader;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -31,6 +36,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import es.dmoral.toasty.Toasty;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
@@ -45,15 +51,19 @@ public class VoteListFragment extends BaseBackFragment {
     RecyclerView mRcvVoteList;
     @BindView(R.id.emptyView)
     QMUIEmptyView mEmptyView;
+    @BindView(R.id.prl_refresh)
+    SmartRefreshLayout mRefreshLayout;
     Unbinder unbinder;
     private String mMeetingId;
     private String mHostId;
+    private int mMeetingStatus;
 
-    public static VoteListFragment newInstance(String meetingId,String hostId){
+    public static VoteListFragment newInstance(String meetingId,String hostId,int status){
         VoteListFragment fragment = new VoteListFragment();
         Bundle bundle=new Bundle();
         bundle.putString("meetingId",meetingId);
         bundle.putString("hostId",hostId);
+        bundle.putInt("meetingStatus",status);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -71,20 +81,48 @@ public class VoteListFragment extends BaseBackFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        initTopbar();
+        initView();
+        loadData();
+    }
+
+    private void initView() {
+        mRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(RefreshLayout refreshLayout) {
+                loadData();
+            }
+        });
+        mRefreshLayout.setEnableLoadMore(false);
+        mRefreshLayout.setRefreshHeader(new ClassicsHeader(getContext()));
+    }
+
+    private void initTopbar() {
         if (getArguments()!=null) {
             mMeetingId = getArguments().getString("meetingId");
             mHostId = getArguments().getString("hostId");
+            mMeetingStatus = getArguments().getInt("meetingStatus");
         }
         mTopbar.setTitle("投票");
-        Button addVote = mTopbar.addRightTextButton("新增投票", R.id.buttonSave);
-        addVote.setTextColor(Color.WHITE);
-        addVote.setOnClickListener(new View.OnClickListener() {
+        if (mMeetingStatus!= Common.STATUS_END) {
+            Button addVote = mTopbar.addRightTextButton("新增投票", R.id.buttonSave);
+            addVote.setTextColor(Color.WHITE);
+            addVote.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startFragment(new SelectVoteModeFragment());
+                }
+            });
+        }else {
+            //防止默认的点击新增投票的提示出现
+            mEmptyView.setDetailText("");
+        }
+        mTopbar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startFragment(new SelectVoteModeFragment());
+                pop();
             }
         });
-        loadData();
     }
 
     private void loadData() {
@@ -102,12 +140,13 @@ public class VoteListFragment extends BaseBackFragment {
 
             @Override
             public void onError(Throwable e) {
+                mRefreshLayout.finishRefresh(false);
 
             }
 
             @Override
             public void onComplete() {
-
+                mRefreshLayout.finishRefresh(true);
             }
         };
 
@@ -166,11 +205,12 @@ public class VoteListFragment extends BaseBackFragment {
             @Override
             public void onNext(HttpResult result) {
                 Logger.i("onNext--");
+
             }
 
             @Override
             public void onError(Throwable e) {
-                Logger.i("onError--"+e.getMessage());
+                Toasty.error(_mActivity,e.getMessage()).show();
             }
 
             @Override

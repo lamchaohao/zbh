@@ -124,7 +124,7 @@ public class RoomAdapter extends RecyclerView.Adapter {
                 .placeholder((R.drawable.ic_insert_chart_blue_500_48dp))
                 .into(holder.mIvRoomPic);
         holder.mTvRoomName.setText(room.getMeetingPlaceName());
-        holder.mTvCapcity.setText(room.getMeetingPlaceCapacity()+"人");
+        holder.mTvCapcity.setText("坐席 "+room.getMeetingPlaceCapacity()+"人");
         String[] tabs = room.getMeetingPlaceTab().split("、");
         int size = tabs.length;
 

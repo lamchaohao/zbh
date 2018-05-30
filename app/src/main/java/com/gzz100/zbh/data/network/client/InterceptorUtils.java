@@ -38,7 +38,7 @@ public class InterceptorUtils {
         }
         if (contentLength != 0) {
             String s = buffer.clone().readString(charset).toString();
-            Logger.e( "responsData = "+s);
+            Logger.d( "responsData = "+s);
             return new JSONObject(buffer.clone().readString(charset)).toString();
             //because response content contain quotation mark
 

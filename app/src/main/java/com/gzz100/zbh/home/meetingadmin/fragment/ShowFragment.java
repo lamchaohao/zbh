@@ -10,7 +10,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -23,12 +22,7 @@ import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.request.DocumentRequest;
 import com.gzz100.zbh.data.network.request.MeetingRequest;
 import com.gzz100.zbh.home.meetingadmin.adapter.CatalogAdapter;
-import com.gzz100.zbh.home.meetingadmin.adapter.ChoseSpeakerAdapter;
 import com.gzz100.zbh.home.meetingadmin.adapter.DocumentAdapter;
-import com.gzz100.zbh.home.meetingadmin.adapter.PPTAdapter;
-import com.gzz100.zbh.utils.DensityUtil;
-import com.gzz100.zbh.utils.GlideApp;
-import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.popup.QMUIPopup;
 import com.tencent.smtt.sdk.ValueCallback;
 import com.tencent.smtt.sdk.WebSettings;
@@ -52,36 +46,31 @@ public class ShowFragment extends BaseFragment {
 
     @BindView(R.id.btFile)
     Button mBtFile;
-    @BindView(R.id.bthost)
-    Button mBthost;
     @BindView(R.id.btRotation)
     ImageView mBtRotation;
-    @BindView(R.id.btpause)
-    ImageView mBtpause;
-    @BindView(R.id.ivEdit)
-    ImageView mIvEdit;
     Unbinder unbinder;
     @BindView(R.id.webView)
     WebView mWebView;
     @BindView(R.id.rcv_content)
     RecyclerView mRcvCatalog;
-    @BindView(R.id.rcv_showPPt)
-    RecyclerView mRcvShowPPt;
     @BindView(R.id.iv_catalog_switch)
     ImageView mIvCatalogSwitch;
     @BindView(R.id.fl_showMask)
     FrameLayout mFlMask;
     private String mMeetingId;
-    private List<DocumentEntity> mDocumentList;
     private List<String> picUrlList;
     private List<DelegateEntity> delegateList;
     private CatalogAdapter mAdapter;
-    private PPTAdapter mPptAdapter;
+    private List<DocumentEntity> mDocumentList;
+    private QMUIPopup mFilePopup;
+    private DocumentAdapter mDocumentAdapter;
+    private long mGroupId;
 
-    public static ShowFragment getNewInstance(String meetingId) {
+    public static ShowFragment getNewInstance(String meetingId,long groupId) {
         Bundle bundle = new Bundle();
         ShowFragment fragment = new ShowFragment();
         bundle.putString("meetingId", meetingId);
+        bundle.putLong("groupId",groupId);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -98,34 +87,52 @@ public class ShowFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         if (getArguments() != null) {
             mMeetingId = getArguments().getString("meetingId");
+            mGroupId = getArguments().getLong("groupId");
         }
         delegateList = new ArrayList<>();
         loadContent();
+        initFilePopupWin();
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
+    private void initFilePopupWin() {
+        mDocumentList = new ArrayList<>();
+        mDocumentAdapter = new DocumentAdapter(getContext(), mDocumentList);
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.item_recycler_view, null);
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
+        mFilePopup = new QMUIPopup(getContext(), DIRECTION_BOTTOM);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+        recyclerView.setAdapter(mDocumentAdapter);
+        mDocumentAdapter.setOnItemClickListener(new DocumentAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int pos, DocumentEntity documentEntity) {
+                loadDocument(mDocumentList.get(pos));
+                mFilePopup.dismiss();
+            }
+
+            @Override
+            public void onAddFileClick() {
+                startParentFragment(ManageFileFragment.newInstance(mMeetingId));
+                mFilePopup.dismiss();
+            }
+        });
+        mFilePopup.setContentView(view);
+
     }
 
-    @OnClick({R.id.btFile, R.id.bthost, R.id.btRotation, R.id.btpause, R.id.ivEdit,R.id.iv_catalog_switch})
+
+
+    @OnClick({R.id.btFile, R.id.btRotation, R.id.iv_catalog_switch})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btFile:
                 loadDocumentData();
                 break;
-            case R.id.bthost:
-                loadDelegates();
-                break;
             case R.id.btRotation:
                 Intent intent = new Intent(getContext(), FullscreenActivity.class);
                 intent.putExtra("meetingId",mMeetingId);
+                intent.putExtra("groupId",mGroupId);
                 startActivity(intent);
-                break;
-            case R.id.btpause:
-                break;
-            case R.id.ivEdit:
                 break;
             case R.id.iv_catalog_switch:
                 if (mRcvCatalog.getVisibility()== View.GONE) {
@@ -173,16 +180,16 @@ public class ShowFragment extends BaseFragment {
     }
 
     private void showDelegateList() {
-        ChoseSpeakerAdapter adapter = new ChoseSpeakerAdapter(getContext(), delegateList);
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.item_recycler_view, null);
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-        QMUIPopup popup = new QMUIPopup(getContext(), DIRECTION_BOTTOM);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-        recyclerView.setAdapter(adapter);
-
-        popup.setContentView(view);
-        popup.show(mBthost);
+//        ChoseSpeakerAdapter adapter = new ChoseSpeakerAdapter(getContext(), delegateList);
+//        View view = LayoutInflater.from(getContext()).inflate(R.layout.item_recycler_view, null);
+//        RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
+//        QMUIPopup popup = new QMUIPopup(getContext(), DIRECTION_BOTTOM);
+//        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+//        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+//        recyclerView.setAdapter(adapter);
+//
+//        popup.setContentView(view);
+//        popup.show(mBthost);
     }
 
     private void loadDocumentData() {
@@ -194,14 +201,8 @@ public class ShowFragment extends BaseFragment {
             }
 
             @Override
-            public void onNext(HttpResult<List<DocumentEntity>> listHttpResult) {
-                mDocumentList = listHttpResult.getResult();
-                if (mDocumentList != null) {
-                    if (mDocumentList.size()==0){
-                        Toasty.normal(getContext(),"暂无文件").show();
-                    }
-                    showDocumentList(mDocumentList);
-                }
+            public void onNext(HttpResult<List<DocumentEntity>> docResult) {
+                showDocumentList(docResult.getResult());
             }
 
             @Override
@@ -220,29 +221,18 @@ public class ShowFragment extends BaseFragment {
     }
 
     private void showDocumentList(final List<DocumentEntity> documentEntities) {
-        DocumentAdapter adapter = new DocumentAdapter(getContext(), documentEntities);
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.item_recycler_view, null);
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-        QMUIPopup popup = new QMUIPopup(getContext(), DIRECTION_BOTTOM);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-        recyclerView.setAdapter(adapter);
-        adapter.setOnItemClickListener(new DocumentAdapter.OnItemClickListener() {
-            @Override
-            public void onClick(int pos, DocumentEntity documentEntity) {
-                Logger.i(mDocumentList.get(pos).getDocumentName());
-                loadDocument(documentEntities.get(pos));
-//                loadwebView(documentEntities.get(pos));
-            }
-        });
-        popup.setContentView(view);
-        popup.show(mBtFile);
 
+        if (documentEntities!=null){
+            mDocumentList.clear();
+            mDocumentList.addAll(documentEntities);
+            mDocumentAdapter.notifyDataSetChanged();
+        }
+
+        mFilePopup.show(mBtFile);
     }
 
     private void loadContent() {
 
-        mRcvShowPPt.setVisibility(View.GONE);
         initWebView();
         initContentView();
     }
@@ -253,11 +243,6 @@ public class ShowFragment extends BaseFragment {
         picUrlList = new ArrayList<>();
         mAdapter = new CatalogAdapter(picUrlList,getContext());
         mRcvCatalog.setAdapter(mAdapter);
-
-        mRcvShowPPt.setLayoutManager(new LinearLayoutManager(getContext()));
-        mRcvShowPPt.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
-        mPptAdapter = new PPTAdapter(picUrlList,getContext());
-        mRcvShowPPt.setAdapter(mPptAdapter);
 
     }
 
@@ -278,40 +263,35 @@ public class ShowFragment extends BaseFragment {
     }
 
 
-    private void loadwebView(DocumentEntity documentEntity){
-        mRcvShowPPt.setVisibility(View.GONE);
-        mWebView.setVisibility(View.VISIBLE);
-        mWebView.loadUrl(documentEntity.getDocumentPath());
-
-    }
-
     private void loadDocument(DocumentEntity doc){
 
         if(doc!=null){
 
             if (doc.getDocumentType().equals("doc")||doc.getDocumentType().equals("docx")
-                ||doc.getDocumentType().equals("xls")||doc.getDocumentType().equals("xlsx")) {
-
-                mRcvShowPPt.setVisibility(View.GONE);
+                    ||doc.getDocumentType().equals("xls")||doc.getDocumentType().equals("xlsx")) {
+                mFlMask.setVisibility(View.GONE);
+                mIvCatalogSwitch.setVisibility(View.GONE);
+                mRcvCatalog.setVisibility(View.GONE);
                 mWebView.setVisibility(View.VISIBLE);
                 mWebView.loadUrl(doc.getDocumentPath());
             }else {
-                mRcvShowPPt.setVisibility(View.GONE);
+                mIvCatalogSwitch.setVisibility(View.VISIBLE);
                 mWebView.setVisibility(View.VISIBLE);
                 mWebView.loadUrl(doc.getDocumentPath());
+                mRcvCatalog.setVisibility(View.VISIBLE);
                 picUrlList.clear();
                 if (doc.getPictureList()!=null){
                     picUrlList.addAll(doc.getPictureList());
-                    mAdapter.notifyDataSetChanged();
-                    mPptAdapter.notifyDataSetChanged();
+
                 }
-
-
+                mAdapter.notifyDataSetChanged();
 
                 mAdapter.setOnItemClickListener(new CatalogAdapter.OnItemClickListener() {
                     @Override
                     public void onItemClick(final int pos, String url) {
                         mAdapter.setPositivePPt(pos);
+                        mRcvCatalog.setVisibility(View.GONE);
+                        mFlMask.setVisibility(View.GONE);
                         callJS(pos+1);
                     }
 
@@ -321,20 +301,6 @@ public class ShowFragment extends BaseFragment {
                     }
                 });
 
-                mPptAdapter.setOnItemClickListener(new PPTAdapter.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(int pos, String url) {
-                        mAdapter.setPositivePPt(pos);
-                        mPptAdapter.notifyDataSetChanged();
-                        mRcvShowPPt.scrollToPosition(pos);
-//                        mRcvShowPPt.smoothScrollToPosition(pos+1);
-                        mRcvCatalog.smoothScrollToPosition(pos+1);
-                        mRcvCatalog.setVisibility(View.GONE);
-                        mFlMask.setVisibility(View.GONE);
-
-
-                    }
-                });
             }
 
         }
@@ -359,22 +325,27 @@ public class ShowFragment extends BaseFragment {
 
     private void showPreView(int pos, String url) {
 
-        QMUIPopup popup = new QMUIPopup(getContext(), DIRECTION_BOTTOM);
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.item_imageview_full, null);
-        ImageView imageView = view.findViewById(R.id.image_view);
-
-        FrameLayout.LayoutParams params=new FrameLayout.LayoutParams(DensityUtil.dp2px(getContext(),240),
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-        imageView.setLayoutParams(params);
-        GlideApp.with(this)
-                .load(url)
-                .encodeQuality(100)
-                .into(imageView);
-
-        popup.setContentView(view);
-        popup.show(mBthost);
+//        QMUIPopup popup = new QMUIPopup(getContext(), DIRECTION_BOTTOM);
+//        View view = LayoutInflater.from(getContext()).inflate(R.layout.item_imageview_full, null);
+//        ImageView imageView = view.findViewById(R.id.image_view);
+//
+//        FrameLayout.LayoutParams params=new FrameLayout.LayoutParams(DensityUtil.dp2px(getContext(),240),
+//                ViewGroup.LayoutParams.WRAP_CONTENT);
+//        imageView.setLayoutParams(params);
+//        GlideApp.with(this)
+//                .load(url)
+//                .encodeQuality(100)
+//                .into(imageView);
+//
+//        popup.setContentView(view);
+//        popup.show(mBthost);
 
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
 
 }

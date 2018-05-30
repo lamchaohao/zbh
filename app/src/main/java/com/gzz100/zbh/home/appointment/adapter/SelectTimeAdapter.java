@@ -120,8 +120,8 @@ public class SelectTimeAdapter extends RecyclerView.Adapter {
                 blockHolder.rootView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        changeSelectTime(position);
                         if (mOnItemClickListener!=null){
-                            changeSelectTime(position);
                             mOnItemClickListener.onItemClick(realTimeBlock);
                         }
                     }
@@ -160,7 +160,7 @@ public class SelectTimeAdapter extends RecyclerView.Adapter {
         View view = LayoutInflater.from(mContext).inflate(R.layout.view_simple_meeting_info, null);
         qmuiPopup.setContentView(view);
         MeetingRoomEntity.MeetingListBean meeting = timeBlock.getMeetingBean();
-        ((TextView)view.findViewById(R.id.tv_simple_room)).setText(meeting.getMeetingId());
+        ((TextView)view.findViewById(R.id.tv_simple_room)).setText(meeting.getMeetingPlaceName());
         ((TextView)view.findViewById(R.id.tv_simple_staff)).setText(meeting.getApplicant());
         StringBuilder sb=new StringBuilder();
         String start = TimeFormatUtil.formatDateAndTime(meeting.getStartTime());
@@ -181,8 +181,8 @@ public class SelectTimeAdapter extends RecyclerView.Adapter {
      * 改变所选择的时间块
      * @param initPos 在recyclerView中的位置
      */
-    private void changeSelectTime(int initPos) {
-        int currentPressPos = getRealPosition(initPos);
+    public void changeSelectTime(int initPos) {
+        int currentPressPos = getTimeBlockViewPosition(initPos);
         if (lastPos == -1){
             currentSelectStartTimePos=currentPressPos;
             currentSelectEndTimePos=currentPressPos;
@@ -300,36 +300,29 @@ public class SelectTimeAdapter extends RecyclerView.Adapter {
     public void setSelectTimeBlock(BookedTime bookedTime){
         Calendar startTime = bookedTime.getStartTime();
         Calendar endTime = bookedTime.getEndTime();
-        boolean isFirst=true;
         for (int i = 0; i < mTimeBlockList.size(); i++) {
             TimeBlock timeBlock = mTimeBlockList.get(i);
             long timeInMillis = timeBlock.getTime().getTimeInMillis();
             if (timeInMillis>=startTime.getTimeInMillis()&&timeInMillis<=endTime.getTimeInMillis()) {
-                if (isFirst) {
-                    //设置相关的参数,避免点击时候错误
-                    currentSelectStartTimePos=i;
-                    isFirst=false;
-                }
-                currentSelectEndTimePos=i;
-                lastPos = i;
-                timeBlock.setSelect(true);
+                int initialPos = getInitialPos(i);
+                changeSelectTime(initialPos);
             }
             long currentTime = System.currentTimeMillis();
             if (timeInMillis<currentTime){
                 timeBlock.setGone(true);
             }
-        }
-        int tempPos = this.currentSelectEndTimePos;
 
-        changeSelectTime(getInitialPos(tempPos));
+        }
 
     }
 
     /**
-     * 设置预定的时间表
-     * @param bookedTimeList 预定的时间表,时间表里有分段的预定时间
+     * 设置已预定的时间表
+     * @param bookedTimeList 已预定的时间表,时间表里有分段的预定时间
      */
     public void setBookedTime(List<MeetingRoomEntity.MeetingListBean> bookedTimeList){
+        //避免之前日期选择了方块,切换日期后点击出现bug
+        resetSelect();
         for (MeetingRoomEntity.MeetingListBean bookedTime : bookedTimeList) {
 
             for (TimeBlock timeBlock : mTimeBlockList) {
@@ -346,6 +339,19 @@ public class SelectTimeAdapter extends RecyclerView.Adapter {
 
         }
         notifyDataSetChanged();
+    }
+
+    public void resetSelect(){
+        for (TimeBlock timeBlock : mTimeBlockList) {
+            timeBlock.setSelect(false);
+        }
+        lastPos=-1;
+        currentSelectStartTimePos=-1;
+        currentSelectEndTimePos=-1;
+        notifyDataSetChanged();
+        if (mOnBookTimeChangeListener!=null){
+            mOnBookTimeChangeListener.onBookTimeChange(0,0);
+        }
     }
 
 
@@ -379,7 +385,7 @@ public class SelectTimeAdapter extends RecyclerView.Adapter {
      * @param position recyclerView中的position
      * @return TimeBlockList集合中的index
      */
-    private int getRealPosition(int position){
+    private int getTimeBlockViewPosition(int position){
         return position-(position/5+1);
     }
 

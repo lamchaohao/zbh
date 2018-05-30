@@ -13,6 +13,9 @@ import com.gzz100.zbh.data.entity.DocumentEntity;
 
 import java.util.List;
 
+import droidninja.filepicker.FilePickerConst;
+import droidninja.filepicker.utils.FileUtils;
+
 /**
  * Created by Lam on 2018/3/27.
  */
@@ -36,29 +39,67 @@ public class DocumentAdapter extends RecyclerView.Adapter{
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+        DocHolder docHolder = (DocHolder) holder;
 
-       DocHolder docHolder = (DocHolder) holder;
-        final DocumentEntity documentEntity = mDocumentList.get(position);
-        docHolder.ivIcon.setImageResource(R.drawable.ic_message_primary_24dp);
-        docHolder.tvName.setText(documentEntity.getDocumentName());
-        docHolder.rootView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mOnItemClickListener!=null) {
-                    mOnItemClickListener.onClick(position,documentEntity);
+        if (position==mDocumentList.size()){
+            docHolder.ivIcon.setImageResource(R.drawable.ic_add_circle_outline_black_24dp);
+            docHolder.tvName.setText("添加文件");
+            docHolder.rootView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mOnItemClickListener!=null) {
+                        mOnItemClickListener.onAddFileClick();
+                    }
                 }
+            });
+        }else {
+            final DocumentEntity documentEntity = mDocumentList.get(position);
+            FilePickerConst.FILE_TYPE fileType = FileUtils.getFileType(documentEntity.getDocumentName());
+            switch (fileType){
+                case PDF:
+                    docHolder.ivIcon.setImageResource(R.drawable.pdf_icon);
+                    break;
+                case PPT:
+                    docHolder.ivIcon.setImageResource(R.drawable.power_point_2013);
+                    break;
+                case TXT:
+                    docHolder.ivIcon.setImageResource(droidninja.filepicker.R.drawable.icon_file_unknown);
+                case WORD:
+                    docHolder.ivIcon.setImageResource(R.drawable.word_2013);
+                    break;
+                case EXCEL:
+                    docHolder.ivIcon.setImageResource(R.drawable.excel_2013);
+                    break;
+                case UNKNOWN:
+                    docHolder.ivIcon.setImageResource(droidninja.filepicker.R.drawable.icon_file_unknown);
+                    break;
             }
-        });
+
+            docHolder.tvName.setText(documentEntity.getDocumentName());
+            docHolder.rootView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mOnItemClickListener!=null) {
+                        mOnItemClickListener.onClick(position,documentEntity);
+                    }
+                }
+            });
+        }
+
+
+
     }
 
     @Override
     public int getItemCount() {
-        return mDocumentList.size();
+        return mDocumentList.size()+1;
     }
+
 
 
     public interface OnItemClickListener{
         void onClick(int pos,DocumentEntity documentEntity);
+        void onAddFileClick();
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {

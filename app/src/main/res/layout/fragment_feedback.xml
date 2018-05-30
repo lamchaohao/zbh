@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <include layout="@layout/widget_topbar"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="240dp">
+        <EditText
+            android:id="@+id/et_feedback"
+            android:layout_margin="8dp"
+            android:gravity="top|left"
+            android:padding="3dp"
+            android:hint="请输入您宝贵的意见..."
+            android:background="@color/colorWhite"
+            android:layout_width="match_parent"
+            android:layout_height="240dp"/>
+
+        <TextView
+            android:id="@+id/tv_textCount"
+            android:layout_alignParentBottom="true"
+            android:text="0/200"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </RelativeLayout>
+
+</LinearLayout>

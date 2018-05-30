@@ -10,17 +10,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.jetbrains.annotations.NotNull;
+
 import me.yokeyword.fragmentation_swipeback.SwipeBackFragment;
 
 public abstract class BaseFragment extends SwipeBackFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        setSwipeBackEnable(false);
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return onCreateView(inflater);
     }
 
@@ -31,7 +34,9 @@ public abstract class BaseFragment extends SwipeBackFragment {
     }
 
     public void startParentFragment(BaseFragment fragment){
-        ((BaseFragment)getParentFragment()).start(fragment);
+        if (getParentFragment()!=null) {
+            ((BaseFragment)getParentFragment()).start(fragment);
+        }
     }
 
 }

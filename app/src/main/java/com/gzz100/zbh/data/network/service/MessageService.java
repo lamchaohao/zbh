@@ -19,5 +19,5 @@ public interface MessageService {
     @FormUrlEncoded
     @POST("getMessages")
     Observable<HttpResult<List<MessageEntity>>> getMessages(@Field("userId")String userId, @Field("token")String token,
-                                                            @Field("companyId")int companyId, @Field("offset")int offset, @Field("limit")int limit);
+                                                            @Field("companyId")String companyId, @Field("offset")int offset, @Field("limit")int limit);
 }

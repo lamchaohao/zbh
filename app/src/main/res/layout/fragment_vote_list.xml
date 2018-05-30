@@ -5,31 +5,31 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <com.qmuiteam.qmui.widget.QMUITopBar
-        android:id="@+id/topbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/qmui_topbar_height"
-        android:fitsSystemWindows="true"
-        app:qmui_layout_collapseMode="pin"
-        app:qmui_topbar_bg_color="@color/colorTopbar"
-        app:qmui_topbar_need_separator="false"/>
-    <FrameLayout
+    <include layout="@layout/widget_topbar"/>
+
+    <com.scwang.smartrefresh.layout.SmartRefreshLayout
+        android:id="@+id/prl_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <com.qmuiteam.qmui.widget.QMUIEmptyView
-            android:id="@+id/emptyView"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="?attr/qmui_topbar_height"
-            android:background="@color/qmui_config_color_white"
-            app:qmui_title_text="暂无投票"
-            app:qmui_detail_text="点击右上角新增投票"/>
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rcv_vote_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="match_parent">
+            <com.qmuiteam.qmui.widget.QMUIEmptyView
+                android:id="@+id/emptyView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="?attr/qmui_topbar_height"
+                android:background="@color/qmui_config_color_white"
+                app:qmui_title_text="暂无投票"
+                app:qmui_detail_text="点击右上角新增投票"/>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rcv_vote_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
-    </FrameLayout>
+        </FrameLayout>
+    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+
 
 
 

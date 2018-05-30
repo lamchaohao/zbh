@@ -1,18 +1,14 @@
 package com.gzz100.zbh.data.entity;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.gzz100.zbh.utils.TimeFormatUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Lam on 2018/3/9.
  */
 
-public class MeetingRoomEntity implements Parcelable {
+public class MeetingRoomEntity {
 
     private String meetingPlaceId;
     private String companyId;
@@ -118,6 +114,7 @@ public class MeetingRoomEntity implements Parcelable {
     public static class MeetingListBean {
 
         private String meetingId;
+        private String meetingPlaceName;
         private String applicant;
         private String departmentName;
         private String startTime;
@@ -129,6 +126,14 @@ public class MeetingRoomEntity implements Parcelable {
 
         public void setMeetingId(String meetingId) {
             this.meetingId = meetingId;
+        }
+
+        public String getMeetingPlaceName() {
+            return meetingPlaceName;
+        }
+
+        public void setMeetingPlaceName(String meetingPlaceName) {
+            this.meetingPlaceName = meetingPlaceName;
         }
 
         public String getApplicant() {
@@ -162,56 +167,34 @@ public class MeetingRoomEntity implements Parcelable {
         public void setEndTime(String endTime) {
             this.endTime = endTime;
         }
-    }
-
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.meetingPlaceId);
-        dest.writeString(this.companyId);
-        dest.writeString(this.meetingPlaceName);
-        dest.writeInt(this.meetingPlaceStatus);
-        dest.writeInt(this.meetingPlaceCapacity);
-        dest.writeString(this.meetingPlaceTab);
-        dest.writeString(this.meetingPlacePic);
-        dest.writeInt(this.needApply);
-        dest.writeByte(this.enable ? (byte) 1 : (byte) 0);
-        dest.writeString(this.otherTab);
-        dest.writeList(this.meetingList);
-    }
-
-    public MeetingRoomEntity() {
-    }
-
-    protected MeetingRoomEntity(Parcel in) {
-        this.meetingPlaceId = in.readString();
-        this.companyId = in.readString();
-        this.meetingPlaceName = in.readString();
-        this.meetingPlaceStatus = in.readInt();
-        this.meetingPlaceCapacity = in.readInt();
-        this.meetingPlaceTab = in.readString();
-        this.meetingPlacePic = in.readString();
-        this.needApply = in.readInt();
-        this.enable = in.readByte() != 0;
-        this.otherTab = in.readString();
-        this.meetingList = new ArrayList<MeetingListBean>();
-        in.readList(this.meetingList, MeetingListBean.class.getClassLoader());
-    }
-
-    public static final Parcelable.Creator<MeetingRoomEntity> CREATOR = new Parcelable.Creator<MeetingRoomEntity>() {
-        @Override
-        public MeetingRoomEntity createFromParcel(Parcel source) {
-            return new MeetingRoomEntity(source);
-        }
 
         @Override
-        public MeetingRoomEntity[] newArray(int size) {
-            return new MeetingRoomEntity[size];
+        public String toString() {
+            return "MeetingListBean{" +
+                    "meetingId='" + meetingId + '\'' +
+                    ", meetingPlaceName='" + meetingPlaceName + '\'' +
+                    ", applicant='" + applicant + '\'' +
+                    ", departmentName='" + departmentName + '\'' +
+                    ", startTime='" + startTime + '\'' +
+                    ", endTime='" + endTime + '\'' +
+                    '}';
         }
-    };
+    }
+
+    @Override
+    public String toString() {
+        return "MeetingRoomEntity{" +
+                "meetingPlaceId='" + meetingPlaceId + '\'' +
+                ", companyId='" + companyId + '\'' +
+                ", meetingPlaceName='" + meetingPlaceName + '\'' +
+                ", meetingPlaceStatus=" + meetingPlaceStatus +
+                ", meetingPlaceCapacity=" + meetingPlaceCapacity +
+                ", meetingPlaceTab='" + meetingPlaceTab + '\'' +
+                ", meetingPlacePic='" + meetingPlacePic + '\'' +
+                ", needApply=" + needApply +
+                ", enable=" + enable +
+                ", otherTab='" + otherTab + '\'' +
+                ", meetingList=" + meetingList +
+                '}';
+    }
 }

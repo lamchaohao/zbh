@@ -6,14 +6,7 @@
               android:orientation="vertical"
               tools:context="com.gzz100.zbh.account.RegFragment">
 
-    <com.qmuiteam.qmui.widget.QMUITopBar
-        android:id="@+id/topbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/qmui_topbar_height"
-        android:fitsSystemWindows="true"
-        app:qmui_layout_collapseMode="pin"
-        app:qmui_topbar_bg_color="@color/colorTopbar"
-        app:qmui_topbar_need_separator="false"/>
+    <include layout="@layout/widget_topbar"/>
 
     <EditText
         android:id="@+id/et_reg_phone"

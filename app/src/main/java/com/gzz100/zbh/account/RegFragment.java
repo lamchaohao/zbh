@@ -12,6 +12,7 @@ import com.gzz100.zbh.R;
 import com.gzz100.zbh.base.BaseFragment;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.request.UserLoginRequest;
+import com.gzz100.zbh.utils.FragmentBackHandler;
 import com.gzz100.zbh.utils.MD5Utils;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 
@@ -26,7 +27,7 @@ import io.reactivex.disposables.Disposable;
 import static com.gzz100.zbh.res.Common.NumRegEx;
 import static com.gzz100.zbh.res.Common.PasswordRegEx;
 
-public class RegFragment extends BaseFragment {
+public class RegFragment extends BaseFragment implements FragmentBackHandler {
 
 
     @BindView(R.id.topbar)
@@ -65,7 +66,9 @@ public class RegFragment extends BaseFragment {
         mTopbar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onPrevious();
+                if (!onPrevious()){
+                   startWithPop(new LoginFragment());
+                }
             }
         });
     }
@@ -77,6 +80,9 @@ public class RegFragment extends BaseFragment {
     }
 
     private boolean onPrevious(){
+        if (stepCount <= (-1)){
+            stepCount=0;
+        }
         stepCount--;
         switch (stepCount){
             case 0:
@@ -100,7 +106,9 @@ public class RegFragment extends BaseFragment {
 
     @OnClick(R.id.btn_next)
     public void onViewClicked() {
-
+        if (stepCount == (-1)){
+            stepCount=0;
+        }
 
         switch (stepCount) {
             case 0:
@@ -184,8 +192,9 @@ public class RegFragment extends BaseFragment {
         }
     }
 
+
     @Override
-    public boolean onBackPressedSupport() {
+    public boolean onBackPressed() {
         return onPrevious();
     }
 }

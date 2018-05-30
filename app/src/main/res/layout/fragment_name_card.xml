@@ -4,14 +4,10 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <com.qmuiteam.qmui.widget.QMUITopBar
-        android:id="@+id/topbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/qmui_topbar_height"/>
+    <include layout="@layout/widget_topbar"/>
 
     <RelativeLayout
-        android:padding="16dp"
-        android:background="@color/colorWhite"
+        style="@style/nameCardRelativelo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
@@ -31,9 +27,7 @@
 
     <RelativeLayout
         android:id="@+id/rl_userName"
-        android:padding="16dp"
-        android:layout_marginTop="8dp"
-        android:background="@color/colorWhite"
+        style="@style/nameCardRelativelo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
@@ -59,9 +53,7 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:padding="16dp"
-        android:layout_marginTop="8dp"
-        android:background="@color/colorWhite"
+        style="@style/nameCardRelativelo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
@@ -80,9 +72,26 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:padding="16dp"
-        android:layout_marginTop="8dp"
-        android:background="@color/colorWhite"
+        style="@style/nameCardRelativelo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:text="部门"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/tv_name_depart"
+            android:text="部门1"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        style="@style/nameCardRelativelo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
@@ -103,7 +112,7 @@
     <Button
         android:id="@+id/btn_quit_company"
         android:text="退出当前企业"
-        android:layout_marginTop="16dp"
+        android:layout_margin="16dp"
         android:background="@color/colorPrimary"
         android:textColor="@color/colorWhite"
         android:layout_width="match_parent"

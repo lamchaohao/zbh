@@ -1,22 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppConfigTheme.Compat" parent="AppBaseTheme.Compat" >
-        <item name="android:colorPrimary">?attr/qmui_config_color_blue</item>
-        <item name="android:colorPrimaryDark">?attr/qmui_config_color_blue</item>
-        <item name="android:colorAccent">?attr/qmui_config_color_blue</item>
-        <item name="android:textColorPrimary">?attr/qmui_config_color_blue</item>
-        <item name="android:textColorSecondary">?attr/qmui_config_color_blue</item> <!--返回箭头也是用这个颜色-->
+    <style name="AppConfigTheme.Compat" parent="Theme.AppCompat.DayNight.DarkActionBar" >
+        <item name="android:colorPrimary">?attr/qmui_color_primary</item>
+        <item name="android:colorPrimaryDark">?attr/qmui_color_dark_primary</item>
+        <item name="android:colorAccent">?attr/qmui_color_accent</item>
+        <item name="android:textColorPrimary">?attr/qmui_text_color_primary</item>
+        <item name="android:textColorSecondary">?attr/qmui_text_color_secondary</item>  <!--返回箭头也是用这个颜色-->
         <item name="android:windowBackground">@color/qmui_config_color_white</item>
+        <item name="android:statusBarColor">?attr/qmui_status_bar</item>
         <item name="android:navigationBarColor">?attr/qmui_config_color_black</item>
         <!--<item name="android:colorControlNormal">@color/qmui_config_color_white</item>-->
         <item name="android:editTextColor">?attr/qmui_config_color_black</item>
         <!-- 该行会影响顶部条收起时效果,为false时，状态栏颜色不会被改变 -->
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:textViewStyle">@style/TextView.Compat</item>
     </style>
 
     <style name="Button.Compat" parent="ButtonBase.Compat">
         <!-- 去掉5.0下Button点击的阴影动画效果 -->
         <item name="android:stateListAnimator">@null</item>
     </style>
+
+    <style name="TextView.Compat" parent="android:Widget.TextView">
+        <item name="android:textAppearance">@style/QMUITextAppearance</item>
+        <!-- textColorHighlight 放在appearance中无效，好像TextView总是默认存在一个textColorHighlight
+             会覆盖掉它，并不知道原因 -->
+        <item name="android:textColorHighlight">?attr/qmui_config_color_background_pressed</item>
+    </style>
+
 </resources>

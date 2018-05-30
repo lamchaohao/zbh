@@ -1,92 +1,109 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
               tools:context="com.gzz100.zbh.home.mine.MineFragment">
-    <android.support.v7.widget.CardView
-        app:cardCornerRadius="8dp"
-        android:layout_margin="8dp"
+
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <RelativeLayout
-            android:padding="8dp"
-            android:id="@+id/rl_nameCard_mine"
+        <android.support.v7.widget.CardView
+            app:cardCornerRadius="8dp"
+            android:layout_margin="8dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <TextView
-                android:id="@+id/tv_userName_mine"
-                android:text="张小明"
-                android:textSize="26sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+            <RelativeLayout
+                android:padding="8dp"
+                android:id="@+id/rl_nameCard_mine"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/tv_userName_mine"
+                    android:text="张小明"
+                    android:textSize="26sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
 
-            <TextView
-                android:id="@+id/tv_statu_mine"
-                android:text="未加入企业"
-                android:textColor="@color/colorTopbar"
-                android:layout_below="@id/tv_userName_mine"
-                android:layout_marginTop="16dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/tv_job_mine"
+                    android:text="职位"
+                    android:textColor="@color/colorPrimary"
+                    android:layout_below="@id/tv_userName_mine"
+                    android:layout_marginTop="16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
 
-            <Button
-                android:id="@+id/btn_joinCompany_mine"
-                android:layout_marginTop="8dp"
-                android:layout_below="@id/tv_statu_mine"
-                android:text="马上加入"
-                android:textColor="@color/colorWhite"
-                android:background="@color/colorTopbar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/tv_statu_mine"
+                    android:text="未加入企业"
+                    android:textColor="@color/colorPrimary"
+                    android:layout_below="@id/tv_job_mine"
+                    android:layout_marginTop="16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
 
-            <ImageView
-                android:id="@+id/iv_mine_compPic"
-                android:layout_alignParentRight="true"
-                android:src="@mipmap/ic_launcher"
-                android:layout_width="64dp"
-                android:layout_height="64dp"/>
+                <Button
+                    android:id="@+id/btn_joinCompany_mine"
+                    android:layout_marginTop="8dp"
+                    android:layout_below="@id/tv_statu_mine"
+                    android:text="马上加入"
+                    android:textColor="@color/colorWhite"
+                    android:background="@color/colorPrimary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
 
-        </RelativeLayout>
+                <ImageView
+                    android:id="@+id/iv_mine_compPic"
+                    android:layout_alignParentRight="true"
+                    android:src="@mipmap/ic_launcher"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"/>
 
-    </android.support.v7.widget.CardView>
+            </RelativeLayout>
 
-    <TextView
-        android:id="@+id/tv_file_mine"
-        android:layout_marginTop="16dp"
-        android:padding="8dp"
-        android:drawableLeft="@drawable/ic_pause_circle_filled_black_24dp"
-        android:text="我的文件"
-        android:textSize="20sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <TextView
-        android:id="@+id/tv_about_mine"
-        android:layout_marginTop="8dp"
-        android:padding="8dp"
-        android:drawableLeft="@drawable/ic_pause_circle_filled_black_24dp"
-        android:text="关于中佰会"
-        android:textSize="20sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <TextView
-        android:id="@+id/tv_setting_mine"
-        android:layout_marginTop="8dp"
-        android:padding="8dp"
-        android:drawableLeft="@drawable/ic_pause_circle_filled_black_24dp"
-        android:text="设置"
-        android:textSize="20sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        </android.support.v7.widget.CardView>
 
-    <TextView
-        android:id="@+id/tv_logout_mine"
-        android:layout_marginTop="8dp"
-        android:padding="8dp"
-        android:drawableLeft="@drawable/ic_pause_circle_filled_black_24dp"
-        android:text="退出登录"
-        android:textSize="20sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-</LinearLayout>
+        <TextView
+            android:id="@+id/tv_file_mine"
+            style="@style/mineRelativelo"
+            android:drawableLeft="@drawable/ic_pause_circle_filled_black_24dp"
+            android:text="我的下载"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/tv_star_mine"
+            style="@style/mineRelativelo"
+            android:drawableLeft="@drawable/ic_pause_circle_filled_black_24dp"
+            android:text="我的收藏"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/tv_about_mine"
+            style="@style/mineRelativelo"
+            android:drawableLeft="@drawable/ic_pause_circle_filled_black_24dp"
+            android:text="关于中佰会"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/tv_setting_mine"
+            style="@style/mineRelativelo"
+            android:drawableLeft="@drawable/ic_pause_circle_filled_black_24dp"
+            android:text="设置"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/tv_logout_mine"
+            style="@style/mineRelativelo"
+            android:drawableLeft="@drawable/ic_pause_circle_filled_black_24dp"
+            android:text="退出登录"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+</ScrollView>

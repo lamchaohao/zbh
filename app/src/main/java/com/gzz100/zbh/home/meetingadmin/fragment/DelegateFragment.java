@@ -19,6 +19,7 @@ import com.gzz100.zbh.data.network.request.MeetingRequest;
 import com.gzz100.zbh.home.appointment.entity.StaffWrap;
 import com.gzz100.zbh.home.appointment.fragment.MultiChosePersonFragment;
 import com.gzz100.zbh.home.meetingadmin.adapter.DelegatesAdapter;
+import com.gzz100.zbh.res.Common;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 
@@ -54,11 +55,13 @@ public class DelegateFragment extends BaseBackFragment {
     private MeetingRequest mRequest;
     private List<DelegateEntity> mDelegates;
     private DelegatesAdapter mAdapter;
+    private int mMeetingStatus;
 
-    public static DelegateFragment newInstance(String meetingId) {
+    public static DelegateFragment newInstance(String meetingId,int status) {
         DelegateFragment fragment = new DelegateFragment();
         Bundle bundle = new Bundle();
         bundle.putString("meetingId", meetingId);
+        bundle.putInt("meetingStatus",status);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -77,6 +80,7 @@ public class DelegateFragment extends BaseBackFragment {
         super.onViewCreated(view, savedInstanceState);
         if (getArguments() != null) {
             mMeetingId = getArguments().getString("meetingId");
+            mMeetingStatus = getArguments().getInt("meetingStatus");
         }
         initTopBar();
         loadData();
@@ -94,8 +98,11 @@ public class DelegateFragment extends BaseBackFragment {
         });
         mTextButton = mTopbar.addRightTextButton("新增人员", R.id.textButtonId);
         mTextButton.setTextColor(Color.WHITE);
-        mRequest = new MeetingRequest();
+        if (mMeetingStatus== Common.STATUS_END) {
+            mTextButton.setVisibility(View.GONE);
+        }
 
+        mRequest = new MeetingRequest();
         mDelegates = new ArrayList<>();
         mRcvDelegates.setLayoutManager(new LinearLayoutManager(getContext()));
         mRcvDelegates.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
@@ -162,17 +169,16 @@ public class DelegateFragment extends BaseBackFragment {
         List<Staff> staffs = staffWrap.getStaffList();
         List<String> needToAddIds =new ArrayList<>();
         List<String> delegateIds=new ArrayList<>();
+        //结果回调
         for (Staff staff : staffs) {
             needToAddIds.add(staff.getUserId());
         }
+        //已有的参会人员
         for (DelegateEntity delegate : mDelegates) {
             delegateIds.add(delegate.getUserId());
         }
-
-        for (String delegateId : delegateIds) {
-            needToAddIds.remove(delegateId);
-        }
-
+        //未添加的id
+        needToAddIds.removeAll(delegateIds);
 
         StringBuilder sb=new StringBuilder();
         sb.append("[");

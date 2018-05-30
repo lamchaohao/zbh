@@ -49,9 +49,6 @@ public class X5Fragment extends BaseBackFragment {
         mDir = new File(Environment.getExternalStorageDirectory()+"/Download");
         Logger.i("file dir="+mDir.getAbsolutePath());
 
-        for (File file : mDir.listFiles()) {
-            Logger.i("子文件:="+file.getAbsolutePath());
-        }
         mListView.setAdapter(new FileAdapter(mDir));
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -62,7 +59,12 @@ public class X5Fragment extends BaseBackFragment {
                     configValue.put("style","1");
                     configValue.put("local","false");
                     configValue.put("topBarBgColor","#2196F3");
-                    QbSdk.openFileReader(getContext(),mDir.listFiles()[position].getAbsolutePath(),configValue,null );
+                    try{
+                        QbSdk.openFileReader(getContext(),mDir.listFiles()[position].getAbsolutePath(),configValue,null );
+                    }catch (Exception e){
+                        Logger.e(e.getMessage());
+                        e.printStackTrace();
+                    }
                 }else {
                     Toast.makeText(getContext(), "这是文件夹", Toast.LENGTH_SHORT).show();
                 }

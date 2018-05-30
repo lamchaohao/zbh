@@ -4,10 +4,8 @@
              android:layout_height="match_parent"
               android:orientation="vertical"
              tools:context="com.gzz100.zbh.account.SearchCompFragment">
-    <com.qmuiteam.qmui.widget.QMUITopBar
-        android:id="@+id/topbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/qmui_topbar_height"/>
+
+    <include layout="@layout/widget_topbar"/>
 
     <LinearLayout
         android:orientation="horizontal"

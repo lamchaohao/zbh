@@ -1,10 +1,13 @@
 package com.gzz100.zbh.data.entity;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by Lam on 2018/3/30.
  */
 
-public class MessageEntity {
+public class MessageEntity implements Parcelable {
 
 
     /**
@@ -110,4 +113,52 @@ public class MessageEntity {
     public void setReceviceId(String receviceId) {
         this.receviceId = receviceId;
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.messageId);
+        dest.writeString(this.companyId);
+        dest.writeString(this.messageDescription);
+        dest.writeInt(this.messageType);
+        dest.writeInt(this.messageStatus);
+        dest.writeLong(this.createTime);
+        dest.writeLong(this.sendTime);
+        dest.writeString(this.createMan);
+        dest.writeString(this.messageTitle);
+        dest.writeString(this.receviceId);
+    }
+
+    public MessageEntity() {
+    }
+
+    protected MessageEntity(Parcel in) {
+        this.messageId = in.readString();
+        this.companyId = in.readString();
+        this.messageDescription = in.readString();
+        this.messageType = in.readInt();
+        this.messageStatus = in.readInt();
+        this.createTime = in.readLong();
+        this.sendTime = in.readLong();
+        this.createMan = in.readString();
+        this.messageTitle = in.readString();
+        this.receviceId = in.readString();
+    }
+
+    public static final Parcelable.Creator<MessageEntity> CREATOR = new Parcelable.Creator<MessageEntity>() {
+        @Override
+        public MessageEntity createFromParcel(Parcel source) {
+            return new MessageEntity(source);
+        }
+
+        @Override
+        public MessageEntity[] newArray(int size) {
+            return new MessageEntity[size];
+        }
+    };
 }

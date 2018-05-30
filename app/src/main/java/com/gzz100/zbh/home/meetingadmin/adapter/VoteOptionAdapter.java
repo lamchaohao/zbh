@@ -18,10 +18,11 @@ import com.gzz100.zbh.data.entity.VoteDetailEntity;
 import com.gzz100.zbh.utils.DensityUtil;
 import com.gzz100.zbh.utils.GlideApp;
 import com.gzz100.zbh.utils.TextHeadPicUtil;
-import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.gzz100.zbh.res.Common.STATUS_END;
 
 /**
  * Created by Lam on 2018/4/10.
@@ -82,7 +83,7 @@ public class VoteOptionAdapter extends RecyclerView.Adapter{
             }
         });
 
-        if (voteDetail.getVoteStatus()==3) {
+        if (voteDetail.getVoteStatus()==STATUS_END) {
             bindResultHolder(holder,position);
         }else {
             bindVoteHolder(holder,position);
@@ -96,7 +97,6 @@ public class VoteOptionAdapter extends RecyclerView.Adapter{
 
         //选中状态
         holder.checkBox.setChecked(isItemChecked(position));
-
 
         holder.rootView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,6 +156,9 @@ public class VoteOptionAdapter extends RecyclerView.Adapter{
         }
 
         holder.tvResultScore.setText(optionListBean.getUserList().size()+"票");
+        if (voteCountSum==0){
+            voteCountSum=-1;
+        }
         float percent = optionListBean.getUserList().size()*100 / voteCountSum;
 
         StringBuffer sb=new StringBuffer();
@@ -172,7 +175,6 @@ public class VoteOptionAdapter extends RecyclerView.Adapter{
         voteCountSum = 0;
         for (VoteDetailEntity.VoteOptionListBean voteOptionListBean : voteDetail.getVoteOptionList()) {
             voteCountSum += voteOptionListBean.getUserList().size();
-            Logger.i("voteCountSum="+voteCountSum);
         }
     }
 

@@ -59,6 +59,11 @@ public class TimeFormatUtil {
        return  sdf.format(date);
     }
 
+    public static String formatMonth(Date date){
+        SimpleDateFormat sdf=new SimpleDateFormat("MM-dd");
+        return  sdf.format(date);
+    }
+
     public static String formatDate(long date){
         Calendar calendar=Calendar.getInstance();
         calendar.setTimeInMillis(date);

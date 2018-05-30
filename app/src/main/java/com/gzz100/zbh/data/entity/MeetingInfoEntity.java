@@ -29,6 +29,7 @@ public class MeetingInfoEntity {
     private String creatorId;
     private String meetingId;
     private String meetingPlaceName;
+    private String meetingPlaceId;
     private String meetingEndTime;
     private List<DelegateListBean> delegateList;
     private List<AgendaListBean> agendaList;
@@ -82,6 +83,14 @@ public class MeetingInfoEntity {
         this.meetingPlaceName = meetingPlaceName;
     }
 
+    public String getMeetingPlaceId() {
+        return meetingPlaceId;
+    }
+
+    public void setMeetingPlaceId(String meetingPlaceId) {
+        this.meetingPlaceId = meetingPlaceId;
+    }
+
     public String getMeetingEndTime() {
         return meetingEndTime;
     }
@@ -124,18 +133,18 @@ public class MeetingInfoEntity {
          * userId : 23
          */
 
-        private Object signInTime;
+        private String signInTime;
         private int delegateRole;
         private String delegateId;
         private String delegateName;
         private int delegateStatus;
         private String userId;
 
-        public Object getSignInTime() {
+        public String getSignInTime() {
             return signInTime;
         }
 
-        public void setSignInTime(Object signInTime) {
+        public void setSignInTime(String signInTime) {
             this.signInTime = signInTime;
         }
 
@@ -190,7 +199,7 @@ public class MeetingInfoEntity {
 
         private Object duration;
         private String agendaName;
-        private String spearker;
+        private String speaker;
         private String agendaId;
 
         public Object getDuration() {
@@ -209,12 +218,12 @@ public class MeetingInfoEntity {
             this.agendaName = agendaName;
         }
 
-        public String getSpearker() {
-            return spearker;
+        public String getSpeaker() {
+            return speaker;
         }
 
-        public void setSpearker(String spearker) {
-            this.spearker = spearker;
+        public void setSpeaker(String speaker) {
+            this.speaker = speaker;
         }
 
         public String getAgendaId() {
