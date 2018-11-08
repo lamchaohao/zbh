@@ -12,6 +12,9 @@ public class TextHeadPicUtil {
 
 
     public static TextDrawable getHeadPic(String userName) {
+        if (userName==null) {
+            userName="缺省";
+        }
         TextDrawable drawable = TextDrawable.builder()
             .beginConfig()
             .fontSize(36)
@@ -22,10 +25,27 @@ public class TextHeadPicUtil {
     }
 
     public static TextDrawable getHeadPic(String userName, int fontSize,int width){
+        if (userName==null) {
+            userName="缺省";
+        }
         TextDrawable drawable = TextDrawable.builder()
                 .beginConfig()
                 .fontSize(fontSize)
                 .width(width)
+                .height(width)
+                .endConfig()
+                .buildRound(getHeadPicName(userName), getColor(userName));
+
+        return drawable;
+    }
+
+    public static TextDrawable getHeadPic(String userName, int fontSize){
+        if (userName==null) {
+            userName="缺省";
+        }
+        TextDrawable drawable = TextDrawable.builder()
+                .beginConfig()
+                .fontSize(fontSize)
                 .endConfig()
                 .buildRound(getHeadPicName(userName), getColor(userName));
 
@@ -36,7 +56,7 @@ public class TextHeadPicUtil {
         String picName=null;
         if (userName==null){
 
-            return "";
+            userName="缺省";
         }
         if (userName.length()>2){
             picName = userName.substring(userName.length()-2, userName.length());

@@ -14,6 +14,8 @@
         <CheckBox
             android:clickable="false"
             android:id="@+id/cb_option_select"
+            android:button="@drawable/qmui_s_checkbox"
+            android:layout_marginLeft="16dp"
             android:layout_gravity="center_vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
@@ -27,7 +29,7 @@
             android:layout_height="72dp"/>
         <TextView
             android:id="@+id/tv_option_text"
-            android:textSize="18sp"
+            android:textSize="14sp"
             android:layout_marginLeft="8dp"
             android:textColor="#000000"
             android:text="选项正文"
@@ -79,7 +81,7 @@
             android:visibility="gone"
             android:orientation="horizontal"
             android:layout_width="wrap_content"
-            android:layout_height="48dp">
+            android:layout_height="wrap_content">
         </LinearLayout>
     </HorizontalScrollView>
 

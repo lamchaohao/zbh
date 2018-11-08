@@ -1,10 +1,13 @@
 package com.gzz100.zbh.mimc;
 
 import com.google.gson.Gson;
+import com.gzz100.zbh.data.eventEnity.MimcLoginStatus;
 import com.orhanobut.logger.Logger;
 import com.xiaomi.mimc.MIMCException;
 import com.xiaomi.mimc.MIMCOnlineStatusListener;
 import com.xiaomi.mimc.MIMCUser;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -31,7 +34,7 @@ public class MCUserManager {
      * @param appAccount APP自己维护的用户帐号，不能为null
      * @return 返回新创建的用户
      */
-    public MIMCUser newUser(String appAccount,MimcMsgHandler.OnHandlerMimcGroupMsgListener msgHandler){
+    public MIMCUser createUser(String appAccount,MimcMsgHandler.OnHandlerMimcGroupMsgListener msgHandler){
         if (appAccount == null) return null;
 
         this.mAppAccount = appAccount;
@@ -98,14 +101,19 @@ public class MCUserManager {
     class OnlineStatusListener implements MIMCOnlineStatusListener{
         /**
          * 在线状态发生改变
-         * @param status 在线状态：STATUS_LOGIN_SUCCESS 在线，STATUS_LOGOUT 下线，STATUS_LOGIN_FAIL 登录失败
+         * @param status 在线状态：MIMCConstant.STATUS_LOGIN_SUCCESS 在线，STATUS_LOGOUT 下线，STATUS_LOGIN_FAIL 登录失败
          * @param code 状态码
          * @param msg 状态描述
          */
         @Override
         public void onStatusChanged(int status, int code, String msg) {
             mStatus = status;
-            Logger.i("status"+status+",msg"+msg+",code="+code);
+            MimcLoginStatus loginStatus = new MimcLoginStatus();
+            loginStatus.code=code;
+            loginStatus.status=status;
+            loginStatus.msg= msg;
+            EventBus.getDefault().post(loginStatus);
+            Logger.i("status="+status+",msg="+msg+",code="+code);
         }
     }
 

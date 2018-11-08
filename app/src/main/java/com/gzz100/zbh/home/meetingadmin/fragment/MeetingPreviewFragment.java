@@ -1,13 +1,13 @@
 package com.gzz100.zbh.home.meetingadmin.fragment;
 
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.base.BaseFragment;
-import com.gzz100.zbh.home.meetingadmin.adapter.MeetingTabAdapter;
-import com.qmuiteam.qmui.widget.QMUITabSegment;
+import com.gzz100.zbh.home.meetingadmin.adapter.ListTabAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,10 +21,11 @@ import butterknife.ButterKnife;
 
 public class MeetingPreviewFragment extends BaseFragment {
     @BindView(R.id.tabSegment_preview)
-    QMUITabSegment mTabSegment;
+    TabLayout mTabSegment;
     @BindView(R.id.contentViewPager)
     ViewPager mContentViewPager;
     View mRootView;
+
     @Override
     protected View onCreateView(LayoutInflater inflater) {
         if (mRootView==null) {
@@ -37,16 +38,11 @@ public class MeetingPreviewFragment extends BaseFragment {
 
     private void initView() {
 
-        mTabSegment.reset();
-        mTabSegment.addTab(new QMUITabSegment.Tab("我参加的"));
-        mTabSegment.addTab(new QMUITabSegment.Tab("我创建的"));
-        mTabSegment.setMode(QMUITabSegment.MODE_FIXED);
-        mTabSegment.setHasIndicator(true);
         List<BaseFragment> fragmentList = new ArrayList<>();
         fragmentList.add(MeetingListFragment.getNewInstance(false));
         fragmentList.add(MeetingListFragment.getNewInstance(true));
 
-        mContentViewPager.setAdapter(new MeetingTabAdapter(getChildFragmentManager(),fragmentList));
+        mContentViewPager.setAdapter(new ListTabAdapter(getChildFragmentManager(),fragmentList));
         mTabSegment.setupWithViewPager(mContentViewPager,false);
     }
 

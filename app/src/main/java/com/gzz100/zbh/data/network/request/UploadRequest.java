@@ -70,8 +70,13 @@ public class UploadRequest {
 
         MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
         for (VoteOption option : vote.getOptionList()){
-            File picFile = option.getPicFile();
-            if (picFile!=null){
+            String picFilePath = option.getPicFile();
+            if (picFilePath!=null){
+                if (picFilePath.startsWith("http")) {
+                    continue;
+                }
+
+                File picFile = new File(picFilePath);
                 RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data; charset=utf-8"), picFile);
                 String fileMD5 = MD5Utils.getFileMD5(picFile);
                 Logger.i(fileMD5);
@@ -97,6 +102,51 @@ public class UploadRequest {
                 .build();
 
         mFileUploadService.uploadVote(requestBody)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+
+    }
+
+
+    public void updateVote(Observer<HttpResult> observer, VoteWrap vote,String meetingId,String voteId){
+
+        MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+        for (VoteOption option : vote.getOptionList()){
+            String picFilePath = option.getPicFile();
+            if (picFilePath!=null){
+                if (picFilePath.startsWith("http")) {
+                    continue;
+                }
+                Logger.i("picFilePath="+picFilePath);
+                File picFile = new File(picFilePath);
+                RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data; charset=utf-8"), picFile);
+                String fileMD5 = MD5Utils.getFileMD5(picFile);
+                Logger.i(fileMD5);
+                //有文件才设置md5值
+                option.setFileMD5Value(fileMD5);
+                builder.addFormDataPart("file",picFile.getName(),requestFile);
+            }
+
+        }
+        Gson gson=new Gson();
+        String uploadInfoJson = gson.toJson(vote.getOptionList());
+        RequestBody requestBody = builder
+                .addFormDataPart("userId", mUser.getUserId())
+                .addFormDataPart("token", mUser.getToken())
+                .addFormDataPart("companyId",mUser.getCompanyId())
+                .addFormDataPart("meetingId",meetingId)
+                .addFormDataPart("voteName",vote.getVoteName())
+                .addFormDataPart("voteSelectableNum",vote.getMaxCount()+"")
+                .addFormDataPart("voteDescription",vote.getVoteDespc())
+                .addFormDataPart("voteOptionNameList",uploadInfoJson)
+                .addFormDataPart("voteModel",vote.isAutoStart()?"1":"2")
+                .addFormDataPart("voteAnonymous",vote.isHideName()?"1":"2")
+                .addFormDataPart("voteId",voteId)
+                .build();
+
+        mFileUploadService.updateVote(requestBody)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

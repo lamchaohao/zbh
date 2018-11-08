@@ -2,6 +2,7 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
+             android:background="@color/backgroudColor"
              xmlns:app="http://schemas.android.com/apk/res-auto"
              tools:context="com.gzz100.zbh.home.message.MessageFragment">
 
@@ -16,9 +17,9 @@
                 android:id="@+id/rcv_msg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
-            <com.qmuiteam.qmui.widget.QMUIEmptyView
-                android:id="@+id/empty_view"
-                app:qmui_title_text="暂无消息"
+            <ImageView
+                android:id="@+id/iv_empty_msg"
+                android:src="@drawable/pic_no_msg"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
 

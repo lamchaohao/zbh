@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.Switch;
@@ -21,6 +21,7 @@ import com.gzz100.zbh.R;
 import com.gzz100.zbh.home.appointment.entity.VoteOption;
 import com.gzz100.zbh.home.appointment.entity.VoteWrap;
 import com.gzz100.zbh.utils.GlideApp;
+import com.orhanobut.logger.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -60,8 +61,6 @@ public class AddVoteAdapter extends RecyclerView.Adapter implements View.OnClick
 
         }
 
-
-
     }
 
     @Override
@@ -82,7 +81,7 @@ public class AddVoteAdapter extends RecyclerView.Adapter implements View.OnClick
         int viewType = getItemViewType(position);
         if (viewType==TYPE_ADD_BUTTON){
             AddButtonHolder viewHolder = (AddButtonHolder) holder;
-            viewHolder.btnAddOption.setOnClickListener(new View.OnClickListener() {
+            viewHolder.llAddOption.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     add();
@@ -123,11 +122,14 @@ public class AddVoteAdapter extends RecyclerView.Adapter implements View.OnClick
         }else {
             final VoteOption option = mOptionList.get(position);
             final AddVoteHolder voteHolder = (AddVoteHolder) holder;
+            Logger.i("picFile from = "+option.getPicFile());
+            if (option.getPicFile()!=null&&!option.getPicFile().startsWith("http")) {
+                GlideApp.with(mContext)
+                        .load(option.getPicFile())
+                        .placeholder(R.drawable.ic_empty_zhihu)
+                        .into(voteHolder.ivOptionPic);
 
-            GlideApp.with(mContext)
-                    .load(option.getPicFile())
-                    .placeholder(R.drawable.ic_empty_zhihu)
-                    .into(voteHolder.ivOptionPic);
+            }
 
             EditText editText = mOptionNameMap.get(option.hashCode());
             if (editText==null){
@@ -148,12 +150,34 @@ public class AddVoteAdapter extends RecyclerView.Adapter implements View.OnClick
 
                 }
             });
+
+            if (option.getPicFile()!=null) {
+                voteHolder.flPic.setVisibility(View.VISIBLE);
+            }else {
+                voteHolder.flPic.setVisibility(View.GONE);
+            }
+
+            voteHolder.tvAddPic.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    voteHolder.flPic.setVisibility(View.VISIBLE);
+                }
+            });
+
             voteHolder.ivOptionPic.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (mOnPicClickListener!=null){
                         mOnPicClickListener.onPicClick(position,option);
                     }
+                }
+            });
+
+            voteHolder.ivClosePic.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    voteHolder.flPic.setVisibility(View.GONE);
+                    option.setPicFile(null);
                 }
             });
 
@@ -198,7 +222,7 @@ public class AddVoteAdapter extends RecyclerView.Adapter implements View.OnClick
     }
 
     public void setPicFile(int position,File file) {
-        mOptionList.get(position).setPicFile(file);
+        mOptionList.get(position).setPicFile(file.getAbsolutePath());
         notifyItemChanged(position);
     }
 
@@ -255,18 +279,23 @@ public class AddVoteAdapter extends RecyclerView.Adapter implements View.OnClick
         EditText etOption;
         ImageView ivDelete;
         ImageView ivOptionPic;
-
+        TextView tvAddPic;
+        View ivClosePic;
+        FrameLayout flPic;
         public AddVoteHolder(View itemView) {
             super(itemView);
             etOption = itemView.findViewById(R.id.et_voteOption);
             ivDelete = itemView.findViewById(R.id.iv_deleteOption);
             ivOptionPic = itemView.findViewById(R.id.iv_addOptionPic);
+            tvAddPic = itemView.findViewById(R.id.tv_addPic);
+            ivClosePic = itemView.findViewById(R.id.ivClose);
+            flPic = itemView.findViewById(R.id.fl_vote_pic);
         }
     }
 
     static class AddButtonHolder extends RecyclerView.ViewHolder{
-        @BindView(R.id.imageButton)
-        ImageButton btnAddOption;
+        @BindView(R.id.ll_addOption)
+        View llAddOption;
         @BindView(R.id.rl_multiSelect)
         View rlMultiSelect;
         @BindView(R.id.rdg_voteStartTime)
@@ -274,11 +303,11 @@ public class AddVoteAdapter extends RecyclerView.Adapter implements View.OnClick
         @BindView(R.id.swc_voteNoName)
         Switch swcVoteNoName;
         @BindView(R.id.bt_add)
-        Button btnAddMaxCount;
+        TextView btnAddMaxCount;
         @BindView(R.id.tv_maxSelcted)
         TextView mTvMaxSelcted;
         @BindView(R.id.bt_minus)
-        Button mBtMinus;
+        TextView mBtMinus;
         @BindView(R.id.btn_submit)
         Button btnSubmit;
         public AddButtonHolder(View itemView) {

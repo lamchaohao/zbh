@@ -1,5 +1,6 @@
 package com.gzz100.zbh.home.appointment.fragment;
 
+import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,14 +12,16 @@ import android.widget.TextView;
 
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.base.BaseBackFragment;
+import com.gzz100.zbh.data.eventEnity.FileInfoEntity;
 import com.gzz100.zbh.home.appointment.adapter.SelectFileAdapter;
 import com.gzz100.zbh.utils.FragmentBackHandler;
-import com.orhanobut.logger.Logger;
+import com.gzz100.zbh.utils.QbSdkFileUtil;
 import com.qmuiteam.qmui.widget.QMUITopBar;
-import com.tencent.smtt.sdk.QbSdk;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -40,14 +43,36 @@ public class SelectFileFragment extends BaseBackFragment implements FragmentBack
     private String rootPath;
     private SelectFileAdapter mAdapter;
     private Button mSaveButton;
+    private ArrayList<String> mSelectedList;
+
+    public static SelectFileFragment newInstance(ArrayList<String> selectList){
+        Bundle bundle = new Bundle();
+        bundle.putStringArrayList("selectList",selectList);
+        SelectFileFragment fragment = new SelectFileFragment();
+        fragment.setArguments(bundle);
+        return fragment;
+    }
 
     @Override
     protected View onCreateView(LayoutInflater inflater) {
         View view = inflater.inflate(R.layout.fragment_select_file, null);
         unbinder = ButterKnife.bind(this, view);
+        initVar();
         initTopbar();
         initView();
         return attachToSwipeBack(view);
+    }
+
+    private void initVar() {
+        if (getArguments()!=null) {
+            mSelectedList = getArguments().getStringArrayList("selectList");
+            if (mSelectedList==null){
+                mSelectedList = new ArrayList<>();
+            }
+        }else {
+            mSelectedList = new ArrayList<>();
+        }
+
     }
 
     private void initTopbar() {
@@ -55,7 +80,9 @@ public class SelectFileFragment extends BaseBackFragment implements FragmentBack
         mTopbar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pop();
+                if (!onBackPressed()) {
+                    pop();
+                }
             }
         });
         View view = LayoutInflater.from(getContext()).inflate(R.layout.button_save, null);
@@ -64,9 +91,15 @@ public class SelectFileFragment extends BaseBackFragment implements FragmentBack
             @Override
             public void onClick(View v) {
                 List<File> selectedFiles = mAdapter.getSelectedFiles();
+                ArrayList<String> filePathList = new ArrayList<>();
                 for (File selectedFile : selectedFiles) {
-                    Logger.i("selectedFile ="+selectedFile.getName());
+                   filePathList.add(selectedFile.getAbsolutePath());
                 }
+                FileInfoEntity fileInfoEntity = new FileInfoEntity();
+                fileInfoEntity.setFileNameList(filePathList);
+                EventBus.getDefault().post(fileInfoEntity);
+                pop();
+
             }
         });
         mTopbar.addRightView(view,R.id.fl_buttonSave);
@@ -77,17 +110,19 @@ public class SelectFileFragment extends BaseBackFragment implements FragmentBack
     private void initView() {
         mRcvSelectFile.setLayoutManager(new LinearLayoutManager(getContext()));
         mAdapter = new SelectFileAdapter(getContext());
+
+        ArrayList<File> selecteFiles=new ArrayList<>();
+        for (String fileName : mSelectedList) {
+            selecteFiles.add(new File(fileName));
+        }
+        mAdapter.setSelectedFiles(selecteFiles);
+
         mRcvSelectFile.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
         mRcvSelectFile.setAdapter(mAdapter);
         mAdapter.setOnItemClickListener(new SelectFileAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(File file, int position) {
-                HashMap<String,String> configValue = new HashMap<>();
-                //“true”表示是进入打开方式选择界面，如果不设置或设置为“false” ，则进入 miniqb 浏览器模式。
-                configValue.put("style","1");
-                configValue.put("local","false");
-                configValue.put("topBarBgColor","#2196F3");
-                QbSdk.openFileReader(getContext(),file.getAbsolutePath(),configValue,null );
+                QbSdkFileUtil.openFile(getContext(),file);
 
             }
         });
@@ -102,7 +137,7 @@ public class SelectFileFragment extends BaseBackFragment implements FragmentBack
         mAdapter.setOnSelectedListener(new SelectFileAdapter.OnSelectedListener() {
             @Override
             public void onSelect(List<File> fileList) {
-                mSaveButton.setText("("+fileList.size()+")"+" 上传");
+                mSaveButton.setText("("+fileList.size()+")"+" 完成");
             }
 
             @Override

@@ -10,16 +10,20 @@ import android.view.View;
 
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.base.BaseFragment;
+import com.gzz100.zbh.data.ObserverImpl;
 import com.gzz100.zbh.data.entity.MeetingEntity;
+import com.gzz100.zbh.data.eventEnity.PushUpdateEntity;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.request.MeetingRequest;
+import com.gzz100.zbh.data.network.request.TemplateRequest;
 import com.gzz100.zbh.home.meetingadmin.adapter.MeetingListAdapter;
 import com.gzz100.zbh.home.root.HomeFragment;
 import com.gzz100.zbh.res.Common;
 import com.qmuiteam.qmui.widget.QMUIEmptyView;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
-import com.scwang.smartrefresh.layout.footer.FalsifyFooter;
 import com.scwang.smartrefresh.layout.header.FalsifyHeader;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
@@ -33,6 +37,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import es.dmoral.toasty.Toasty;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
@@ -134,7 +139,7 @@ public class MeetingListFragment extends BaseFragment {
     }
 
     private void initView() {
-       initRefreshLayout();
+        initRefreshLayout();
         mRcvMeetinglist.setLayoutManager(new LinearLayoutManager(getContext()));
         mMeetings = new ArrayList();
         mAdapter = new MeetingListAdapter(getContext(), mMeetings);
@@ -144,11 +149,58 @@ public class MeetingListFragment extends BaseFragment {
             public void onItemClick(int pos) {
                dealOnMeetingItemClick(pos);
             }
+
+            @Override
+            public void onItemLongClick(int pos) {
+                showTemplateDialog(pos);
+            }
         });
+    }
+
+    private void showTemplateDialog(final int pos) {
+
+        new QMUIDialog.MessageDialogBuilder(_mActivity)
+                .setMessage("添加到会议模板")
+                .addAction("添加", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        dialog.dismiss();
+                        addToTemplate(pos);
+                    }
+                })
+                .addAction("取消", new QMUIDialogAction.ActionListener() {
+                    @Override
+                    public void onClick(QMUIDialog dialog, int index) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
+
+    }
+
+    private void addToTemplate(int pos) {
+        String meetingId = mMeetings.get(pos).getMeetingId();
+        TemplateRequest request = new TemplateRequest();
+        request.addMeetingToTemplate(new ObserverImpl<HttpResult>() {
+            @Override
+            protected void onResponse(HttpResult result) {
+                Toasty.success(_mActivity,"添加成功").show();
+            }
+
+            @Override
+            protected void onFailure(Throwable e) {
+                Toasty.error(_mActivity,e.getMessage()).show();
+            }
+        },meetingId);
+
     }
 
     private void dealOnMeetingItemClick(int pos) {
         MeetingEntity meetingEntity = mMeetings.get(pos);
+        meetingEntity.setUnread("");
+        mAdapter.notifyItemChanged(pos);
+        PushUpdateEntity pushUpdateEntity = new PushUpdateEntity(PushUpdateEntity.PassthrougMsgType.meetingDecrement);
+        EventBus.getDefault().post(pushUpdateEntity);
         if(meetingEntity.getMeetingStatus()== Common.STATUS_END){
             if (getParentFragment()!=null) {
                 ((BaseFragment) getParentFragment())
@@ -168,17 +220,6 @@ public class MeetingListFragment extends BaseFragment {
                                 MeetingParentFragment.getNewInstance
                                         (meetingEntity.getMeetingId(),meetingEntity.getMeetingName(), groupId));
             }
-
-//            Intent intent = new Intent(_mActivity, MeetingParentActivity.class);
-//            intent.putExtra("meetingId",meetingEntity.getMeetingId());
-//            intent.putExtra("meetingName",meetingEntity.getMeetingName());
-//            if (TextUtils.isEmpty(meetingEntity.getMimcTopicId())) {
-//                intent.putExtra("groupId",0);
-//            }else {
-//                intent.putExtra("groupId",Long.parseLong(meetingEntity.getMimcTopicId()));
-//            }
-//            startActivity(intent);
-
         }
     }
 
@@ -198,7 +239,7 @@ public class MeetingListFragment extends BaseFragment {
         });
 
         mRefreshLayout.setRefreshHeader(new FalsifyHeader(getContext()));
-        mRefreshLayout.setRefreshFooter(new FalsifyFooter(getContext()));
+//        mRefreshLayout.setRefreshFooter(new FalsifyFooter(getContext()));
     }
 
     private void loadMore() {

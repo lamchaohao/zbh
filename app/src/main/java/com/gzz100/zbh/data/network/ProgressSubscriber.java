@@ -17,6 +17,7 @@ public class ProgressSubscriber <T> implements ProgressCancelListener,Observer<T
     private ProgressDialogHandler mProgressDialogHandler;
 
     private Context context;
+    private Disposable mDisposable;
 
     public ProgressSubscriber(SubscriberOnNextListener mSubscriberOnNextListener, Context context) {
         this.mSubscriberOnNextListener = mSubscriberOnNextListener;
@@ -50,6 +51,7 @@ public class ProgressSubscriber <T> implements ProgressCancelListener,Observer<T
 
     @Override
     public void onSubscribe(Disposable d) {
+        mDisposable = d;
         showProgressDialog();
     }
 
@@ -62,4 +64,12 @@ public class ProgressSubscriber <T> implements ProgressCancelListener,Observer<T
     public void onCancelProgress() {
 
     }
+
+    public void cancleRequest(){
+        if (mDisposable!=null){
+            mDisposable.dispose();
+        }
+        onCancelProgress();
+    }
+
 }

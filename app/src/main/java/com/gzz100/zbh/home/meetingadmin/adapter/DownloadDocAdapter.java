@@ -65,18 +65,18 @@ public class DownloadDocAdapter extends RecyclerView.Adapter {
         FilePickerConst.FILE_TYPE fileType = FileUtils.getFileType(file.getDocumentType());
         switch (fileType){
             case PDF:
-                viewHolder.ivIcon.setImageResource(R.drawable.pdf_icon);
+                viewHolder.ivIcon.setImageResource(R.drawable.ic_pdf);
                 break;
             case PPT:
-                viewHolder.ivIcon.setImageResource(R.drawable.power_point_2013);
+                viewHolder.ivIcon.setImageResource(R.drawable.ic_power_point);
                 break;
             case TXT:
                 viewHolder.ivIcon.setImageResource(droidninja.filepicker.R.drawable.icon_file_unknown);
             case WORD:
-                viewHolder.ivIcon.setImageResource(R.drawable.word_2013);
+                viewHolder.ivIcon.setImageResource(R.drawable.ic_word);
                 break;
             case EXCEL:
-                viewHolder.ivIcon.setImageResource(R.drawable.excel_2013);
+                viewHolder.ivIcon.setImageResource(R.drawable.ic_excel);
                 break;
             case UNKNOWN:
                 viewHolder.ivIcon.setImageResource(droidninja.filepicker.R.drawable.icon_file_unknown);

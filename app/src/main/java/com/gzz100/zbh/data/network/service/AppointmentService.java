@@ -1,8 +1,8 @@
 package com.gzz100.zbh.data.network.service;
 
 import com.gzz100.zbh.data.entity.MeetingEntity;
-import com.gzz100.zbh.data.entity.Staff;
 import com.gzz100.zbh.data.network.HttpResult;
+import com.gzz100.zbh.home.appointment.entity.Department;
 
 import java.util.List;
 
@@ -42,8 +42,8 @@ public interface AppointmentService {
 
     @FormUrlEncoded
     @POST("getStaffs")//获取员工列表
-    Observable<HttpResult<List<Staff>>> getStaffs(@Field("userId") String userId,
-                                                  @Field("token") String token,
-                                                  @Field("companyId") String companyId);
+    Observable<HttpResult<List<Department>>> getStaffs(@Field("userId") String userId,
+                                                       @Field("token") String token,
+                                                       @Field("companyId") String companyId);
 
 }

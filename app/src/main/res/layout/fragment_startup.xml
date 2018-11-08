@@ -1,13 +1,23 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             tools:context="com.gzz100.zbh.account.StartupFragment">
+             tools:context="com.gzz100.zbh.account.fragment.StartupFragment">
 
     <ImageView
         android:id="@+id/iv_pic_startup"
-        android:src="@mipmap/ic_launcher"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:src="@drawable/start_logo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="204dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
-</FrameLayout>
+    <ImageView
+        android:src="@drawable/company_logo"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="26dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</RelativeLayout>

@@ -5,9 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.gzz100.zbh.data.eventEnity.PushUpdateEntity;
 import com.gzz100.zbh.res.Common;
 import com.huawei.hms.support.api.push.PushReceiver;
 import com.orhanobut.logger.Logger;
+
+import org.greenrobot.eventbus.EventBus;
+import org.json.JSONObject;
 
 /**
  * Created by Lam on 2018/1/25.
@@ -34,14 +38,24 @@ public class HMSpushReciver extends PushReceiver {
             //CP可以自己解析消息内容，然后做相应的处理
             String content = new String(msg, "UTF-8");
             Logger.e("收到PUSH透传消息,消息内容为:" + content);
-//            String season = extras.getString("season");
-            Logger.e(extras.toString());
+            Logger.e("extras: "+extras.toString());
             byte[] ext = extras.getByteArray("pushMsg");
-            Logger.e("pushMsg="+new String(ext,"UTF-8"));
-//            Logger.i("透传ext:"+season);
             Intent intent = new Intent();
             intent.setAction(ACTION_UPDATEUI);
             intent.putExtra("log", "收到PUSH透传消息,消息内容为:" + content);
+            JSONObject jsonObject=new JSONObject(content);
+            String type = (String) jsonObject.get("type");
+            if (type.equals("2")){
+                //加入公司通知
+                EventBus.getDefault().post(new PushUpdateEntity(PushUpdateEntity.PassthrougMsgType.joinCompany));
+            }else if (type.equals("3")){
+                PushUpdateEntity pushUpdateEntity = new PushUpdateEntity(PushUpdateEntity.PassthrougMsgType.updateUnreadMsg);
+                String meetingNum = (String) extras.get("meetingNum");
+                String messageNum = (String) extras.get("messageNum");
+                pushUpdateEntity.setMeetingNum(meetingNum);
+                pushUpdateEntity.setMessageNum(messageNum);
+                EventBus.getDefault().post(pushUpdateEntity);
+            }
             context.sendBroadcast(intent);
         } catch (Exception e) {
             e.printStackTrace();

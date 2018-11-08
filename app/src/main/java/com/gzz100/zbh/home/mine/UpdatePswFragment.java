@@ -17,6 +17,7 @@ import com.gzz100.zbh.account.User;
 import com.gzz100.zbh.base.BaseBackFragment;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.request.AccountRequest;
+import com.gzz100.zbh.data.network.service.AccountService;
 import com.gzz100.zbh.res.Common;
 import com.gzz100.zbh.utils.MD5Utils;
 import com.qmuiteam.qmui.widget.QMUITopBar;
@@ -40,7 +41,7 @@ public class UpdatePswFragment extends BaseBackFragment {
     @BindView(R.id.et_checkcode)
     EditText mEtCheckcode;
     @BindView(R.id.btn_getCheckCode)
-    Button mBtnGetCheckCode;
+    TextView mBtnGetCheckCode;
     @BindView(R.id.et_newPsw)
     EditText mEtNewPsw;
     @BindView(R.id.btn_confirm)
@@ -190,7 +191,7 @@ public class UpdatePswFragment extends BaseBackFragment {
             public void onComplete() {
 
             }
-        },phone,Common.CheckCode_UpdatePsw);
+        },phone, AccountService.Method.Modify_Password);
 
 
     }

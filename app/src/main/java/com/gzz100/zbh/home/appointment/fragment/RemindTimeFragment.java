@@ -96,7 +96,7 @@ public class RemindTimeFragment extends BaseBackFragment implements RadioGroup.O
             case "7d":
                 mRdgRemind.check(R.id.week1_notify);
                 break;
-            case "no":
+            case "0":
                 mRdgRemind.check(R.id.none_notify);
                 break;
         }
@@ -129,7 +129,7 @@ public class RemindTimeFragment extends BaseBackFragment implements RadioGroup.O
 
         switch (checkedId){
             case R.id.none_notify:
-                EventBus.getDefault().post("no");
+                EventBus.getDefault().post("0");
                 break;
             case R.id.min15_notify:
                 EventBus.getDefault().post("15");

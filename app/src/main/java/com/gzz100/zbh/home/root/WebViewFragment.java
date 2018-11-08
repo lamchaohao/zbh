@@ -15,6 +15,7 @@ import com.tencent.smtt.export.external.extension.interfaces.IX5WebChromeClientE
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
+import com.tencent.smtt.sdk.WebViewClient;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -123,6 +124,14 @@ public class WebViewFragment extends BaseBackFragment {
 
             }
 
+        });
+
+        mWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+                return true;
+            }
         });
 
         settings.setJavaScriptEnabled(true);

@@ -2,29 +2,62 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
+              android:background="@color/backgroudColor"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
     <include layout="@layout/widget_topbar"/>
-    <EditText
-        android:id="@+id/et_voteName"
-        android:hint="投票名称"
-        android:background="@null"
-        android:padding="8dp"
+
+    <RelativeLayout
+        android:id="@+id/rl_changeMode"
+        android:background="@drawable/recycler_bg"
+        android:padding="16dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="8dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <EditText
-        android:id="@+id/et_voteDescp"
-        android:hint="投票说明(选填)"
-        android:background="@null"
-        android:padding="8dp"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tv_vote_mode"
+            android:text="多选"
+            android:textSize="16sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:text="更改"
+            android:textSize="12sp"
+            android:textColor="@color/colorSecondaryText"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:background="#FFFFFF"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/et_voteName"
+            android:hint="投票名称"
+            android:background="@null"
+            android:padding="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <EditText
+            android:id="@+id/et_voteDescp"
+            android:hint="投票说明(选填)"
+            android:background="@null"
+            android:padding="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rcv_addVote"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
-
-
 </LinearLayout>

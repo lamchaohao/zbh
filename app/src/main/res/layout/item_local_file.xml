@@ -6,13 +6,21 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content">
 
+    <CheckBox
+        android:id="@+id/cb_file"
+        android:visibility="gone"
+        android:button="@drawable/qmui_s_checkbox"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
     <ImageView
         android:id="@+id/iv_FileIcon"
         android:layout_margin="8dp"
         android:src="@drawable/ic_folder_yellow_700_36dp"
         android:layout_gravity="center"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_width="36dp"
+        android:layout_height="36dp"/>
     <LinearLayout
         android:layout_weight="1"
         android:orientation="vertical"

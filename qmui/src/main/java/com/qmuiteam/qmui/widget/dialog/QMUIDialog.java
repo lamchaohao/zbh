@@ -7,12 +7,10 @@ import android.content.DialogInterface;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.LayoutRes;
 import android.text.InputType;
 import android.text.method.TransformationMethod;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -633,6 +631,7 @@ public class QMUIDialog extends Dialog {
     public static class CustomDialogBuilder extends QMUIDialogBuilder {
 
         private int mLayoutId;
+        private View mCustomView;
 
         public CustomDialogBuilder(Context context) {
             super(context);
@@ -641,14 +640,20 @@ public class QMUIDialog extends Dialog {
         /**
          * 设置内容区域的 layoutResId
          */
-        public CustomDialogBuilder setLayout(@LayoutRes int layoutResId) {
-            mLayoutId = layoutResId;
+//        public CustomDialogBuilder setLayout(@LayoutRes int layoutResId) {
+//            mLayoutId = layoutResId;
+//            return this;
+//        }
+
+        public CustomDialogBuilder setCustomView(View view) {
+            mCustomView = view;
             return this;
         }
 
         @Override
         protected void onCreateContent(QMUIDialog dialog, ViewGroup parent) {
-            parent.addView(LayoutInflater.from(mContext).inflate(mLayoutId, parent, false));
+//            parent.addView(LayoutInflater.from(mContext).inflate(mLayoutId, parent, false));
+            parent.addView(mCustomView);
         }
     }
 

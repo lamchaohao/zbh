@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.githang.statusbar.StatusBarCompat;
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.res.NonAnimator;
 import com.qmuiteam.qmui.widget.QMUITopBar;
@@ -29,6 +30,8 @@ public class MsgActivity extends SupportActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_msg);
+        StatusBarCompat.setStatusBarColor(this, getResources().getColor(R.color.colorTopbar), true);
+
         unbinder = ButterKnife.bind(this);
         initTopbar();
         initView();

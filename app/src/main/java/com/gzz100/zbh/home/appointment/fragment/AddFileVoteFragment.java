@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.base.BaseBackFragment;
+import com.gzz100.zbh.data.ObserverImpl;
+import com.gzz100.zbh.data.eventEnity.FileInfoEntity;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.ProgressSubscriber;
 import com.gzz100.zbh.data.network.SubscriberOnNextListener;
@@ -25,9 +27,9 @@ import com.gzz100.zbh.data.network.request.UploadRequest;
 import com.gzz100.zbh.home.appointment.adapter.SelectedDocsAdapter;
 import com.gzz100.zbh.home.appointment.adapter.VoteListAdapter;
 import com.gzz100.zbh.home.appointment.entity.VoteWrap;
+import com.gzz100.zbh.utils.QbSdkFileUtil;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.QMUITopBar;
-import com.tencent.smtt.sdk.QbSdk;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -35,18 +37,14 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import droidninja.filepicker.FilePickerBuilder;
 import droidninja.filepicker.FilePickerConst;
 import es.dmoral.toasty.Toasty;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
 import permissions.dispatcher.OnPermissionDenied;
@@ -83,6 +81,8 @@ public class AddFileVoteFragment extends BaseBackFragment {
     private ArrayList<String> mDocPaths;
     private boolean fileUploadComplete;
     private boolean voteComplete;
+    private ObserverImpl<HttpResult> mUploadVoteObserver;
+    private ProgressSubscriber<HttpResult> mUploadFilesubscriber;
 
     public static AddFileVoteFragment newInstance(String meetingId) {
         Bundle args = new Bundle();
@@ -128,13 +128,7 @@ public class AddFileVoteFragment extends BaseBackFragment {
                 if (file==null){
                     AddFileVoteFragmentPermissionsDispatcher.showSelectFileWithPermissionCheck(AddFileVoteFragment.this);
                 }else {
-                    HashMap<String,String> configValue = new HashMap<>();
-                    //“true”表示是进入打开方式选择界面，如果不设置或设置为“false” ，则进入 miniqb 浏览器模式。
-                    configValue.put("style","1");
-                    configValue.put("local","false");
-                    configValue.put("topBarBgColor","#2196F3");
-                    QbSdk.openFileReader(getContext(),file.getAbsolutePath(),configValue,null);
-
+                    QbSdkFileUtil.openFile(_mActivity,file);
                 }
 
             }
@@ -160,12 +154,6 @@ public class AddFileVoteFragment extends BaseBackFragment {
         });
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        EventBus.getDefault().unregister(this);
-        unbinder.unbind();
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -176,10 +164,11 @@ public class AddFileVoteFragment extends BaseBackFragment {
 
     @NeedsPermission({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE})
     public void showSelectFile(){
-        FilePickerBuilder.getInstance().setMaxCount(20)
-                .setActivityTheme(R.style.LibAppTheme)
-                .setSelectedFiles(mDocPaths)
-                .pickFile(this);
+        startFragment(SelectFileFragment.newInstance(mDocPaths));
+//        FilePickerBuilder.getInstance().setMaxCount(10)
+//                .setActivityTheme(R.style.LibAppTheme)
+//                .setSelectedFiles(mDocPaths)
+//                .pickFile(this);
     }
 
     // 向用户说明为什么需要这些权限（可选）
@@ -205,13 +194,13 @@ public class AddFileVoteFragment extends BaseBackFragment {
     // 用户拒绝授权回调（可选）
     @OnPermissionDenied({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE})
     void showDeniedForReadFile() {
-        Toast.makeText(getContext(), "用户拒绝了授权并向你扔了一条狗", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "用户拒绝了授权", Toast.LENGTH_SHORT).show();
     }
 
     // 用户勾选了“不再提醒”时调用（可选）
     @OnNeverAskAgain({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE})
     void showNeverAskForReadFile() {
-        Toast.makeText(getContext(), "用户把你打入冷宫", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "需要开启时请前往手机应用设置开启权限", Toast.LENGTH_LONG).show();
     }
 
     @OnClick({R.id.tv_addFile, R.id.rl_vote, R.id.bt_next_detail})
@@ -221,7 +210,11 @@ public class AddFileVoteFragment extends BaseBackFragment {
                 AddFileVoteFragmentPermissionsDispatcher.showSelectFileWithPermissionCheck(this);
                 break;
             case R.id.rl_vote:
-               startFragment(new SelectVoteModeFragment());
+//               startFragment(new SelectVoteModeFragment());
+                VoteWrap voteWrap =new VoteWrap();
+                voteWrap.setSingle(true);
+                startFragment(AddVoteFragment.newInstance(voteWrap));
+
                 break;
             case R.id.bt_next_detail:
                 uploadFile();
@@ -233,25 +226,11 @@ public class AddFileVoteFragment extends BaseBackFragment {
     private void uploadVote() {
 
         UploadRequest request = new UploadRequest();
-        Observer<HttpResult> observer = new Observer<HttpResult>() {
+        mUploadVoteObserver = new ObserverImpl<HttpResult>() {
             int completeCount = 0;
-            @Override
-            public void onSubscribe(Disposable d) {
-
-            }
 
             @Override
-            public void onNext(HttpResult result) {
-                Logger.i("onNext--");
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Logger.i("onError--"+e.getMessage());
-            }
-
-            @Override
-            public void onComplete() {
+            protected void onResponse(HttpResult result) {
                 completeCount++;
                 Logger.i("complete=="+completeCount);
                 if (completeCount==mVoteWrapList.size()){
@@ -261,9 +240,15 @@ public class AddFileVoteFragment extends BaseBackFragment {
                     }
                 }
             }
+
+            @Override
+            protected void onFailure(Throwable e) {
+                Toasty.error(_mActivity,e.getMessage()).show();
+            }
         };
+
         for (VoteWrap voteWrap : mVoteWrapList) {
-            request.uploadVoteList(observer,voteWrap,mMeetingId);
+            request.uploadVoteList(mUploadVoteObserver,voteWrap,mMeetingId);
         }
 
     }
@@ -276,7 +261,7 @@ public class AddFileVoteFragment extends BaseBackFragment {
                 Logger.i("SubscriberOnNextListener == "+request.toString());
             }
         };
-        ProgressSubscriber<HttpResult> subscriber = new ProgressSubscriber<HttpResult>(subscriberOnNextListener,getContext()) {
+        mUploadFilesubscriber = new ProgressSubscriber<HttpResult>(subscriberOnNextListener,getContext()) {
             @Override
             public void onNext(HttpResult result) {
                 super.onNext(result);
@@ -296,12 +281,11 @@ public class AddFileVoteFragment extends BaseBackFragment {
                     pop();
                 }
                 Toasty.info(getContext(),"文件上传成功").show();
-                Logger.i("onComplete 文件上传完毕");
 
             }
         };
 
-        request.uploadFileList(subscriber,docFileList,mMeetingId);
+        request.uploadFileList(mUploadFilesubscriber,docFileList,mMeetingId);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -318,6 +302,23 @@ public class AddFileVoteFragment extends BaseBackFragment {
                 break;
         }
         mVoteListAdapter.notifyDataSetChanged();
+    }
+
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onSelectedResult(FileInfoEntity fileInfoEntity){
+        if (fileInfoEntity.getFileNameList()!=null) {
+            mDocPaths = new ArrayList<>();
+            docFileList.clear();
+            mDocPaths.addAll(fileInfoEntity.getFileNameList());
+            for (String docPath : mDocPaths) {
+                File file = new File(docPath);
+                docFileList.add(file);
+            }
+            mAdapter.notifyDataSetChanged();
+        }
+
     }
 
     @Override
@@ -338,4 +339,19 @@ public class AddFileVoteFragment extends BaseBackFragment {
         }
 
     }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBus.getDefault().unregister(this);
+        unbinder.unbind();
+        if (mUploadVoteObserver!=null) {
+            mUploadVoteObserver.cancleRequest();
+        }
+        if (mUploadFilesubscriber!=null) {
+            mUploadFilesubscriber.cancleRequest();
+        }
+    }
+
 }

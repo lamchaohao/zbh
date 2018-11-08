@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
+              android:background="@color/backgroudColor"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
@@ -19,10 +20,31 @@
             android:id="@+id/tv_phone"
             android:layout_alignParentRight="true"
             android:text="1363222255"
-            android:drawableRight="@drawable/ic_keyboard_arrow_right_black_24dp"
+            android:textSize="14sp"
+            android:textColor="@color/colorTextNormal2"
+            android:layout_marginRight="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <ImageView
+            android:src="@drawable/ic_arrow_right"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:background="#FFFFFF"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <View
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@color/colorGray"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
     </RelativeLayout>
 
 
@@ -30,7 +52,7 @@
         android:id="@+id/tv_setpsw"
         style="@style/apmDetailRelative"
         android:text="修改密码"
-        android:drawableRight="@drawable/ic_keyboard_arrow_right_black_24dp"
+        android:drawableRight="@drawable/ic_arrow_right"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 

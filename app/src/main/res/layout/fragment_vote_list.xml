@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
+
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
@@ -9,19 +10,18 @@
 
     <com.scwang.smartrefresh.layout.SmartRefreshLayout
         android:id="@+id/prl_refresh"
+        android:background="@color/backgroudColor"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <com.qmuiteam.qmui.widget.QMUIEmptyView
-                android:id="@+id/emptyView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="?attr/qmui_topbar_height"
-                android:background="@color/qmui_config_color_white"
-                app:qmui_title_text="暂无投票"
-                app:qmui_detail_text="点击右上角新增投票"/>
+            <ImageView
+                android:id="@+id/iv_empty_tips"
+                android:layout_gravity="center"
+                android:src="@drawable/pic_vote_empty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rcv_vote_list"
                 android:layout_width="match_parent"

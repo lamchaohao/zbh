@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.orhanobut.logger.Logger;
 import com.xiaomi.mimc.MIMCGroupMessage;
 import com.xiaomi.mimc.MIMCMessage;
 import com.xiaomi.mimc.MIMCMessageHandler;
@@ -46,10 +47,19 @@ public class MimcMsgHandler implements MIMCMessageHandler {
      */
     @Override
     public void handleGroupMessage(List<MIMCGroupMessage> packets) {
+        Logger.i("handleGroupMessage packets.size="+packets.size());
         for (int i = 0; i < packets.size(); i++) {
             MIMCGroupMessage mimcGroupMessage = packets.get(i);
             if (!mAccountId.equals(mimcGroupMessage.getFromAccount())) {
-                BaseMCMsg msg = mGson.fromJson(new String(mimcGroupMessage.getPayload()), BaseMCMsg.class);
+                String payload = new String(mimcGroupMessage.getPayload());
+                Logger.i("receive:"+payload);
+                BaseMCMsg msg=null;
+                if (payload.contains("version")&&payload.contains("msgBody")&&payload.contains("timestamp")){
+                    msg = mGson.fromJson(new String(mimcGroupMessage.getPayload()), BaseMCMsg.class);
+                }else {
+                    return;
+                }
+
 
                 switch (msg.getMsgType()) {
                     case Constant.TEXT:

@@ -3,7 +3,6 @@ package com.gzz100.zbh.home.meetingadmin.fragment;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,11 +10,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.base.BaseBackFragment;
+import com.gzz100.zbh.data.ObserverImpl;
 import com.gzz100.zbh.data.entity.DownloadFileEntity;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.request.AttachRequest;
@@ -23,9 +24,7 @@ import com.gzz100.zbh.data.network.request.MeetingRequest;
 import com.gzz100.zbh.home.meetingadmin.adapter.DownloadDocAdapter;
 import com.gzz100.zbh.home.root.WebViewFragment;
 import com.gzz100.zbh.utils.FileDownloadManager;
-import com.gzz100.zbh.utils.ShareToWeixin;
 import com.orhanobut.logger.Logger;
-import com.qmuiteam.qmui.widget.QMUIEmptyView;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
 
@@ -41,12 +40,14 @@ import es.dmoral.toasty.Toasty;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
+import static com.gzz100.zbh.res.Common.DOWNLOAD_PATH;
+
 public class DownloadFileFragment extends BaseBackFragment {
 
     @BindView(R.id.topbar)
     QMUITopBar mTopBar;
-    @BindView(R.id.emptyView)
-    QMUIEmptyView mEmptyView;
+    @BindView(R.id.iv_empty_doc)
+    ImageView mEmptyView;
     @BindView(R.id.rcv_downloadDoc)
     RecyclerView mRcvDownloadDoc;
     @BindView(R.id.btn_save)
@@ -92,34 +93,27 @@ public class DownloadFileFragment extends BaseBackFragment {
     private void loadData() {
         MeetingRequest request=new MeetingRequest();
 
-        Observer<HttpResult<List<DownloadFileEntity>>> observer=new Observer<HttpResult<List<DownloadFileEntity>>>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-
-            }
+        Observer<HttpResult<List<DownloadFileEntity>>> observer=new ObserverImpl<HttpResult<List<DownloadFileEntity>>>() {
 
             @Override
-            public void onNext(HttpResult<List<DownloadFileEntity>> result) {
+            protected void onResponse(HttpResult<List<DownloadFileEntity>> result) {
                 List<DownloadFileEntity> fileList = result.getResult();
                 if (fileList!=null) {
                     mCanDownloadList.addAll(fileList);
                     mAdapter.notifyDataSetChanged();
                     if (mCanDownloadList.size()==0){
-                        mEmptyView.show();
+                        mEmptyView.setVisibility(View.VISIBLE);
+                        mBtnSave.setVisibility(View.GONE);
                     }else {
-                        mEmptyView.hide();
+                        mEmptyView.setVisibility(View.GONE);
+                        mBtnSave.setVisibility(View.VISIBLE);
                     }
                 }
             }
 
             @Override
-            public void onError(Throwable e) {
+            protected void onFailure(Throwable e) {
                 Toasty.error(getContext().getApplicationContext(),e.getMessage()).show();
-            }
-
-            @Override
-            public void onComplete() {
-
             }
         };
 
@@ -256,7 +250,7 @@ public class DownloadFileFragment extends BaseBackFragment {
     }
 
     private Uri getFileUri(String fileName){
-        File file=new File(Environment.getExternalStorageDirectory()+"/zbh/"+fileName);
+        File file=new File(DOWNLOAD_PATH+"/"+fileName);
         Uri contentUri=Uri.fromFile(file);
         return contentUri;
     }

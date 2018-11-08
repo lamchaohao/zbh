@@ -85,8 +85,15 @@
                 android:textColor="#67cf0b"
                 android:visibility="gone"
                 android:text="投影仪"/>
-
         </LinearLayout>
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/tv_apply"
+        android:text="审核"
+        android:textSize="10sp"
+        android:layout_marginRight="2dp"
+        android:layout_marginTop="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 </LinearLayout>

@@ -14,6 +14,7 @@ import com.gzz100.zbh.R;
 import com.gzz100.zbh.data.entity.MeetingRoomEntity;
 import com.gzz100.zbh.utils.GlideApp;
 import com.gzz100.zbh.utils.TimeFormatUtil;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -123,6 +124,11 @@ public class RoomAdapter extends RecyclerView.Adapter {
                 .load(room.getMeetingPlacePic())
                 .placeholder((R.drawable.ic_insert_chart_blue_500_48dp))
                 .into(holder.mIvRoomPic);
+        if (room.getNeedApply()==1) {
+            holder.mTvApply.setVisibility(View.VISIBLE);
+        }else {
+            holder.mTvApply.setVisibility(View.GONE);
+        }
         holder.mTvRoomName.setText(room.getMeetingPlaceName());
         holder.mTvCapcity.setText("坐席 "+room.getMeetingPlaceCapacity()+"人");
         String[] tabs = room.getMeetingPlaceTab().split("、");
@@ -150,7 +156,7 @@ public class RoomAdapter extends RecyclerView.Adapter {
         }
         final int roomPosition = unablePosition;
         if (!room.isEnable()){
-            holder.rootView.setBackgroundColor(Color.GRAY);
+            holder.rootView.setBackgroundColor(mContext.getResources().getColor(R.color.colorGray));
         }else {
             holder.rootView.setBackgroundColor(Color.WHITE);
         }
@@ -180,6 +186,10 @@ public class RoomAdapter extends RecyclerView.Adapter {
         }
 
         return realPos;
+    }
+
+    public List<MeetingRoomEntity> getDatas(){
+        return mRoomList;
     }
 
     @Override
@@ -229,17 +239,22 @@ public class RoomAdapter extends RecyclerView.Adapter {
 
     /**
      * 设置不能被预约的会议室
-     * @param rooms
+     * @param rooms 各个会议室当日预约情况的列表
      */
     public void setUnableRoomData(List<MeetingRoomEntity> rooms,String startTime){
+        Logger.i("startTime="+startTime);
         for (MeetingRoomEntity meetingRoomEntity : mRoomList) {
             meetingRoomEntity.setEnable(true);//先重置,不然再次选择时间后可预约的会议室显示的不可预约
+
             for (MeetingRoomEntity room : rooms) {
+                //找到相应会议室,判断当天所预约情况
                 if (room.getMeetingPlaceId().equals(meetingRoomEntity.getMeetingPlaceId())) {
                     long startTimeMillis = TimeFormatUtil.formatTimeMillis(startTime);
                     for (MeetingRoomEntity.MeetingListBean meetingListBean : room.getMeetingList()) {
                         if (startTimeMillis>=meetingListBean.getStartTime()
                                 &&startTimeMillis<meetingListBean.getEndTime()) {
+                            Logger.i(meetingRoomEntity.getMeetingPlaceName()+"---unable");
+                            Logger.i("meetingBean startTime="+meetingListBean.getStartTime()+",apmStart="+startTimeMillis);
                             meetingRoomEntity.setEnable(false);
                         }
                     }
@@ -248,6 +263,7 @@ public class RoomAdapter extends RecyclerView.Adapter {
                 }
                 break;
             }
+
         }
         if (rooms==null||rooms.size()==0){
             for (MeetingRoomEntity entity : mRoomList) {
@@ -312,6 +328,8 @@ public class RoomAdapter extends RecyclerView.Adapter {
         TextView mTvTag4;
         @BindView(R.id.tv_capcity_room)
         TextView mTvCapcity;
+        @BindView(R.id.tv_apply)
+        TextView mTvApply;
 
         public RoomHolder(View itemView) {
             super(itemView);

@@ -1,10 +1,12 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
+              android:orientation="vertical"
              xmlns:app="http://schemas.android.com/apk/res-auto"
-             tools:context="com.gzz100.zbh.account.ScanFragment">
+             tools:context="com.gzz100.zbh.account.fragment.ScanFragment">
 
+    <include layout="@layout/widget_topbar"/>
     <cn.bingoogolapple.qrcode.zxing.ZXingView
         android:id="@+id/zxingview"
         android:layout_width="match_parent"
@@ -17,8 +19,11 @@
         app:qrcv_cornerSize="3dp"
         app:qrcv_maskColor="#33FFFFFF"
         app:qrcv_rectWidth="200dp"
+        app:qrcv_isOnlyDecodeScanBoxArea="true"
+        app:qrcv_isShowDefaultGridScanLineDrawable="true"
+        app:qrcv_isScanLineReverse="true"
         app:qrcv_scanLineColor="@color/colorPrimaryDark"
         app:qrcv_scanLineSize="1dp"
         app:qrcv_topOffset="90dp" />
 
-</FrameLayout>
+</LinearLayout>

@@ -1,6 +1,5 @@
 package com.gzz100.zbh.home.appointment.entity;
 
-import java.io.File;
 import java.io.Serializable;
 
 /**
@@ -13,7 +12,7 @@ import java.io.Serializable;
 public class VoteOption implements Serializable{
 
     private String voteOptionName;
-    private File picFile;
+    private String picFile;
     private String fileMd5;
     public String getOptionName() {
         return voteOptionName;
@@ -23,11 +22,11 @@ public class VoteOption implements Serializable{
         this.voteOptionName = optionName;
     }
 
-    public File getPicFile() {
+    public String getPicFile() {
         return picFile;
     }
 
-    public void setPicFile(File picFile) {
+    public void setPicFile(String picFile) {
         this.picFile = picFile;
     }
 
@@ -43,7 +42,7 @@ public class VoteOption implements Serializable{
     public String toString() {
         return "VoteOption{" +
                 "voteOptionName='" + voteOptionName + '\'' +
-                ", picFile=" + (picFile==null?"null":picFile.getAbsolutePath()) +
+                ", picFile=" + (picFile==null?"null":picFile) +
                 '}';
     }
 }

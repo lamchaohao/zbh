@@ -9,7 +9,7 @@
     <ImageView
         android:id="@+id/iv_FileIcon"
         android:layout_margin="8dp"
-        android:src="@drawable/power_point_2013"
+        android:src="@drawable/ic_power_point"
         android:layout_gravity="center"
         android:layout_width="48dp"
         android:layout_height="48dp"/>

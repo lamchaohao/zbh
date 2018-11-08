@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#2196F3</color>
+    <color name="colorPrimary">#419DE5</color>
     <color name="colorPrimaryDark">#1976D2</color>
-    <color name="colorAccent">#00bcd4</color>
+    <color name="colorAccent">#419DE5</color>
     <color name="statusBarColor">#F5F5F5</color>
     <color name="colorTopbarText">#000000</color>
     <color name="textColorPrimary">#DD000000</color>
-    <color name="navigationBarColor">#2196F3</color>
+    <color name="navigationBarColor">#419DE5</color>
     <color name="colorSecondaryText">#757575</color>
     <color name="lightPrimaryColor">#BBDEFB</color>
     <color name="colorTopbar">#F5F5F5</color>
@@ -15,9 +15,14 @@
     <color name="colorTopbarAndNotificationBar">#F5F5F5</color>
     <color name="colorTextSelected">#0090DB</color>
     <color name="colorTextNormal">#707070</color>
-    <color name="colorTextNormal2">#000000</color>
+    <color name="colorTextNormal2">#75000000</color>
+    <color name="backgroudColor">@color/colorTopbar</color>
+
     <color name="black_overlay">#66000000</color>
     <color name="black_mask">#e8424242</color>
     <color name="black_select">#3F4A52</color>
+
+    <color name="default_shadow_color">#88757575</color>
+    <color name="default_fill_color">#ffffff</color>
 
 </resources>

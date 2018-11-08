@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -15,8 +17,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bigkoo.pickerview.TimePickerView;
+import com.google.gson.Gson;
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.base.BaseBackFragment;
+import com.gzz100.zbh.data.ObserverImpl;
 import com.gzz100.zbh.data.entity.MeetingRoomEntity;
 import com.gzz100.zbh.data.entity.Staff;
 import com.gzz100.zbh.data.entity.UpdateMeetingEntity;
@@ -30,7 +34,7 @@ import com.gzz100.zbh.home.appointment.entity.StaffWrap;
 import com.gzz100.zbh.home.appointment.fragment.AddAgendaFragment;
 import com.gzz100.zbh.home.appointment.fragment.MultiChosePersonFragment;
 import com.gzz100.zbh.home.appointment.fragment.RemindTimeFragment;
-import com.gzz100.zbh.home.root.UpdateMsg;
+import com.gzz100.zbh.data.eventEnity.UpdateMsg;
 import com.gzz100.zbh.utils.DensityUtil;
 import com.gzz100.zbh.utils.GlideApp;
 import com.gzz100.zbh.utils.TextHeadPicUtil;
@@ -57,8 +61,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import es.dmoral.toasty.Toasty;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
 
 /**
  * Created by Lam on 2018/4/19.
@@ -91,6 +93,10 @@ public class UpdateMeetingFragment extends BaseBackFragment {
     LinearLayout mLlDelegateListView;
     @BindView(R.id.rl_delegate_detail)
     RelativeLayout mRlDelegate;
+    @BindView(R.id.rl_delagetePic_detail)
+    View mParentViewDelegatePic;
+    @BindView(R.id.rl_copypic_detail)
+    View mParentViewCopyPic;
     @BindView(R.id.tv_agendaSum_detail)
     TextView mTvAgendaSum;
     @BindView(R.id.rl_agenda_detail)
@@ -130,7 +136,7 @@ public class UpdateMeetingFragment extends BaseBackFragment {
     private String mRemindTimeStr;
     private String mRoomId;
     private String mMeetingId;
-//    private MeetingRoomEntity mMeetingRoomEntity;
+//    private MeetingRoomEventEntity mMeetingRoomEntity;
     private SelectTimeAdapter mAdapter;
     public static final int RC_HOST = 366;
     public static final int RC_DELEGATE = 367;
@@ -144,6 +150,9 @@ public class UpdateMeetingFragment extends BaseBackFragment {
     private long mStartTime;
     private long mEndTime;
     private boolean hasInitRoom;
+    private ObserverImpl<HttpResult<UpdateMeetingEntity>> mInfoObserver;
+    private ObserverImpl<HttpResult> mUpdateObserver;
+    private ObserverImpl<HttpResult<List<MeetingRoomEntity>>> mListObserver;
 
     public static UpdateMeetingFragment newInstance(String meetingId,String roomId){
         UpdateMeetingFragment fragment=new UpdateMeetingFragment();
@@ -166,38 +175,50 @@ public class UpdateMeetingFragment extends BaseBackFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         initVar();
         initTopbar();
+        initView();
         initTimeTableView();
         loadMeetingInfo();
     }
 
+    private void initView() {
+        mEtMeetingName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                mTvNameCount.setText(s.length()+"/30");
+            }
+        });
+    }
 
     private void loadMeetingInfo() {
 
         final MeetingRequest request = new MeetingRequest();
-        request.getUpdateMeetingInfo(new Observer<HttpResult<UpdateMeetingEntity>>() {
+        mInfoObserver = new ObserverImpl<HttpResult<UpdateMeetingEntity>>() {
             @Override
-            public void onSubscribe(Disposable d) {
-
-            }
-
-            @Override
-            public void onNext(HttpResult<UpdateMeetingEntity> updateInfo) {
+            protected void onResponse(HttpResult<UpdateMeetingEntity> updateInfo) {
                 UpdateMeetingEntity meetingInfo = updateInfo.getResult();
                 setDataToPeople(meetingInfo);
                 String theBookedTime = meetingInfo.getMeetingStartTime();
                 initTabs(theBookedTime);
+                onRemindTimeChange(meetingInfo.getNotifyTime());
             }
 
             @Override
-            public void onError(Throwable e) {
-
+            protected void onFailure(Throwable e) {
+                Toasty.error(getContext(),e.getMessage()).show();
             }
+        };
 
-            @Override
-            public void onComplete() {
-
-            }
-        },mMeetingId);
+        request.getUpdateMeetingInfo(mInfoObserver,mMeetingId);
 
     }
 
@@ -219,6 +240,7 @@ public class UpdateMeetingFragment extends BaseBackFragment {
             staff.setUserId(staffBean.getUserId());
             delegateList.add(staff);
         }
+        mLlDelegateListView.setVisibility(View.VISIBLE);
         StaffWrap delegateWrap=new StaffWrap(RC_DELEGATE,delegateList);
         onStaffSelectedCallBack(delegateWrap);
         //抄送人员
@@ -230,16 +252,21 @@ public class UpdateMeetingFragment extends BaseBackFragment {
             staff.setUserId(staffBean.getUserId());
             copyList.add(staff);
         }
-        StaffWrap copyWrap=new StaffWrap(RC_DELEGATE,copyList);
+        mLlCopyListView.setVisibility(View.VISIBLE);
+        StaffWrap copyWrap=new StaffWrap(RC_COPY,copyList);
         onStaffSelectedCallBack(copyWrap);
+
         //纪要人员
-        Staff summaryStaff = new Staff();
-        summaryStaff.setUserId(meetingInfo.getHostId());
-        summaryStaff.setUserName(meetingInfo.getHostName());
-        List<Staff>summaryList = new ArrayList<>();
-        summaryList.add(host);
-        StaffWrap summaryWrap=new StaffWrap(RC_HOST,summaryList);
-        onStaffSelectedCallBack(summaryWrap);
+        if (meetingInfo.getSummaryPerson()!=null) {
+            Staff summaryStaff = new Staff();
+            summaryStaff.setUserId(meetingInfo.getSummaryPerson().getUserId());
+            summaryStaff.setUserName(meetingInfo.getSummaryPerson().getUserName());
+            List<Staff> summaryList =new ArrayList<>();
+            summaryList.add(summaryStaff);
+            StaffWrap summaryWrap=new StaffWrap(RC_SUMMARY,summaryList);
+            onStaffSelectedCallBack(summaryWrap);
+        }
+
         //议程
 
         List<UpdateMeetingEntity.AgendaListBean> agendaList = meetingInfo.getAgendaList();
@@ -274,11 +301,10 @@ public class UpdateMeetingFragment extends BaseBackFragment {
     private void initTopbar() {
         mTopbar.setTitle("修改会议");
         mBtNext.setText("提交修改");
-        onRemindTimeChange("no");
+        onRemindTimeChange("0");
     }
 
     private void initTabs(String theBookedTime) {
-        Logger.i("bookedTime="+theBookedTime);
         final String subBookedTime = theBookedTime.substring(0, theBookedTime.lastIndexOf(" "));
         mTopbar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
             @Override
@@ -286,10 +312,6 @@ public class UpdateMeetingFragment extends BaseBackFragment {
                 pop();
             }
         });
-//        int normalColor = QMUIResHelper.getAttrColor(getActivity(), R.attr.qmui_config_color_black);
-//        int selectColor = QMUIResHelper.getAttrColor(getActivity(), R.attr.qmui_config_color_blue);
-//        mTabSegment.setDefaultNormalColor(normalColor);
-//        mTabSegment.setDefaultSelectedColor(selectColor);
         QMUITabSegment.Tab todayTabs = new QMUITabSegment.Tab("预定日期");
         QMUITabSegment.Tab tomorrowTab = new QMUITabSegment.Tab("明天");
         QMUITabSegment.Tab dayAfterTomrwTab = new QMUITabSegment.Tab("后天");
@@ -373,14 +395,9 @@ public class UpdateMeetingFragment extends BaseBackFragment {
     private void loadMeetingListData(String startTime) {
         MeetingRoomRequest request = new MeetingRoomRequest();
         mAdapter.setAppointmentDate(startTime);
-        request.getMeetingListByRoomId(new Observer<HttpResult<List<MeetingRoomEntity>>>() {
+        mListObserver = new ObserverImpl<HttpResult<List<MeetingRoomEntity>>>() {
             @Override
-            public void onSubscribe(Disposable d) {
-
-            }
-
-            @Override
-            public void onNext(HttpResult<List<MeetingRoomEntity>> result) {
+            protected void onResponse(HttpResult<List<MeetingRoomEntity>> result) {
                 List<MeetingRoomEntity> roomEntities = result.getResult();
                 if (roomEntities.size() == 1) {
                     List<MeetingRoomEntity.MeetingListBean> meetingList = roomEntities.get(0).getMeetingList();
@@ -388,11 +405,11 @@ public class UpdateMeetingFragment extends BaseBackFragment {
                     int theTargetIndex=0;
                     for (final MeetingRoomEntity.MeetingListBean meetingListBean : meetingList) {
                         if (meetingListBean.getMeetingId().equals(mMeetingId)) {
-
+                            Logger.i("meetingId="+mMeetingId+",meetingListBean="+meetingListBean.getStartTime());
                             mRcvApmDetailTime.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
-
+                                    Logger.i("getStartTime="+meetingListBean.getStartTime()+",getEndTime="+meetingListBean.getEndTime());
                                     BookedTime bookedTime=new BookedTime(meetingListBean.getStartTime(),meetingListBean.getEndTime());
                                     mAdapter.setSelectTimeBlock(bookedTime);
                                 }
@@ -409,15 +426,11 @@ public class UpdateMeetingFragment extends BaseBackFragment {
             }
 
             @Override
-            public void onError(Throwable e) {
+            protected void onFailure(Throwable e) {
 
             }
-
-            @Override
-            public void onComplete() {
-
-            }
-        }, mRoomId, startTime);
+        };
+        request.getMeetingListByRoomId(mListObserver, mRoomId, startTime);
     }
 
     private void shouldinitMeetingRoom(MeetingRoomEntity roomEntity) {
@@ -500,9 +513,9 @@ public class UpdateMeetingFragment extends BaseBackFragment {
                 mCopyStaffList = staffWrap.getStaffList();
                 mLlCopyListView.removeAllViews();
                 if (mCopyStaffList.size() == 0) {
-                    mLlCopyListView.setVisibility(View.GONE);
+                    mParentViewCopyPic.setVisibility(View.GONE);
                 } else {
-                    mLlCopyListView.setVisibility(View.VISIBLE);
+                    mParentViewCopyPic.setVisibility(View.VISIBLE);
                 }
                 for (Staff staff : mCopyStaffList) {
                     ImageView iv = new ImageView(getContext());
@@ -512,16 +525,15 @@ public class UpdateMeetingFragment extends BaseBackFragment {
                     iv.setImageDrawable(TextHeadPicUtil.getHeadPic(staff.getUserName(), fontSize, imageSize));
                     mLlCopyListView.addView(iv);
                 }
-
                 mTvCopySum.setText(mCopyStaffList.size() + "人");
                 break;
             case RC_DELEGATE:
                 mDelegateList = staffWrap.getStaffList();
                 mLlDelegateListView.removeAllViews();
                 if (mDelegateList.size() == 0) {
-                    mLlDelegateListView.setVisibility(View.GONE);
+                    mParentViewDelegatePic.setVisibility(View.GONE);
                 } else {
-                    mLlDelegateListView.setVisibility(View.VISIBLE);
+                    mParentViewDelegatePic.setVisibility(View.VISIBLE);
                 }
                 for (Staff staff : mDelegateList) {
                     ImageView iv = new ImageView(getContext());
@@ -531,6 +543,7 @@ public class UpdateMeetingFragment extends BaseBackFragment {
                     iv.setImageDrawable(TextHeadPicUtil.getHeadPic(staff.getUserName(), fontSize, imageSize));
                     mLlDelegateListView.addView(iv);
                 }
+
                 mTvDelegateSum.setText(mDelegateList.size() + "人");
                 break;
             case RC_HOST:
@@ -543,6 +556,7 @@ public class UpdateMeetingFragment extends BaseBackFragment {
                 break;
         }
     }
+
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onAgendaAddedCallBack(ArrayList<Agenda> agendas) {
@@ -579,7 +593,7 @@ public class UpdateMeetingFragment extends BaseBackFragment {
             case "7d":
                 tvTimeShow = "1周";
                 break;
-            case "no":
+            case "0":
                 tvTimeShow = "不提醒";
                 break;
         }
@@ -587,8 +601,8 @@ public class UpdateMeetingFragment extends BaseBackFragment {
         tvRemindTime.setText(tvTimeShow);
     }
 
-    @OnClick({R.id.rl_host, R.id.rl_delegate_detail, R.id.rl_agenda_detail,R.id.rl_remind,
-            R.id.rl_summary_detail, R.id.rl_copy_detail, R.id.bt_next_detail})
+    @OnClick({R.id.rl_host, R.id.rl_delegate_detail,R.id.ll_delegateList_detail, R.id.rl_agenda_detail,R.id.rl_remind,
+            R.id.rl_summary_detail, R.id.rl_copy_detail,R.id.ll_copyList_detail, R.id.bt_next_detail})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.rl_host:
@@ -598,12 +612,11 @@ public class UpdateMeetingFragment extends BaseBackFragment {
                 }
                 startFragment(MultiChosePersonFragment.newInstance(MultiChosePersonFragment.SingleChoice, RC_HOST, new long[]{hostId}));
                 break;
+            case R.id.ll_delegateList_detail:
+                startSelectDelegates();
+                break;
             case R.id.rl_delegate_detail:
-                long[] delegateIds = new long[mDelegateList.size()];
-                for (int i = 0; i < mDelegateList.size(); i++) {
-                    delegateIds[i] = Long.parseLong(mDelegateList.get(i).getUserId());
-                }
-                startFragment(MultiChosePersonFragment.newInstance(MultiChosePersonFragment.MultiChoices, RC_DELEGATE, delegateIds));
+                startSelectDelegates();
                 break;
             case R.id.rl_agenda_detail:
                 startFragment(AddAgendaFragment.newInstance(mAddedAgendas));
@@ -615,12 +628,11 @@ public class UpdateMeetingFragment extends BaseBackFragment {
                 }
                 startFragment(MultiChosePersonFragment.newInstance(MultiChosePersonFragment.SingleChoice, RC_SUMMARY, new long[]{summaryId}));
                 break;
+            case R.id.ll_copyList_detail:
+                startSelectCopy();
+                break;
             case R.id.rl_copy_detail:
-                long[] copyToIds = new long[mCopyStaffList.size()];
-                for (int i = 0; i < mCopyStaffList.size(); i++) {
-                    copyToIds[i] = Long.parseLong(mCopyStaffList.get(i).getUserId());
-                }
-                startFragment(MultiChosePersonFragment.newInstance(MultiChosePersonFragment.MultiChoices, RC_COPY, copyToIds));
+                startSelectCopy();
                 break;
             case R.id.rl_remind:
                 startFragment(RemindTimeFragment.newInstance(mRemindTimeStr));
@@ -633,28 +645,36 @@ public class UpdateMeetingFragment extends BaseBackFragment {
         }
     }
 
+    private void startSelectCopy(){
+        long[] copyToIds = new long[mCopyStaffList.size()];
+        for (int i = 0; i < mCopyStaffList.size(); i++) {
+            copyToIds[i] = Long.parseLong(mCopyStaffList.get(i).getUserId());
+        }
+        startFragment(MultiChosePersonFragment.newInstance(MultiChosePersonFragment.MultiChoices, RC_COPY, copyToIds));
+    }
+
+    private void startSelectDelegates(){
+        long[] delegateIds = new long[mDelegateList.size()];
+        for (int i = 0; i < mDelegateList.size(); i++) {
+            delegateIds[i] = Long.parseLong(mDelegateList.get(i).getUserId());
+        }
+        startFragment(MultiChosePersonFragment.newInstance(MultiChosePersonFragment.MultiChoices, RC_DELEGATE, delegateIds));
+    }
+
+
     private void updateMeeting() {
         MeetingRequest request = new MeetingRequest();
-        Observer<HttpResult> observer = new Observer<HttpResult>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-
-            }
+        mUpdateObserver = new ObserverImpl<HttpResult>() {
 
             @Override
-            public void onNext(HttpResult result) {
+            protected void onResponse(HttpResult result) {
                 EventBus.getDefault().post(new UpdateMsg(UpdateMsg.Action.updateMeeting));
                 pop();
             }
 
             @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onComplete() {
-
+            protected void onFailure(Throwable e) {
+                Toasty.error(getContext(),e.getMessage()).show();
             }
         };
         String startTime = TimeFormatUtil.formatDateAndTime(mStartTime);
@@ -672,35 +692,27 @@ public class UpdateMeetingFragment extends BaseBackFragment {
         }
         Logger.i(agendaJsonArray.toString());
 
-        StringBuilder delegateIdList = new StringBuilder("[");
+        Gson gson=new Gson();
+        String[] delegateIdArr=new String[mDelegateList.size()];
         for (int i = 0; i < mDelegateList.size(); i++) {
-            if (mDelegateList.get(i).getUserId().equals(mHostStaff.getUserId())){
-                //如果参会人员中包含主持人
-                continue;
-            }else {
-                delegateIdList.append(mDelegateList.get(i).getUserId());
-            }
-
-            if (i != mDelegateList.size() - 1) {
-                delegateIdList.append(",");
-            } else {
-                delegateIdList.append("]");
-            }
+            delegateIdArr[i] = mDelegateList.get(i).getUserId();
         }
-        StringBuilder copyIdList = new StringBuilder("[");
-        for (int i = 0; i < mDelegateList.size(); i++) {
-            copyIdList.append(mDelegateList.get(i).getUserId());
-            if (i != mDelegateList.size() - 1) {
-                copyIdList.append(",");
-            } else {
-                copyIdList.append("]");
-            }
+        String delegateIdJson = gson.toJson(delegateIdArr);
+        Logger.i("delegateIdList:" + delegateIdJson);
+        String[] copyIdArr=new String[mCopyStaffList.size()];
+        for (int i = 0; i < mCopyStaffList.size(); i++) {
+            copyIdArr[i]=mCopyStaffList.get(i).getUserId();
+
         }
 
-        request.updateMeeting(observer,mMeetingId,mEtMeetingName.getText().toString(),
+        String copyIdJson = gson.toJson(copyIdArr);
+        Logger.i("copyIdJson="+copyIdJson);
+
+
+        request.updateMeeting(mUpdateObserver,mMeetingId,mEtMeetingName.getText().toString(),
                 mRoomId, startTime, endTime, mHostStaff.getUserId(),
-                mSummaryStaff.getUserId(), copyIdList.toString(),
-                agendaJsonArray.toString(), delegateIdList.toString(),mRemindTimeStr);
+                mSummaryStaff.getUserId(), copyIdJson,
+                agendaJsonArray.toString(), delegateIdJson,mRemindTimeStr);
     }
 
     private boolean checkData() {
@@ -735,6 +747,12 @@ public class UpdateMeetingFragment extends BaseBackFragment {
         super.onDestroyView();
         EventBus.getDefault().unregister(this);
         unbinder.unbind();
+        if (mUpdateObserver!=null) {
+            mUpdateObserver.cancleRequest();
+        }
+        if (mListObserver!=null) {
+            mListObserver.cancleRequest();
+        }
     }
 
 

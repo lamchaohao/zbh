@@ -95,4 +95,14 @@ public class UserLoginRequest {
                 .subscribe(observer);
     }
 
+    public void logout(Observer<HttpResult> observer){
+        User user = User.getUserFromCache();
+        mLoginService.logout(user.getUserId(),user.getToken())
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+
+    }
+
 }

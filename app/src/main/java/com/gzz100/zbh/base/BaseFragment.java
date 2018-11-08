@@ -10,6 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.gzz100.zbh.account.eventEntity.OnBackEvent;
+
+import org.greenrobot.eventbus.EventBus;
 import org.jetbrains.annotations.NotNull;
 
 import me.yokeyword.fragmentation_swipeback.SwipeBackFragment;
@@ -25,6 +28,13 @@ public abstract class BaseFragment extends SwipeBackFragment {
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return onCreateView(inflater);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        hideSoftInput();
+        EventBus.getDefault().post(new OnBackEvent());
     }
 
     protected abstract View onCreateView(LayoutInflater inflater);

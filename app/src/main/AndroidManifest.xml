@@ -36,14 +36,15 @@
             android:name="com.huawei.hms.client.appid"
             android:value="appid=100198313">
         </meta-data>
+
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.gzz100.fileprovider"
+            android:authorities="com.gzz100.zbh.FileProvider"
             android:exported="false"
             android:grantUriPermissions="true">
-        <meta-data
-            android:name="android.support.FILE_PROVIDER_PATHS"
-            android:resource="@xml/file_paths" />
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
         </provider>
 
         <activity
@@ -162,13 +163,13 @@
         </activity>
         <!-- hms needs end===================== -->
         <activity
-            android:name=".home.meetingadmin.fragment.FullscreenActivity"
+            android:name=".home.meetingadmin.activity.FullscreenActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_fullscreen"
             android:screenOrientation="landscape"
+            android:label="@string/title_activity_fullscreen"
             android:theme="@style/FullscreenTheme">
         </activity>
-        <activity android:name=".home.meetingadmin.fragment.PhotoActivity">
+        <activity android:name=".home.meetingadmin.activity.PhotoActivity">
         </activity>
         <activity android:name=".OfficeActivity">
         </activity>

@@ -15,7 +15,7 @@ import com.gzz100.zbh.account.User;
 import com.gzz100.zbh.base.BaseBackFragment;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.request.AccountRequest;
-import com.gzz100.zbh.home.root.UpdateMsg;
+import com.gzz100.zbh.data.eventEnity.UpdateMsg;
 import com.gzz100.zbh.utils.FragmentBackHandler;
 import com.gzz100.zbh.utils.MD5Utils;
 import com.qmuiteam.qmui.widget.QMUITopBar;

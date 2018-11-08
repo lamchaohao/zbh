@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -18,6 +17,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gzz100.zbh.R;
@@ -28,6 +29,7 @@ import com.gzz100.zbh.home.appointment.entity.VoteWrap;
 import com.gzz100.zbh.utils.SuperGlideEngine;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 
@@ -38,6 +40,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
@@ -61,6 +64,10 @@ public class AddVoteFragment extends BaseBackFragment {
     EditText mEtVoteDescp;
     @BindView(R.id.rcv_addVote)
     RecyclerView mRcvAddVote;
+    @BindView(R.id.rl_changeMode)
+    RelativeLayout mRlChangeMode;
+    @BindView(R.id.tv_vote_mode)
+    TextView mTvMode;
 
     private VoteWrap mVoteWrap;
     private AddVoteAdapter mAdapter;
@@ -93,8 +100,10 @@ public class AddVoteFragment extends BaseBackFragment {
                 mEtVoteDescp.setText(mVoteWrap.getVoteDespc());
             }
         }
+
+        mTvMode.setText(mVoteWrap.isSingle()?"单选":"多选");
+
         Button rightButton = mTopbar.addRightTextButton("删除", R.id.buttonSave);
-        rightButton.setTextColor(Color.WHITE);
         rightButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -150,6 +159,27 @@ public class AddVoteFragment extends BaseBackFragment {
 
     }
 
+
+    @OnClick(R.id.rl_changeMode)
+    void onSelectModeChange(View view){
+        final String[] items=new String[]{"多选","单选"};
+        new QMUIDialog.CheckableDialogBuilder(getContext())
+                .setCheckedIndex(mVoteWrap.isSingle()?1:0)
+                .addItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mVoteWrap.setSingle(which==1);
+                        mAdapter.notifyDataSetChanged();
+                        if (which==1){
+                            mTvMode.setText("单选");
+                        } else {
+                            mTvMode.setText("多选");
+                        }
+                        dialog.dismiss();
+                    }
+                }).show();
+
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -212,13 +242,13 @@ public class AddVoteFragment extends BaseBackFragment {
     // 用户拒绝授权回调（可选）
     @OnPermissionDenied({Manifest.permission.WRITE_EXTERNAL_STORAGE})
     void showDeniedForReadFile() {
-        Toast.makeText(getContext(), "用户拒绝了授权并向你扔了一条狗", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "用户拒绝了授权", Toast.LENGTH_SHORT).show();
     }
 
     // 用户勾选了“不再提醒”时调用（可选）
     @OnNeverAskAgain({Manifest.permission.WRITE_EXTERNAL_STORAGE})
     void showNeverAskForReadFile() {
-        Toast.makeText(getContext(), "用户把你打入冷宫", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "如需开启,请在应用管理设置", Toast.LENGTH_SHORT).show();
     }
 
     private File uri2File(Uri uri) {

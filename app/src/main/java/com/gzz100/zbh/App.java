@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Process;
 import android.support.multidex.MultiDex;
@@ -145,10 +146,18 @@ public class App extends Application {
     }
 
     private void initPushModel() {
+        Logger.i("brand:"+Build.BRAND);
         //xiaomiPush
-        initXiaomiPush();
+
+        if (Build.BRAND.toUpperCase().contains("HUAWEI")) {
+            initHMSPush();
+            Logger.i("init HMSPush");
+        }else {
+            initXiaomiPush();
+            Logger.i("init xiaomiPush");
+        }
         //huawei push
-//        initHMSPush();
+//
 
     }
 

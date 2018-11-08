@@ -3,6 +3,7 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent"
               android:orientation="vertical"
+              android:background="@color/backgroudColor"
              tools:context="com.gzz100.zbh.home.mine.SettingFragment">
 
 
@@ -11,10 +12,24 @@
     <TextView
         android:id="@+id/tv_account_safe"
         android:text="账号与安全"
+        android:layout_marginTop="8dp"
         style="@style/apmDetailRelative"
-        android:drawableRight="@drawable/ic_keyboard_arrow_right_black_24dp"
+        android:drawableRight="@drawable/ic_arrow_right"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+
+    <FrameLayout
+        android:background="#FFFFFF"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <View
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@color/colorGray"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
+
+    </FrameLayout>
 
     <RelativeLayout
         android:id="@+id/rl_clear_cache"
@@ -33,12 +48,23 @@
             android:layout_alignParentRight="true"
             android:text="3.8 M"
             android:layout_centerVertical="true"
-            android:drawableRight="@drawable/ic_keyboard_arrow_right_black_24dp"
+            android:drawableRight="@drawable/ic_arrow_right"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
     </RelativeLayout>
+    <FrameLayout
+        android:background="#FFFFFF"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <View
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@color/colorGray"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
 
+    </FrameLayout>
     <RelativeLayout
         android:id="@+id/rl_msg_push"
         style="@style/apmDetailRelative"

@@ -7,6 +7,9 @@ import android.text.TextUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.cache.ExternalCacheDiskCacheFactory;
 import com.bumptech.glide.load.engine.cache.InternalCacheDiskCacheFactory;
+import com.gzz100.zbh.data.eventEnity.UpdateMsg;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -36,6 +39,7 @@ public class GlideCacheUtil {
                     public void run() {
                         Glide.get(context).clearDiskCache();
 // BusUtil.getBus().post(new GlideCacheClearSuccessEvent());
+                        EventBus.getDefault().post(new UpdateMsg(UpdateMsg.Action.updateCache));
                     }
                 }).start();
             } else {

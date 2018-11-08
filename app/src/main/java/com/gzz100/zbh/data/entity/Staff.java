@@ -103,6 +103,7 @@ public class Staff implements Parcelable {
                 ", departmentId='" + departmentId + '\'' +
                 ", userName='" + userName + '\'' +
                 ", userId='" + userId + '\'' +
+                ", isSelect=" + isSelect +
                 '}';
     }
 

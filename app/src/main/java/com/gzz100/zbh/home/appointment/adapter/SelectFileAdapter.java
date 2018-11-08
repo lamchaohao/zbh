@@ -18,8 +18,14 @@ import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+
+import droidninja.filepicker.FilePickerConst;
+import droidninja.filepicker.utils.FileUtils;
 
 /**
  * Created by Lam on 2018/2/8.
@@ -28,7 +34,7 @@ import java.util.List;
 public class SelectFileAdapter extends RecyclerView.Adapter {
 
     private Context mContext;
-    private File[] mFiles;
+    private List<File> mFiles;
     private File mCurrentFile;
     private String mRootFilePath;
     private OnItemClickListener mOnItemClickListener;
@@ -41,9 +47,24 @@ public class SelectFileAdapter extends RecyclerView.Adapter {
         mContext = context;
         mCurrentFile = Environment.getExternalStorageDirectory();
         mRootFilePath = mCurrentFile.getAbsolutePath();
-        mFiles = mCurrentFile.listFiles();
+        mFiles = Arrays.asList(mCurrentFile.listFiles());
+        sortFile(mFiles);
         mSdf = SimpleDateFormat.getDateInstance();
         selectedFiles = new ArrayList<>();
+    }
+
+    private void sortFile(List fileList){
+        Collections.sort(fileList, new Comparator<File>() {
+            @Override
+            public int compare(File o1, File o2) {
+                if (o1.isDirectory() && o2.isFile())
+                    return -1;
+                if (o1.isFile() && o2.isDirectory())
+                    return 1;
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
+
     }
 
     @Override
@@ -55,7 +76,7 @@ public class SelectFileAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         final FileHolder viewHolder= (FileHolder) holder;
-        final File file = mFiles[position];
+        final File file = mFiles.get(position);
         if (file.isDirectory()) {
             //文件夹样式
             viewHolder.ivIcon.setImageResource(R.drawable.ic_folder_yellow_700_36dp);
@@ -66,7 +87,26 @@ public class SelectFileAdapter extends RecyclerView.Adapter {
             viewHolder.divider.setVisibility(View.GONE);
             viewHolder.flCheck.setVisibility(View.GONE);
         }else {
-            viewHolder.ivIcon.setImageResource(R.drawable.ic_insert_drive_file_black_24dp);
+           FilePickerConst.FILE_TYPE fileType = FileUtils.getFileType(file.getAbsolutePath());
+            switch (fileType){
+                case PDF:
+                    viewHolder.ivIcon.setImageResource(R.drawable.ic_pdf);
+                    break;
+                case PPT:
+                    viewHolder.ivIcon.setImageResource(R.drawable.ic_power_point);
+                    break;
+                case TXT:
+                    viewHolder.ivIcon.setImageResource(droidninja.filepicker.R.drawable.icon_file_unknown);
+                case WORD:
+                    viewHolder.ivIcon.setImageResource(R.drawable.ic_word);
+                    break;
+                case EXCEL:
+                    viewHolder.ivIcon.setImageResource(R.drawable.ic_excel);
+                    break;
+                case UNKNOWN:
+                    viewHolder.ivIcon.setImageResource(droidninja.filepicker.R.drawable.icon_file_unknown);
+                    break;
+            }
             viewHolder.cbSelect.setVisibility(View.VISIBLE);
             viewHolder.tvFileName.setText(file.getName());
             viewHolder.tvFileSize.setText(FormatFileSizeUtil.formatFileSize(file.length()));
@@ -130,7 +170,8 @@ public class SelectFileAdapter extends RecyclerView.Adapter {
 
     public void setCurrentFile(File file){
         mCurrentFile = file;
-        mFiles = file.listFiles();
+        mFiles = Arrays.asList(mCurrentFile.listFiles());;
+        sortFile(mFiles);
         notifyDataSetChanged();
         if (mOnFileDirChange!=null){
             mOnFileDirChange.onFileChange(mCurrentFile);
@@ -141,6 +182,11 @@ public class SelectFileAdapter extends RecyclerView.Adapter {
         return selectedFiles;
     }
 
+    public void setSelectedFiles(List<File> files) {
+        selectedFiles.addAll(files);
+        notifyDataSetChanged();
+    }
+
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         mOnItemClickListener = onItemClickListener;
     }
@@ -148,9 +194,9 @@ public class SelectFileAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemCount() {
         if (mOnSelectedListener!=null){
-            mOnSelectedListener.onItemCountChange(mFiles.length);
+            mOnSelectedListener.onItemCountChange(mFiles.size());
         }
-        return mFiles.length;
+        return mFiles.size();
     }
 
     static class FileHolder extends RecyclerView.ViewHolder{

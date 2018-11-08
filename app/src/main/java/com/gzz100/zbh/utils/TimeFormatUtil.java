@@ -11,7 +11,6 @@ import java.util.Date;
 public class TimeFormatUtil {
 
     public static long formatTimeMillis(String dateTime){
-
 //        2017-10-10 10:10
         if (dateTime.length()==16&&dateTime.contains("-")) {
             int year = Integer.parseInt(dateTime.substring(0, 4));
@@ -34,7 +33,7 @@ public class TimeFormatUtil {
 
     public static long formatDateToMillis(String date){
 
-//        2017-10-10 10:10
+//        格式如 2017-10-10 10:10
         if (date.length()==10&&date.contains("-")) {
             int year = Integer.parseInt(date.substring(0, 4));
             int month =  Integer.parseInt(date.substring(5, 7));
@@ -68,6 +67,13 @@ public class TimeFormatUtil {
         Calendar calendar=Calendar.getInstance();
         calendar.setTimeInMillis(date);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        return sdf.format(calendar.getTime());
+    }
+
+    public static String formatTime(long date){
+        Calendar calendar=Calendar.getInstance();
+        calendar.setTimeInMillis(date);
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
         return sdf.format(calendar.getTime());
     }
 

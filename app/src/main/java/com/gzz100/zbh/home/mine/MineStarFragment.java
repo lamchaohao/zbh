@@ -12,6 +12,7 @@ import android.view.View;
 
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.base.BaseBackFragment;
+import com.gzz100.zbh.data.ObserverImpl;
 import com.gzz100.zbh.data.entity.StarFileEntity;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.request.AttachRequest;
@@ -58,6 +59,7 @@ public class MineStarFragment extends BaseBackFragment {
     private int offset;
     private StarFileAdapter mAdapter;
     private List<StarFileEntity> mFileList;
+    private ObserverImpl<HttpResult<List<StarFileEntity>>> mObserver;
 
     @Override
     protected View onCreateView(LayoutInflater inflater) {
@@ -183,14 +185,15 @@ public class MineStarFragment extends BaseBackFragment {
 
     private void loadData() {
 
-        Observer<HttpResult<List<StarFileEntity>>> observer = new Observer<HttpResult<List<StarFileEntity>>>() {
-            @Override
-            public void onSubscribe(Disposable d) {
+        mObserver = new ObserverImpl<HttpResult<List<StarFileEntity>>>() {
 
+            @Override
+            public void onComplete() {
+                mRefreshLayout.finishRefresh();
             }
 
             @Override
-            public void onNext(HttpResult<List<StarFileEntity>> result) {
+            protected void onResponse(HttpResult<List<StarFileEntity>> result) {
                 List<StarFileEntity> fileList = result.getResult();
                 if (fileList!=null){
                     offset = fileList.size();
@@ -198,9 +201,11 @@ public class MineStarFragment extends BaseBackFragment {
                     mFileList.addAll(fileList);
                     mAdapter.notifyDataSetChanged();
                     if (fileList.size()==0){
-                        mEmptyView.show();
+                        mEmptyView.show("暂无收藏","");
+                        mRcvMyStar.setVisibility(View.GONE);
                     }else {
                         mEmptyView.hide();
+                        mRcvMyStar.setVisibility(View.VISIBLE);
                     }
                 }else {
                     mEmptyView.hide();
@@ -208,17 +213,12 @@ public class MineStarFragment extends BaseBackFragment {
             }
 
             @Override
-            public void onError(Throwable e) {
+            protected void onFailure(Throwable e) {
                 mRefreshLayout.finishRefresh(false);
-            }
-
-            @Override
-            public void onComplete() {
-                mRefreshLayout.finishRefresh();
             }
         };
 
-        mRequest.getStarFile(observer,0,20);
+        mRequest.getStarFile(mObserver,0,20);
 
 
     }
@@ -288,5 +288,6 @@ public class MineStarFragment extends BaseBackFragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        mObserver.cancleRequest();
     }
 }

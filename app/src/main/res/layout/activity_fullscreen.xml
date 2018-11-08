@@ -5,7 +5,7 @@
              android:layout_height="match_parent"
               android:background="@color/colorWhite"
               android:keepScreenOn="true"
-             tools:context="com.gzz100.zbh.home.meetingadmin.fragment.FullscreenActivity">
+             tools:context="com.gzz100.zbh.home.meetingadmin.activity.FullscreenActivity">
 
     <include layout="@layout/sub_tools"/>
 
@@ -20,6 +20,7 @@
             android:layout_height="match_parent"/>
         <com.gzz100.zbh.widget.SuperDrawingView
             android:id="@+id/sdv_canvas"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 

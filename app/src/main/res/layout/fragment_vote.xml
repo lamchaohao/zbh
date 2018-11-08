@@ -2,102 +2,159 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
+              android:background="@color/backgroudColor"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
     <include layout="@layout/widget_topbar"/>
 
-        <android.support.v7.widget.CardView
-            app:cardCornerRadius="3dp"
-            android:layout_marginLeft="3dp"
-            android:layout_marginRight="3dp"
-            android:layout_marginTop="3dp"
-            android:layout_marginBottom="2dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        <RelativeLayout
-            android:padding="8dp"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+    <com.gzz100.zbh.widget.ShadowLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/tv_vote_name"
+        <LinearLayout
+            android:id="@+id/ll_rootview"
+            android:orientation="vertical"
+            android:paddingLeft="16dp"
+            android:background="@drawable/recycler_bg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:paddingTop="20dp"
+                android:layout_marginBottom="14dp"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:src="@drawable/ic_vote"
+                    android:layout_marginRight="8dp"
+                    android:layout_gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
                 <TextView
-                    android:id="@+id/tv_vote_mode"
-                    android:layout_marginTop="8dp"
+                    android:id="@+id/tv_vote_name"
+                    android:text="这是投票标题"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:gravity="center|left"
+                android:layout_marginBottom="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/tv_vote_hideName"
+                    android:text="【匿名】"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
                     android:textColor="@color/colorPrimary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
                 <TextView
-                    android:id="@+id/tv_vote_hideName"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:id="@+id/tv_vote_mode"
+                    android:text="【单选】"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorPrimary"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"/>
                 <TextView
                     android:id="@+id/tv_vote_selectableNum"
-                    android:layout_marginTop="8dp"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorPrimary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
-            </LinearLayout>
 
+            </LinearLayout>
             <LinearLayout
-                android:layout_alignParentRight="true"
-                android:orientation="vertical"
-                android:layout_width="wrap_content"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/tv_vote_desc"
+                    android:text="这是投票描述"
+                    android:layout_weight="1"
+                    android:textColor="@color/colorTextNormal2"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginRight="16dp"
+                    android:maxLines="2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_marginRight="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/tv_vote_start"
+                        android:background="@color/colorPrimary"
+                        android:text="开始"
+                        android:paddingLeft="12dp"
+                        android:paddingRight="12dp"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:layout_gravity="center"
+                        android:textColor="@color/colorWhite"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                    <TextView
+                        android:id="@+id/tv_vote_summary"
+                        android:text="16/26人 已投"
+                        android:textColor="@color/colorTextNormal2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
 
-                <TextView
-                    android:id="@+id/tv_vote_staus"
-                    android:paddingRight="16dp"
-                    android:paddingLeft="16dp"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:id="@+id/tv_vote_start"
-                    android:background="@color/colorPrimary"
-                    android:paddingRight="16dp"
-                    android:paddingLeft="16dp"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp"
-                    android:textColor="@color/colorWhite"
-                    android:layout_margin="5dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-                <TextView
-                    android:id="@+id/tv_vote_summary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
             </LinearLayout>
 
+        </LinearLayout>
 
-        </RelativeLayout>
-    </android.support.v7.widget.CardView>
+
+        <ImageView
+            android:id="@+id/iv_vote_status"
+            android:layout_gravity="right"
+            android:src="@drawable/ic_statu_on_ready"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </com.gzz100.zbh.widget.ShadowLayout>
+
 
     <RelativeLayout
         android:layout_marginTop="5dp"
+        android:layout_marginBottom="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rcv_vote"
-            android:layout_marginBottom="48dp"
+        <android.support.v7.widget.CardView
+            android:layout_margin="8dp"
+            android:layout_marginBottom="56dp"
+            android:elevation="2dp"
+            app:cardCornerRadius="6px"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="wrap_content">
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rcv_vote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </android.support.v7.widget.CardView>
+
+
         <Button
-            android:textColor="@color/colorWhite"
-            android:text="提交"
-            android:background="@color/colorPrimary"
             android:id="@+id/btn_vote_comfirm"
+            android:text="提交"
+            android:textColor="@color/colorWhite"
+            android:background="@drawable/bg_btn_round_conner"
             android:layout_alignParentBottom="true"
+            android:layout_margin="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 

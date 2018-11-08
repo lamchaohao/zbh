@@ -1,7 +1,6 @@
 package com.gzz100.zbh.home.appointment.fragment;
 
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -9,20 +8,20 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ExpandableListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.base.BaseBackFragment;
+import com.gzz100.zbh.data.ObserverImpl;
 import com.gzz100.zbh.data.entity.Staff;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.request.AppointmentRequest;
@@ -32,7 +31,9 @@ import com.gzz100.zbh.home.appointment.adapter.StaffAdapter;
 import com.gzz100.zbh.home.appointment.entity.Department;
 import com.gzz100.zbh.home.appointment.entity.StaffWrap;
 import com.mypopsy.widget.FloatingSearchView;
+import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -42,8 +43,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
+import es.dmoral.toasty.Toasty;
 
 import static com.gzz100.zbh.home.appointment.fragment.ApmDetailFragment.RC_COPY;
 import static com.gzz100.zbh.home.appointment.fragment.ApmDetailFragment.RC_DELEGATE;
@@ -59,6 +59,8 @@ public class MultiChosePersonFragment extends BaseBackFragment implements StaffA
     @BindView(R.id.expandableListView)
     ExpandableListView mExpandableListView;
     Unbinder unbinder;
+    @BindView(R.id.rl_multiSelect)
+    RelativeLayout rlSelected;
     @BindView(R.id.floatingSearchView)
     FloatingSearchView mSearchView;
     @BindView(R.id.topbar)
@@ -69,17 +71,21 @@ public class MultiChosePersonFragment extends BaseBackFragment implements StaffA
     RecyclerView mRcvSelected;
     @BindView(R.id.cb_selectAll)
     CheckBox mCbSelectAll;
+    @BindView(R.id.tv_comfirm)
+    TextView mTvComfirm;
 
     private List<Department> mDepartmentList;
     private List<Staff> mSelectedStaffs;
-    private StaffAdapter mStaffAdapter;
-    private SearchResultAdapter mSearchResultAdapter;
-    private SelectedStaffAdapter mSelectedAdapter;
+    private StaffAdapter mStaffAdapter;//人员列表
+    private SearchResultAdapter mSearchResultAdapter;//搜索结果列表
+    private SelectedStaffAdapter mSelectedAdapter;//选择结果列表
     private long[] mSelectedIds;
     private boolean isMultiChoiceMode;
     private int mRequestCode;
     public static final String MultiChoices = "MultiChoice_Mode";
     public static final String SingleChoice = "SingleChoice_Mode";
+    private ObserverImpl<HttpResult<List<Department>>> mDataObserver;
+    private QMUITipDialog mLoadingDialog;
 
     public static MultiChosePersonFragment newInstance(String mode, int requestCode,long[] selectedIds) {
         Bundle args = new Bundle();
@@ -112,8 +118,18 @@ public class MultiChosePersonFragment extends BaseBackFragment implements StaffA
         initTopBar();
         initSelectedIfNeed();
         initSearchView();
+        initTipDialog();
         loadStaffData();
         return attachToSwipeBack(view);
+    }
+
+    private void initTipDialog() {
+        mLoadingDialog = new QMUITipDialog.Builder(getContext())
+                .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
+                .setTipWord("获取中")
+                .create();
+        mLoadingDialog.show();
+
     }
 
     private void initSelectedIfNeed() {
@@ -162,14 +178,16 @@ public class MultiChosePersonFragment extends BaseBackFragment implements StaffA
 
     private void initTopBar() {
         if (isMultiChoiceMode) {
-            Button rightButton = mTopbar.addRightTextButton("保存", R.id.imageButtonId);
-            rightButton.setTextColor(Color.WHITE);
-            rightButton.setOnClickListener(new View.OnClickListener() {
+//            Button rightButton = mTopbar.addRightTextButton("保存", R.id.imageButtonId);
+            rlSelected.setVisibility(View.VISIBLE);
+            mTvComfirm.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     postMessageToResult(mSelectedAdapter.getSelectedStaffList());
                 }
             });
+        }else {
+            rlSelected.setVisibility(View.GONE);
         }
         String title;
         switch (mRequestCode) {
@@ -276,66 +294,63 @@ public class MultiChosePersonFragment extends BaseBackFragment implements StaffA
         pop();
     }
 
+    @Override
+    public boolean onBackPressedSupport() {
+        if (mLoadingDialog.isShowing()){
+            mLoadingDialog.dismiss();
+            pop();
+            return true;
+        }else {
+            return false;
+        }
+    }
 
     private void loadStaffData(){
         mDepartmentList = new ArrayList<>();
 
         AppointmentRequest request=new AppointmentRequest();
-        Observer observer=new Observer<HttpResult<List<Staff>>>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-
-            }
-
-            @Override
-            public void onNext(HttpResult<List<Staff>> result) {
-                Log.i("onNext","Observer------onNext");
-                List<Staff> staffList = result.getResult();
-                for (Staff staff : staffList) {
-                    boolean isExistDepart =false;
-                    for (long selectedId : mSelectedIds) {
-                        if (Long.parseLong(staff.getUserId())==selectedId) {
-                            staff.setSelect(true);
-                            if (isMultiChoiceMode){
-                                mSelectedStaffs.add(staff);//用于显示已选人员
-                            }
-                            break;
-                        }
-                    }
-                    if (isMultiChoiceMode){
-                        mSelectedAdapter.setStaffList(mSelectedStaffs);
-                    }
-                    for (Department department1 : mDepartmentList) {
-                        if (department1.getDepartmentId()==Long.parseLong(staff.getDepartmentId())) {
-                            isExistDepart = true;
-                            department1.getStaffs().add(staff);
-                            break;
-                        }
-                    }
-                    if (!isExistDepart) {
-                        Department department = new Department();
-                        department.setDepartmentId(Long.parseLong(staff.getDepartmentId()));
-                        department.setDepartmentName(staff.getDepartmentName());
-                        List<Staff> staffs=new ArrayList<>();
-                        staffs.add(staff);
-                        department.setStaffs(staffs);
-                        mDepartmentList.add(department);
-                    }
-                }
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
+        //用于显示已选人员
+        mDataObserver = new ObserverImpl<HttpResult<List<Department>>>() {
 
             @Override
             public void onComplete() {
                 initView();
             }
+
+            @Override
+            protected void onResponse(HttpResult<List<Department>> result) {
+
+                List<Department> departments = result.getResult();
+
+                for (Department department : departments) {
+                    for (Staff staff : department.getStaffs()) {
+                        for (long selectedId : mSelectedIds) {
+                            if (Long.parseLong(staff.getUserId())==selectedId) {
+                                staff.setSelect(true);
+                                if (isMultiChoiceMode){
+                                    mSelectedStaffs.add(staff);//用于显示已选人员
+                                }
+                                break;
+                            }
+                        }
+                        if (isMultiChoiceMode){
+                            mSelectedAdapter.setStaffList(mSelectedStaffs);
+                        }
+                    }
+
+                }
+                mDepartmentList.addAll(departments);
+                mLoadingDialog.dismiss();
+
+            }
+
+            @Override
+            protected void onFailure(Throwable e) {
+                mLoadingDialog.dismiss();
+                Toasty.error(_mActivity,e.getMessage()).show();
+            }
         };
-        request.getAllStaffs(observer);
+        request.getAllStaffs(mDataObserver);
     }
 
 
@@ -397,22 +412,26 @@ public class MultiChosePersonFragment extends BaseBackFragment implements StaffA
     @Override
     public void onSearchStaffCheck(Staff staff) {
         if (isMultiChoiceMode) {
-            for (Department department : mDepartmentList) {
-                if (department.getDepartmentId() == Long.parseLong(staff.getDepartmentId())) {
-                    for (Staff departStaff : department.getStaffs()) {
-                        if (staff.getUserId() == departStaff.getUserId()) {
-                            departStaff.setSelect(staff.isSelect());
-                            if (staff.isSelect()) {
-                                mSelectedAdapter.add(staff);
-                            }else {
-                                mSelectedAdapter.remove(staff);
-                            }
-                            mStaffAdapter.notifyDataSetChanged();
-                            return;
-                        }
-                    }
-                }
+            Logger.i(staff.toString());
+            if (staff.isSelect()) {
+                mSelectedAdapter.add(staff);
+            }else {
+                mSelectedAdapter.remove(staff);
             }
+
+//            ArrayList<Staff> selected =new ArrayList();
+//            selected.addAll(mSelectedAdapter.getSelectedStaffList());
+//            for (Staff selectedStaff : selected) {
+//                if (selectedStaff.getUserId().equals(staff.getUserId())) {
+//                    if (selectedStaff.isSelect()) {
+//                        mSelectedAdapter.add(staff);
+//                    }else {
+//                        mSelectedAdapter.remove(staff);
+//                    }
+//                    mStaffAdapter.notifyDataSetChanged();
+//                }
+//            }
+
         } else {
             //单选模式下直接返回所选中的staff并pop
             List<Staff> postObject = new ArrayList<>();
@@ -435,5 +454,11 @@ public class MultiChosePersonFragment extends BaseBackFragment implements StaffA
             staff.setSelect(isSelect);
         }
         mSearchResultAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mDataObserver.cancleRequest();
     }
 }

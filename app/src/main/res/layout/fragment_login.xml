@@ -1,68 +1,139 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:background="@color/colorPrimary"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include layout="@layout/widget_topbar"/>
-
-    <ImageView
-        android:layout_gravity="center"
-        android:src="@mipmap/ic_launcher"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
-    <android.support.design.widget.TextInputLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <android.support.design.widget.TextInputEditText
-            android:id="@+id/et_login_phone"
-            android:layout_margin="8dp"
-            android:inputType="phone"
-            android:hint="手机号码"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </android.support.design.widget.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <android.support.design.widget.TextInputEditText
-            android:id="@+id/et_login_psw"
-            android:layout_margin="8dp"
-            android:hint="密码"
-            android:inputType="textPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </android.support.design.widget.TextInputLayout>
-
-    <Button
-        android:id="@+id/btn_login_login"
-        android:text="登录"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <RelativeLayout
-        android:layout_margin="8dp"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/tv_forgetPsw"
-            android:padding="8dp"
-            android:text="忘记密码"
+        <ImageView
+            android:layout_gravity="center"
+            android:src="@drawable/start_logo_white"
+            android:layout_marginTop="83dp"
+            android:layout_marginBottom="72dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-        <TextView
-            android:id="@+id/btn_login_reg"
-            android:textColor="@color/colorPrimary"
-            android:padding="8dp"
-            android:layout_alignParentRight="true"
-            android:text="手机号码快速注册"
+
+        <LinearLayout
+            android:layout_marginLeft="52dp"
+            android:layout_marginRight="52dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:src="@drawable/ic_login_user"
+                android:layout_gravity="center"
+                android:layout_marginRight="18dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/et_login_phone"
+                    android:padding="4dp"
+                    android:inputType="phone"
+                    android:textColor="@color/colorWhite"
+                    android:hint="手机号码"
+                    android:textSize="14sp"
+                    android:background="@null"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+                <View
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/colorWhite"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"/>
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginLeft="52dp"
+            android:layout_marginRight="52dp"
+            android:layout_marginTop="40dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:src="@drawable/ic_login_lock"
+                android:layout_gravity="center"
+                android:layout_marginRight="18dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/et_login_psw"
+                    android:hint="请输入密码"
+                    android:padding="4dp"
+                    android:background="@null"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorWhite"
+                    android:inputType="textPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+                <CheckBox
+                    android:id="@+id/iv_psw_eye"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/close_eye"
+                    android:padding="4dp"
+                    android:button="@drawable/selector_eye_switch"
+                    android:layout_marginBottom="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <View
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/colorWhite"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"/>
+            </RelativeLayout>
+
+        </LinearLayout>
+
+
+        <RelativeLayout
+            android:layout_marginLeft="52dp"
+            android:layout_marginRight="52dp"
+            android:layout_marginTop="26dp"
+            android:layout_marginBottom="72dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/tv_forgetPsw"
+                android:text="忘记密码"
+                android:textColor="@color/colorWhite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:id="@+id/btn_login_reg"
+                android:textColor="@color/colorWhite"
+                android:layout_alignParentRight="true"
+                android:text="快速注册"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/iv_login"
+            android:src="@drawable/login_arrow_right"
+            android:layout_gravity="center"
+            android:padding="18dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-    </RelativeLayout>
 
-</LinearLayout>
+    </LinearLayout>
+
+
+</ScrollView>

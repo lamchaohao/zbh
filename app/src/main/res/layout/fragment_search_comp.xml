@@ -3,7 +3,7 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent"
               android:orientation="vertical"
-             tools:context="com.gzz100.zbh.account.SearchCompFragment">
+             tools:context="com.gzz100.zbh.account.fragment.SearchCompFragment">
 
     <include layout="@layout/widget_topbar"/>
 

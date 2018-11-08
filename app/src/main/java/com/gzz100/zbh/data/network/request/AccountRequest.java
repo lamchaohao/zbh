@@ -34,11 +34,11 @@ public class AccountRequest {
     }
 
 
-    public void getCheckCode(Observer<HttpResult> observer,String phone,String type){
+    public void getCheckCode(Observer<HttpResult> observer,String phone,AccountService.Method method){
         long time = System.currentTimeMillis();
         String hashStr=phone+time;
         int i = hashStr.hashCode();
-        mAccountService.getCheckCode(phone,time,i+"",type)
+        mAccountService.getCheckCode(phone,time,i+"",method)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -65,5 +65,14 @@ public class AccountRequest {
                 .subscribe(observer);
 
     }
+
+    public void resetPassword(Observer<HttpResult> observer,String phone,String psw,String checkCode){
+        mAccountService.updatePassword(phone,psw,checkCode)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
 
 }

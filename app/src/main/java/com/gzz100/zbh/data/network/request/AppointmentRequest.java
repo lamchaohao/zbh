@@ -2,10 +2,10 @@ package com.gzz100.zbh.data.network.request;
 
 import com.gzz100.zbh.account.User;
 import com.gzz100.zbh.data.entity.MeetingEntity;
-import com.gzz100.zbh.data.entity.Staff;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.client.HttpClient;
 import com.gzz100.zbh.data.network.service.AppointmentService;
+import com.gzz100.zbh.home.appointment.entity.Department;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ public class AppointmentRequest {
 
     }
 
-    public void getAllStaffs(Observer<HttpResult<List<Staff>>> observer){
+    public void getAllStaffs(Observer<HttpResult<List<Department>>> observer){
         User user = User.getUserFromCache();
         mAppointmentService.getStaffs(user.getUserId(),user.getToken(),user.getCompanyId())
                 .subscribeOn(Schedulers.io())

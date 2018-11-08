@@ -44,18 +44,18 @@ public class StarFileAdapter extends RecyclerView.Adapter {
         FilePickerConst.FILE_TYPE fileType = FileUtils.getFileType(fileEntity.getDocumentType());
         switch (fileType){
             case PDF:
-                viewHolder.ivIcon.setImageResource(R.drawable.pdf_icon);
+                viewHolder.ivIcon.setImageResource(R.drawable.ic_pdf);
                 break;
             case PPT:
-                viewHolder.ivIcon.setImageResource(R.drawable.power_point_2013);
+                viewHolder.ivIcon.setImageResource(R.drawable.ic_power_point);
                 break;
             case TXT:
                 viewHolder.ivIcon.setImageResource(R.drawable.ic_insert_drive_file_black_24dp);
             case WORD:
-                viewHolder.ivIcon.setImageResource(R.drawable.word_2013);
+                viewHolder.ivIcon.setImageResource(R.drawable.ic_word);
                 break;
             case EXCEL:
-                viewHolder.ivIcon.setImageResource(R.drawable.excel_2013);
+                viewHolder.ivIcon.setImageResource(R.drawable.ic_excel);
                 break;
             case UNKNOWN:
                 viewHolder.ivIcon.setImageResource(R.drawable.ic_insert_drive_file_black_24dp);

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:background="@color/backgroudColor"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <include layout="@layout/widget_topbar" />
+
+    <LinearLayout
+        android:background="#FFFFFF"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/et_newPsw"
+            android:inputType="textPassword"
+            android:background="@null"
+            android:layout_margin="8dp"
+            android:padding="8dp"
+            android:hint="输入新密码6-20数字,英文组合"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <View
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@color/colorGray"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
+
+        <EditText
+            android:id="@+id/et_repeatPsw"
+            android:hint="再次输入确认密码"
+            android:layout_margin="8dp"
+            android:padding="8dp"
+            android:inputType="textVisiblePassword"
+            android:background="@null"
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+
+    <Button
+        android:id="@+id/btn_confirm"
+        android:text="下一步"
+        android:layout_margin="16dp"
+        android:textColor="@color/colorWhite"
+        android:background="@drawable/bg_btn_round_conner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

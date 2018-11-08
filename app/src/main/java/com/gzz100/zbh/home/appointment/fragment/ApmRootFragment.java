@@ -1,5 +1,6 @@
 package com.gzz100.zbh.home.appointment.fragment;
 
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,7 +8,6 @@ import android.view.View;
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.base.BaseFragment;
 import com.gzz100.zbh.home.meetingadmin.adapter.MeetingTabAdapter;
-import com.qmuiteam.qmui.widget.QMUITabSegment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ import butterknife.ButterKnife;
 
 public class ApmRootFragment extends BaseFragment {
     @BindView(R.id.tabSegment_apm)
-    QMUITabSegment mTabSegmentApm;
+    TabLayout mTabSegmentApm;
     @BindView(R.id.contentViewPager)
     ViewPager mContentViewPager;
     View mRootView;
@@ -42,17 +42,12 @@ public class ApmRootFragment extends BaseFragment {
     }
 
     private void initView() {
-        mTabSegmentApm.reset();
-        mTabSegmentApm.addTab(new QMUITabSegment.Tab("预约会议"));
-        mTabSegmentApm.addTab(new QMUITabSegment.Tab("历史模板"));
-        mTabSegmentApm.setMode(QMUITabSegment.MODE_FIXED);
-        mTabSegmentApm.setHasIndicator(true);
         List<BaseFragment> fragmentList = new ArrayList<>();
         fragmentList.add(new AppointmentFragment());
         fragmentList.add(new TemplateFragment());
 
-        mContentViewPager.setAdapter(new MeetingTabAdapter(getChildFragmentManager(),fragmentList));
         mTabSegmentApm.setupWithViewPager(mContentViewPager,false);
+        mContentViewPager.setAdapter(new MeetingTabAdapter(getChildFragmentManager(),fragmentList));
     }
 
     @Override

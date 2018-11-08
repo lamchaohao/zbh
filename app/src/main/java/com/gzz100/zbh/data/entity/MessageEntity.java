@@ -11,107 +11,52 @@ public class MessageEntity implements Parcelable {
 
 
     /**
-     * messageId : 982564566
-     * companyId : 0
-     * messageDescription : 系统公告
-     * messageType : 11
-     * messageStatus : 1
-     * createTime : 1519887049000
-     * sendTime : 1519887049000
-     * createMan : null
-     * messageTitle : 系统公告
-     * receviceId : null
+     * createTime : 1530612759000
+     * extra : {"type":"1","meeting":"{\"meetingEndTime\":1530617400000,\"meetingId\":\"2210\",\"meetingName\":\"会议07031900\",\"meetingPlaceName\":\"-\",\"meetingStartTime\":1530615600000}"}
+     * messageId : 0153061275891
+     * messageTitle : 会议通知
+     * messageDescription : 会议（会议07031900）将在 2018-07-03 19:00开始，请准时参加
      */
 
-    private String messageId;
-    private String companyId;
-    private String messageDescription;
-    private int messageType;
-    private int messageStatus;
     private long createTime;
-    private long sendTime;
-    private String createMan;
+    private String extra;
+    private String messageId;
     private String messageTitle;
-    private String receviceId;
+    private String messageDescription;
+    private long sendTime;
+    private String unread;
 
-    public String getMessageId() {
-        return messageId;
-    }
-
-    public void setMessageId(String messageId) {
-        this.messageId = messageId;
-    }
-
-    public String getCompanyId() {
-        return companyId;
-    }
-
-    public void setCompanyId(String companyId) {
-        this.companyId = companyId;
-    }
-
-    public String getMessageDescription() {
-        return messageDescription;
-    }
-
-    public void setMessageDescription(String messageDescription) {
-        this.messageDescription = messageDescription;
-    }
-
-    public int getMessageType() {
-        return messageType;
-    }
-
-    public void setMessageType(int messageType) {
-        this.messageType = messageType;
-    }
-
-    public int getMessageStatus() {
-        return messageStatus;
-    }
-
-    public void setMessageStatus(int messageStatus) {
-        this.messageStatus = messageStatus;
-    }
 
     public long getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(long createTime) {
-        this.createTime = createTime;
+    public String getExtra() {
+        return extra;
     }
 
-    public long getSendTime() {
-        return sendTime;
-    }
-
-    public void setSendTime(long sendTime) {
-        this.sendTime = sendTime;
-    }
-
-    public Object getCreateMan() {
-        return createMan;
-    }
-
-    public void setCreateMan(String createMan) {
-        this.createMan = createMan;
+    public String getMessageId() {
+        return messageId;
     }
 
     public String getMessageTitle() {
         return messageTitle;
     }
 
-    public void setMessageTitle(String messageTitle) {
-        this.messageTitle = messageTitle;
+    public String getMessageDescription() {
+        return messageDescription;
     }
 
-    public Object getReceviceId() {
-        return receviceId;
+    public long getSendTime() {
+        return sendTime;
     }
 
-    public void setReceviceId(String receviceId) {
-        this.receviceId = receviceId;
+    public String getUnread() {
+        return unread;
+    }
+
+    public void setUnread(String unread) {
+        this.unread = unread;
     }
 
 
@@ -122,35 +67,29 @@ public class MessageEntity implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.messageId);
-        dest.writeString(this.companyId);
-        dest.writeString(this.messageDescription);
-        dest.writeInt(this.messageType);
-        dest.writeInt(this.messageStatus);
         dest.writeLong(this.createTime);
-        dest.writeLong(this.sendTime);
-        dest.writeString(this.createMan);
+        dest.writeString(this.extra);
+        dest.writeString(this.messageId);
         dest.writeString(this.messageTitle);
-        dest.writeString(this.receviceId);
+        dest.writeString(this.messageDescription);
+        dest.writeLong(this.sendTime);
+        dest.writeString(this.unread);
     }
 
     public MessageEntity() {
     }
 
     protected MessageEntity(Parcel in) {
-        this.messageId = in.readString();
-        this.companyId = in.readString();
-        this.messageDescription = in.readString();
-        this.messageType = in.readInt();
-        this.messageStatus = in.readInt();
         this.createTime = in.readLong();
-        this.sendTime = in.readLong();
-        this.createMan = in.readString();
+        this.extra = in.readString();
+        this.messageId = in.readString();
         this.messageTitle = in.readString();
-        this.receviceId = in.readString();
+        this.messageDescription = in.readString();
+        this.sendTime = in.readLong();
+        this.unread = in.readString();
     }
 
-    public static final Parcelable.Creator<MessageEntity> CREATOR = new Parcelable.Creator<MessageEntity>() {
+    public static final Creator<MessageEntity> CREATOR = new Creator<MessageEntity>() {
         @Override
         public MessageEntity createFromParcel(Parcel source) {
             return new MessageEntity(source);

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.text.TextUtils;
 
 import com.gzz100.zbh.home.message.MsgActivity;
+import com.gzz100.zbh.data.eventEnity.PushUpdateEntity;
 import com.gzz100.zbh.res.Common;
 import com.orhanobut.logger.Logger;
 import com.xiaomi.mipush.sdk.ErrorCode;
@@ -13,7 +14,10 @@ import com.xiaomi.mipush.sdk.MiPushCommandMessage;
 import com.xiaomi.mipush.sdk.MiPushMessage;
 import com.xiaomi.mipush.sdk.PushMessageReceiver;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.List;
+import java.util.Map;
 
 /**
  * 小米的推送
@@ -34,6 +38,7 @@ public class PushReceiver extends PushMessageReceiver {
 
     @Override
     public void onReceivePassThroughMessage(Context context, MiPushMessage message) {
+        Logger.i("PassThroughMessage message.titile ="+message.getTitle()+",message="+message.toString());
         mMessage = message.getContent();
         if(!TextUtils.isEmpty(message.getTopic())) {
             mTopic=message.getTopic();
@@ -42,7 +47,23 @@ public class PushReceiver extends PushMessageReceiver {
         } else if(!TextUtils.isEmpty(message.getUserAccount())) {
             mUserAccount=message.getUserAccount();
         }
-        Logger.i("PassThroughMessage message.titile ="+message.getTitle()+",message="+message.toString());
+        if (message.getExtra()==null) {
+            Logger.i("message.getExtra()");
+            return;
+        }
+        String type = message.getExtra().get("type");
+        if (type.equals("2")){
+            EventBus.getDefault().post(new PushUpdateEntity(PushUpdateEntity.PassthrougMsgType.joinCompany));
+        }else if (type.equals("3")){
+            PushUpdateEntity pushUpdateEntity = new PushUpdateEntity(PushUpdateEntity.PassthrougMsgType.updateUnreadMsg);
+            String meetingNum = message.getExtra().get("meetingNum");
+            String messageNum = message.getExtra().get("messageNum");
+            pushUpdateEntity.setMeetingNum(meetingNum);
+            pushUpdateEntity.setMessageNum(messageNum);
+            EventBus.getDefault().post(pushUpdateEntity);
+        }
+        EventBus.getDefault().post(new PushUpdateEntity(PushUpdateEntity.PassthrougMsgType.updateMeetingReceive));
+
     }
     @Override
     public void onNotificationMessageClicked(Context context, MiPushMessage message) {
@@ -54,8 +75,16 @@ public class PushReceiver extends PushMessageReceiver {
         } else if(!TextUtils.isEmpty(message.getUserAccount())) {
             mUserAccount=message.getUserAccount();
         }
-
         Logger.i("message.titile ="+message.getTitle()+",message="+message.toString());
+        Map<String, String> extra = message.getExtra();
+        String meetingId = extra.get("meetingId");
+        if (!TextUtils.isEmpty(meetingId)) {
+            String meetingName = extra.get("meetingName");
+            String meetingPlaceName = extra.get("meetingPlaceName");
+            String meetingStartTime = extra.get("meetingStartTime");
+            String meetingEndTime = extra.get("meetingEndTime");
+            Logger.i(meetingId+","+meetingName+","+meetingPlaceName+","+meetingStartTime+","+meetingEndTime);
+        }
 
         Intent intent = new Intent();
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

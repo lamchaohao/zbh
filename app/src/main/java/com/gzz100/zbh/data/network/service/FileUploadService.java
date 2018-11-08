@@ -21,6 +21,10 @@ public interface FileUploadService {
     @POST("vote")
     Observable<HttpResult> uploadVote(@Body RequestBody body);
 
+    @POST("updateVote")
+    Observable<HttpResult> updateVote(@Body RequestBody body);
+
+
     @FormUrlEncoded
     @POST("deleteFileById")
     Observable<HttpResult> deleteFile(@Field("userId")String userId,

@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.data.entity.Staff;
 import com.gzz100.zbh.home.appointment.entity.Department;
+import com.gzz100.zbh.utils.DensityUtil;
 import com.gzz100.zbh.utils.TextHeadPicUtil;
 
 import java.util.List;
@@ -80,6 +81,7 @@ public class StaffAdapter extends BaseExpandableListAdapter {
             holder.cbChoice=view.findViewById(R.id.cb_department);
             holder.tvDepartmentName = view.findViewById(R.id.tv_departName);
             holder.tvDepartmentNums =view.findViewById(R.id.tv_departStaffCount);
+            holder.ivArrow = view.findViewById(R.id.iv_arrow);
             view.setTag(holder);
         }else{
             holder = (DepartmentHolder)view.getTag();
@@ -102,6 +104,11 @@ public class StaffAdapter extends BaseExpandableListAdapter {
             holder.cbChoice.setVisibility(View.GONE);
         }
 
+        if (isExpanded) {
+            holder.ivArrow.setImageResource(R.drawable.ic_arrow_down);
+        }else {
+            holder.ivArrow.setImageResource(R.drawable.ic_arrow_right);
+        }
 
         return view;
 
@@ -119,16 +126,17 @@ public class StaffAdapter extends BaseExpandableListAdapter {
             holder.cbIsSelect = view.findViewById(R.id.cb_staff);
             holder.ivStaffPic = view.findViewById(R.id.iv_staff_pic);
             holder.tvStaffName =view.findViewById(R.id.tv_staffName);
+            holder.tvPosition = view.findViewById(R.id.tv_staff_position);
             view.setTag(holder);
         }else{
             holder = (StaffHolder)view.getTag();
         }
         //判断是否已经打开列表
         final Staff staff = mDepartmentList.get(groupPosition).getStaffs().get(childPosition);
-
-        holder.ivStaffPic.setImageDrawable(TextHeadPicUtil.getHeadPic(staff.getUserName()));
+        int fontSize = DensityUtil.sp2px(mContext, 12);
+        holder.ivStaffPic.setImageDrawable(TextHeadPicUtil.getHeadPic(staff.getUserName(),fontSize));
         holder.tvStaffName.setText(staff.getUserName());
-
+        holder.tvPosition.setText(staff.getPositionName());
         if (staff.isSelect()) {
             holder.tvState.setVisibility(View.VISIBLE);
             holder.ivStaffPic.setImageAlpha(128);
@@ -172,6 +180,7 @@ public class StaffAdapter extends BaseExpandableListAdapter {
         CheckBox cbChoice;
         TextView tvDepartmentName;
         TextView tvDepartmentNums;
+        ImageView ivArrow;
     }
 
     class StaffHolder{
@@ -180,6 +189,7 @@ public class StaffAdapter extends BaseExpandableListAdapter {
         CheckBox cbIsSelect;
         ImageView ivStaffPic;
         TextView tvStaffName;
+        TextView tvPosition;
     }
 
     public interface OnDepartmentSelectListener{

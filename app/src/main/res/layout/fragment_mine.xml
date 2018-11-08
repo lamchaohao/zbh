@@ -13,97 +13,250 @@
         <android.support.v7.widget.CardView
             app:cardCornerRadius="8dp"
             android:layout_margin="8dp"
+            android:id="@+id/cv_nameCard_mine"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <RelativeLayout
-                android:padding="8dp"
-                android:id="@+id/rl_nameCard_mine"
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/tv_userName_mine"
-                    android:text="张小明"
-                    android:textSize="26sp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_marginTop="34dp"
+                        android:layout_marginLeft="24dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:id="@+id/tv_userName_mine"
+                            android:text="张小明"
+                            android:textSize="20sp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
 
-                <TextView
-                    android:id="@+id/tv_job_mine"
-                    android:text="职位"
-                    android:textColor="@color/colorPrimary"
-                    android:layout_below="@id/tv_userName_mine"
-                    android:layout_marginTop="16dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                        <TextView
+                            android:id="@+id/tv_job_mine"
+                            android:text="未加入企业"
+                            android:textColor="#0090DB"
+                            android:layout_marginLeft="16dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
 
-                <TextView
-                    android:id="@+id/tv_statu_mine"
-                    android:text="未加入企业"
-                    android:textColor="@color/colorPrimary"
-                    android:layout_below="@id/tv_job_mine"
-                    android:layout_marginTop="16dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    </LinearLayout>
 
-                <Button
-                    android:id="@+id/btn_joinCompany_mine"
-                    android:layout_marginTop="8dp"
-                    android:layout_below="@id/tv_statu_mine"
-                    android:text="马上加入"
-                    android:textColor="@color/colorWhite"
-                    android:background="@color/colorPrimary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    <ImageView
+                        android:id="@+id/iv_mine_compPic"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="24dp"
+                        android:layout_marginTop="24dp"
+                        android:src="@mipmap/ic_launcher"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"/>
 
-                <ImageView
-                    android:id="@+id/iv_mine_compPic"
-                    android:layout_alignParentRight="true"
-                    android:src="@mipmap/ic_launcher"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"/>
+                </RelativeLayout>
 
-            </RelativeLayout>
+
+                <View
+                    android:background="@color/colorGray"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginRight="24dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+
+                    android:layout_height="64dp">
+                    <TextView
+                        android:id="@+id/btn_joinCompany_mine"
+                        android:text="立即加入"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginLeft="24dp"
+                        android:gravity="center"
+                        android:textColor="@color/colorWhite"
+                        android:textStyle="bold"
+                        android:background="#FFBA00"
+                        android:textSize="12sp"
+                        android:layout_width="58dp"
+                        android:padding="3dp"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/tv_mine_companyName"
+                        android:text="广州市中佰信息科技有限公司"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="32dp"
+                        android:layout_centerVertical="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
 
         </android.support.v7.widget.CardView>
 
-        <TextView
-            android:id="@+id/tv_file_mine"
-            style="@style/mineRelativelo"
-            android:drawableLeft="@drawable/ic_pause_circle_filled_black_24dp"
-            android:text="我的下载"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+        <LinearLayout
+            android:id="@+id/ll_download_mine"
+            style="@style/mineItemLO"
+            android:layout_height="48dp"
+            android:layout_width="match_parent">
 
-        <TextView
-            android:id="@+id/tv_star_mine"
-            style="@style/mineRelativelo"
-            android:drawableLeft="@drawable/ic_pause_circle_filled_black_24dp"
-            android:text="我的收藏"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            <ImageView
+                android:src="@drawable/ic_folder_mine"
+                android:layout_marginRight="10dp"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TextView
+                style="@style/mineRelativelo"
+                android:text="我的下载"
+                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <ImageView
+                android:src="@drawable/ic_arrow_right"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/tv_about_mine"
-            style="@style/mineRelativelo"
-            android:drawableLeft="@drawable/ic_pause_circle_filled_black_24dp"
-            android:text="关于中佰会"
+        <View
+            android:background="@color/colorGray"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-        <TextView
-            android:id="@+id/tv_setting_mine"
-            style="@style/mineRelativelo"
-            android:drawableLeft="@drawable/ic_pause_circle_filled_black_24dp"
-            android:text="设置"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="1dp"/>
 
-        <TextView
-            android:id="@+id/tv_logout_mine"
-            style="@style/mineRelativelo"
-            android:drawableLeft="@drawable/ic_pause_circle_filled_black_24dp"
-            android:text="退出登录"
+
+        <LinearLayout
+            android:id="@+id/ll_star_mine"
+            style="@style/mineItemLO"
+            android:layout_height="48dp"
+            android:layout_width="match_parent">
+
+            <ImageView
+                android:src="@drawable/ic_file"
+                android:layout_marginRight="10dp"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TextView
+                style="@style/mineRelativelo"
+                android:text="我的收藏"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <ImageView
+                android:src="@drawable/ic_arrow_right"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <View
+            android:background="@color/colorGray"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="1dp"/>
+
+
+        <LinearLayout
+            android:id="@+id/ll_about_mine"
+            style="@style/mineItemLO"
+            android:layout_height="48dp"
+            android:layout_width="match_parent">
+
+            <ImageView
+                android:src="@drawable/ic_about"
+                android:layout_marginRight="10dp"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TextView
+                style="@style/mineRelativelo"
+                android:text="关于中佰会"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <ImageView
+                android:src="@drawable/ic_arrow_right"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <View
+            android:background="@color/colorGray"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
+
+
+        <LinearLayout
+            android:id="@+id/ll_setting_mine"
+            style="@style/mineItemLO"
+            android:layout_height="48dp"
+            android:layout_width="match_parent">
+
+            <ImageView
+                android:src="@drawable/ic_setting"
+                android:layout_marginRight="10dp"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TextView
+                style="@style/mineRelativelo"
+                android:text="设置"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <ImageView
+                android:src="@drawable/ic_arrow_right"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <View
+            android:background="@color/colorGray"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
+
+
+        <LinearLayout
+            android:id="@+id/ll_logout_mine"
+            style="@style/mineItemLO"
+            android:layout_height="48dp"
+            android:layout_width="match_parent">
+
+            <ImageView
+                android:src="@drawable/ic_menu_primary_24dp"
+                android:layout_marginRight="10dp"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TextView
+                style="@style/mineRelativelo"
+                android:text="退出登录"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <ImageView
+                android:src="@drawable/ic_arrow_right"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+
     </LinearLayout>
 
 </ScrollView>

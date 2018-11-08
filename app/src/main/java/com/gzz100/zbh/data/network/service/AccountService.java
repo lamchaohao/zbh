@@ -13,6 +13,13 @@ import retrofit2.http.POST;
 
 public interface AccountService {
 
+    enum Method{
+        Register_User,
+        User_Login,
+        Modify_Password,
+        Modify_Phone
+    }
+
     @FormUrlEncoded
     @POST("checkPassword")
     Observable<HttpResult> checkPsw(@Field("userId") String userId, @Field("token") String token, @Field("password")String password);
@@ -20,7 +27,7 @@ public interface AccountService {
 
     @FormUrlEncoded
     @POST("getCheckCode")
-    Observable<HttpResult> getCheckCode(@Field("phone") String phone, @Field("time") long time, @Field("hashcode")String hashcode,@Field("type")String type);
+    Observable<HttpResult> getCheckCode(@Field("phone") String phone, @Field("timestamp") long timeStamp, @Field("hashcode")String hashcode,@Field("method")Method method);
 
 
 

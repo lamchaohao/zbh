@@ -9,13 +9,16 @@
 
     <include layout="@layout/widget_topbar"/>
 
-    <com.qmuiteam.qmui.widget.QMUITabSegment
+    <android.support.design.widget.TabLayout
+        app:tabIndicatorColor="@color/colorPrimary"
+        app:tabSelectedTextColor="@color/colorPrimary"
+        app:tabTextColor="@color/colorTextNormal2"
+        app:tabTextAppearance="@style/Base.Widget.Design.TabLayout.TabText"
+        app:tabIndicatorHeight="2dp"
+        android:background="#E5E5E5"
         android:id="@+id/tabSegment_parent"
-        android:layout_gravity="bottom"
-        android:background="?attr/qmui_list_item_bg_with_border_top"
-        app:qmui_tab_icon_position="top"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/home_tab_height"/>
+        android:layout_height="48dp"/>
 
     <com.qmuiteam.qmui.widget.QMUIViewPager
         android:id="@+id/contentViewPager"

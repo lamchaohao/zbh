@@ -69,8 +69,8 @@ public class DelegatesAdapter extends RecyclerView.Adapter {
         TextView tvDelegateName;
         @BindView(R.id.tv_name_position)
         TextView tvNamePosition;
-        @BindView(R.id.tv_signed)
-        TextView tvSigned;
+        @BindView(R.id.ll_signed)
+        View tvSigned;
 
         public DelegateHolder(View itemView) {
             super(itemView);

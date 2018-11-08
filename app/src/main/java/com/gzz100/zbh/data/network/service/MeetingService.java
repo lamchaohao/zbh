@@ -23,14 +23,33 @@ import retrofit2.http.POST;
 
 public interface MeetingService {
 
+
     @FormUrlEncoded
     @POST("meetings")
     Observable<HttpResult<List<MeetingEntity>>> getMeetings(@Field("userId")String userId, @Field("token")String token,
+                                                            @Field("companyId")String companyId,
                                                             @Field("offset")int offset, @Field("limit")int limit);
+
+
+    /**
+     *
+     * @param userId
+     * @param token
+     * @param companyId
+     * @param offset
+     * @param limit 返回条数
+     * @param startTime 20181010或201810101010
+     * @return
+     */
+    @FormUrlEncoded
+    @POST("meetings")
+    Observable<HttpResult<List<MeetingEntity>>> getMeetingsByTime(@Field("userId")String userId, @Field("token")String token,
+                                                            @Field("companyId")String companyId,
+                                                            @Field("offset")int offset, @Field("limit")int limit,@Field("startTime")String startTime);
 
     @FormUrlEncoded
     @POST("getMeetingByCreator")
-    Observable<HttpResult<List<MeetingEntity>>> getMeetingsByCreator(@Field("userId")String userId, @Field("token")String token,
+    Observable<HttpResult<List<MeetingEntity>>> getMeetingsByCreator(@Field("userId")String userId, @Field("token")String token,@Field("companyId")String companyId,
                                                             @Field("offset")int offset, @Field("limit")int limit);
 
     @FormUrlEncoded

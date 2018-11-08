@@ -15,16 +15,24 @@ import android.view.View;
 
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.base.BaseBackFragment;
+import com.gzz100.zbh.data.ObserverImpl;
 import com.gzz100.zbh.data.entity.DocumentEntity;
+import com.gzz100.zbh.data.eventEnity.FileInfoEntity;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.request.DocumentRequest;
 import com.gzz100.zbh.data.network.request.UploadRequest;
 import com.gzz100.zbh.home.appointment.adapter.SelectedDocsAdapter;
+import com.gzz100.zbh.home.appointment.fragment.SelectFileFragment;
 import com.gzz100.zbh.home.meetingadmin.adapter.CloudFileAdapter;
 import com.gzz100.zbh.home.root.WebViewFragment;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
 import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 import com.tencent.smtt.sdk.QbSdk;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,10 +43,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import droidninja.filepicker.FilePickerBuilder;
 import droidninja.filepicker.FilePickerConst;
 import es.dmoral.toasty.Toasty;
-import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
@@ -66,6 +72,8 @@ public class ManageFileFragment extends BaseBackFragment {
     private QMUITipDialog mCompleteDialog;
     private UploadRequest mRequest;
     private CloudFileAdapter mCloudFileAdapter;
+    private ObserverImpl<HttpResult<List<DocumentEntity>>> mDataObserver;
+    private ObserverImpl<HttpResult> mUploadFileObserver;
 
     public static ManageFileFragment newInstance(String meetingId) {
         Bundle args = new Bundle();
@@ -80,6 +88,7 @@ public class ManageFileFragment extends BaseBackFragment {
     protected View onCreateView(LayoutInflater inflater) {
         View view = inflater.inflate(R.layout.fragment_manage_file, null);
         unbinder = ButterKnife.bind(this, view);
+        EventBus.getDefault().register(this);
         return attachToSwipeBack(view);
     }
 
@@ -165,35 +174,24 @@ public class ManageFileFragment extends BaseBackFragment {
     private void loadCloudFile() {
         DocumentRequest request=new DocumentRequest();
         mDocumentEntityList=new ArrayList<>();
-        Observer<HttpResult<List<DocumentEntity>>> observer = new Observer<HttpResult<List<DocumentEntity>>>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-
-            }
+        mDataObserver = new ObserverImpl<HttpResult<List<DocumentEntity>>>() {
 
             @Override
-            public void onNext(HttpResult<List<DocumentEntity>> documentResult) {
-
+            protected void onResponse(HttpResult<List<DocumentEntity>> documentResult) {
                 if (documentResult.getResult()!=null){
                     mDocumentEntityList.clear();
                     mDocumentEntityList.addAll(documentResult.getResult());
                 }
                 initExistDocView();
-
             }
 
             @Override
-            public void onError(Throwable e) {
+            protected void onFailure(Throwable e) {
                 Toasty.error(_mActivity, e.getMessage()).show();
-            }
-
-            @Override
-            public void onComplete() {
-
             }
         };
 
-        request.getDocumentList(observer, mMeetingId);
+        request.getDocumentList(mDataObserver, mMeetingId);
     }
 
 
@@ -222,14 +220,10 @@ public class ManageFileFragment extends BaseBackFragment {
 
     private void deleteFileById(final int position, DocumentEntity documentEntity){
 
-        Observer<HttpResult> observer=new Observer<HttpResult>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-
-            }
+        ObserverImpl<HttpResult> observer=new ObserverImpl<HttpResult>() {
 
             @Override
-            public void onNext(HttpResult result) {
+            protected void onResponse(HttpResult result) {
                 mDocumentEntityList.remove(position);
                 mCloudFileAdapter.notifyItemRemoved(position);
                 mCloudFileAdapter.notifyDataSetChanged();
@@ -247,19 +241,28 @@ public class ManageFileFragment extends BaseBackFragment {
             }
 
             @Override
-            public void onError(Throwable e) {
+            protected void onFailure(Throwable e) {
                 Toasty.error(_mActivity, e.getMessage()).show();
-
-            }
-
-            @Override
-            public void onComplete() {
-
             }
         };
         mRequest.deleteFile(observer,mMeetingId,documentEntity.getDocumentId());
     }
 
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onSelectedResult(FileInfoEntity fileInfoEntity){
+        if (fileInfoEntity.getFileNameList()!=null) {
+            mDocPaths = new ArrayList<>();
+            docFileList.clear();
+            mDocPaths.addAll(fileInfoEntity.getFileNameList());
+            for (String docPath : mDocPaths) {
+                File file = new File(docPath);
+                docFileList.add(file);
+            }
+            mAdapter.notifyDataSetChanged();
+        }
+
+    }
 
 
     @Override
@@ -291,10 +294,37 @@ public class ManageFileFragment extends BaseBackFragment {
 
     @NeedsPermission({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE})
     public void showSelectFile(){
-        FilePickerBuilder.getInstance().setMaxCount(20)
-                .setActivityTheme(R.style.LibAppTheme)
-                .setSelectedFiles(mDocPaths)
-                .pickFile(this);
+
+
+        final int TAG_OPEN_PICKER=1;
+        final int TAG_OPEN_USUAL=2;
+        QMUIBottomSheet.BottomGridSheetBuilder builder = new QMUIBottomSheet.BottomGridSheetBuilder(getActivity());
+        builder.addItem(R.mipmap.icon_more_operation_share_friend, "常用文件夹", TAG_OPEN_USUAL, QMUIBottomSheet.BottomGridSheetBuilder.FIRST_LINE)
+                .addItem(R.mipmap.icon_more_operation_share_moment, "打开文件选择器", TAG_OPEN_PICKER, QMUIBottomSheet.BottomGridSheetBuilder.FIRST_LINE)
+                .setOnSheetItemClickListener(new QMUIBottomSheet.BottomGridSheetBuilder.OnSheetItemClickListener() {
+                    @Override
+                    public void onClick(QMUIBottomSheet dialog, View itemView) {
+                        dialog.dismiss();
+                        String type=null;
+
+                        int tag = (int) itemView.getTag();
+                        switch (tag) {
+                            case TAG_OPEN_USUAL:
+//                                FilePickerBuilder.getInstance().setMaxCount(10)
+//                                    .setActivityTheme(R.style.LibAppTheme)
+//                                    .setSelectedFiles(mDocPaths)
+//                                    .enableSelectAll(true)
+//                                    .enableImagePicker(true)
+//                                    .pickFile(_mActivity);
+//                                startFragment(LatestFileFragment.newInstance(mDocPaths));
+                                break;
+                            case TAG_OPEN_PICKER:
+                                startFragment(SelectFileFragment.newInstance(mDocPaths));
+                                break;
+                        }
+                    }
+                }).build().show();
+
     }
 
 
@@ -309,25 +339,14 @@ public class ManageFileFragment extends BaseBackFragment {
 
     private void uploadFiles() {
 
-        Observer<HttpResult> observer=new Observer<HttpResult>() {
+        mUploadFileObserver = new ObserverImpl<HttpResult>() {
             @Override
             public void onSubscribe(Disposable d) {
                 mUploadDialog.show();
             }
 
             @Override
-            public void onNext(HttpResult result) {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                mUploadDialog.dismiss();
-                Toasty.error(_mActivity,e.getMessage()).show();
-            }
-
-            @Override
-            public void onComplete() {
+            protected void onResponse(HttpResult result) {
                 mUploadDialog.dismiss();
                 mCompleteDialog.show();
                 mRcvSelectedDocs.postDelayed(new Runnable() {
@@ -339,16 +358,30 @@ public class ManageFileFragment extends BaseBackFragment {
 
                 loadCloudFile();
             }
+
+            @Override
+            protected void onFailure(Throwable e) {
+                mUploadDialog.dismiss();
+                Toasty.error(_mActivity,e.getMessage()).show();
+            }
         };
 
-        mRequest.uploadFileList(observer,docFileList,mMeetingId);
+        mRequest.uploadFileList(mUploadFileObserver,docFileList,mMeetingId);
 
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        EventBus.getDefault().unregister(this);
         unbinder.unbind();
+        if (mDataObserver!=null) {
+            mDataObserver.cancleRequest();
+        }
+
+        if (mUploadFileObserver!=null) {
+            mUploadFileObserver.cancleRequest();
+        }
     }
 
 }

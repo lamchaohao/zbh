@@ -22,8 +22,8 @@ public class HttpClient {
 
         builder.addInterceptor(new RspCheckInterceptor());//添加拦截器
         builder.connectTimeout(120, TimeUnit.SECONDS);
-        builder.readTimeout(60, TimeUnit.SECONDS);
-        builder.writeTimeout(60, TimeUnit.SECONDS);
+        builder.readTimeout(120, TimeUnit.SECONDS);
+        builder.writeTimeout(120, TimeUnit.SECONDS);
         builder.retryOnConnectionFailure(true);
         OkHttpClient client = builder.build();
 

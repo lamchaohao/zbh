@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
+              android:background="@color/backgroudColor"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
@@ -10,11 +11,20 @@
 
     <com.scwang.smartrefresh.layout.SmartRefreshLayout
         android:id="@+id/prl_refresh"
+        android:layout_margin="8dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rcv_myStar"
+                android:background="@drawable/card_bg_round_conner"
+                android:padding="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
             <com.qmuiteam.qmui.widget.QMUIEmptyView
                 android:id="@+id/emptyView"
                 android:layout_width="match_parent"
@@ -22,11 +32,6 @@
                 android:layout_marginTop="?attr/qmui_topbar_height"
                 android:background="@color/qmui_config_color_white"
                 app:qmui_title_text="暂无收藏"/>
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/rcv_myStar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
         </FrameLayout>
 
 

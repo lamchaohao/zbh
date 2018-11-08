@@ -72,4 +72,14 @@ public class VoteRequest {
                 .subscribe(observer);
     }
 
+    public void deleteVote(Observer<HttpResult> observer, String voteId){
+        User user = User.getUserFromCache();
+        mVoteService.deleteVote(voteId,user.getUserId(),user.getToken())
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
+
 }

@@ -87,7 +87,7 @@ public class MimcMsgFragment extends BaseFragment implements MimcMsgHandler.OnHa
         mRecyclerView.setAdapter(mAdapter);
 
         mUserManager = MCUserManager.getInstance();
-        mUserManager.newUser(mUserId,this);
+        mUserManager.createUser(mUserId,this);
         try {
             if (mUserManager.getUser()!=null){
                 mUserManager.getUser().login();
@@ -155,4 +155,5 @@ public class MimcMsgFragment extends BaseFragment implements MimcMsgHandler.OnHa
             Logger.i(e.getMessage());
         }
     }
+
 }

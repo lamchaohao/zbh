@@ -34,16 +34,26 @@ public class MeetingRequest {
 
     public void getMeetingList(Observer<HttpResult<List<MeetingEntity>>> observer, int offset,int limit){
         User user = User.getUserFromCache();
-        mMeetingService.getMeetings(user.getUserId(),user.getToken(),offset,limit)
+        mMeetingService.getMeetings(user.getUserId(),user.getToken(),user.getCompanyId(),offset,limit)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(observer);
     }
 
+    public void getMeetingListByTime(Observer<HttpResult<List<MeetingEntity>>> observer, int offset,int limit,String time){
+        User user = User.getUserFromCache();
+        mMeetingService.getMeetingsByTime(user.getUserId(),user.getToken(),user.getCompanyId(),offset,limit,time)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
+
     public void getMyCreatedMeeting(Observer<HttpResult<List<MeetingEntity>>> observer, int offset,int limit){
         User user = User.getUserFromCache();
-        mMeetingService.getMeetingsByCreator(user.getUserId(),user.getToken(),offset,limit)
+        mMeetingService.getMeetingsByCreator(user.getUserId(),user.getToken(),user.getCompanyId(),offset,limit)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

@@ -18,6 +18,7 @@ import com.gzz100.zbh.home.appointment.entity.BookedTime;
 import com.gzz100.zbh.home.appointment.entity.TimeBlock;
 import com.gzz100.zbh.utils.DensityUtil;
 import com.gzz100.zbh.utils.TimeFormatUtil;
+import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.popup.QMUIPopup;
 
 import java.util.ArrayList;
@@ -53,12 +54,12 @@ public class SelectTimeAdapter extends RecyclerView.Adapter {
 
     private void initTimes(String date) {
         List<TimeBlock> timeBlocks=new ArrayList<>();
+        long millis = TimeFormatUtil.formatDateToMillis(date);
         for (int i = 0; i < 64; i++) {
             TimeBlock timeBlock =new TimeBlock();
             Calendar calendar = Calendar.getInstance();
             int left= i%4;
             int minute=left*15;
-            long millis = TimeFormatUtil.formatDateToMillis(date);
             calendar.setTimeInMillis(millis);
             calendar.set(Calendar.HOUR_OF_DAY,7+i/4);
             calendar.set(Calendar.MINUTE,minute);
@@ -136,7 +137,8 @@ public class SelectTimeAdapter extends RecyclerView.Adapter {
                 }else {
                     dptName = "预";
                 }
-                blockHolder.textView.setText(dptName);
+                blockHolder.textView.setTextSize(8);
+                blockHolder.textView.setText(dptName+"\n"+"预约");
                 blockHolder.rootView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -303,7 +305,8 @@ public class SelectTimeAdapter extends RecyclerView.Adapter {
         for (int i = 0; i < mTimeBlockList.size(); i++) {
             TimeBlock timeBlock = mTimeBlockList.get(i);
             long timeInMillis = timeBlock.getTime().getTimeInMillis();
-            if (timeInMillis>=startTime.getTimeInMillis()&&timeInMillis<=endTime.getTimeInMillis()) {
+            Logger.i("timeblock millis="+timeInMillis+",startTimeMillis="+startTime.getTimeInMillis());
+            if (timeInMillis>=startTime.getTimeInMillis()&&timeInMillis<endTime.getTimeInMillis()) {
                 int initialPos = getInitialPos(i);
                 changeSelectTime(initialPos);
             }

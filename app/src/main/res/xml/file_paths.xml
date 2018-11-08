@@ -2,16 +2,16 @@
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- "/" -->
-    <root-path name="test" path="test"/>
+    <root-path name="test" path="."/>
     <!--Context.getFilesDir().-->
-    <files-path path="images" name="images"/>
+    <files-path path="files" name="files"/>
     <!-- getCacheDir().-->
-    <cache-path name="images1" path="images" />
+    <cache-path name="cache" path="cache" />
     <!-- Environment.getExternalStorageDirectory().-->
-    <external-path name="zbhDocument" path="zbh" />
+    <external-path name="zbhDocument" path="AzbhDownload" />
     <!--Context#getExternalFilesDir(String) Context.getExternalFilesDir(null).   -->
-    <external-files-path name="images3" path="images" />
+    <external-files-path name="zbhDownload" path="AzbhDownload" />
     <!-- Context.getExternalCacheDir().  -->
-    <external-cache-path name="images4" path="images" />
+    <external-cache-path name="ex_cache" path="AzbhDownload/cache" />
 
 </paths>

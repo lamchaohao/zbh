@@ -3,11 +3,10 @@ package com.gzz100.zbh.home.meetingadmin.adapter;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gzz100.zbh.R;
@@ -40,27 +39,26 @@ public class VoteListAdapter extends RecyclerView.Adapter {
 
         VoteHolder voteHolder = (VoteHolder) holder;
         final VoteEntity voteEntity = voteList.get(position);
-        SpannableStringBuilder ssb = new SpannableStringBuilder(voteEntity.getVoteName());
+        SpannableStringBuilder ssb = new SpannableStringBuilder();
         int voteSelectableNum = voteEntity.getVoteSelectableNum();
         ssb.append("【");
         ssb.append(voteSelectableNum==1?"单选":"多选");
         ssb.append("】");
-        ssb.setSpan(new ForegroundColorSpan(0xFF2196F3),voteEntity.getVoteName().length(),ssb.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-        voteHolder.tvVoteName.setText(ssb);
+        voteHolder.tvVoteMode.setText(ssb.toString());
+        voteHolder.tvVoteName.setText(voteEntity.getVoteName());
         voteHolder.tvVoteDesc.setText(voteEntity.getVoteDescription());
         String staus="";
         switch (voteEntity.getVoteStatus()) {
             case 1:
-                staus="进行中";
+               voteHolder.ivStatus.setImageResource(R.drawable.ic_statu_on_meeting);
                 break;
             case 2:
-                staus="未开始";
+                voteHolder.ivStatus.setImageResource(R.drawable.ic_statu_on_ready);
                 break;
             case 3:
-                staus="已结束";
+                voteHolder.ivStatus.setImageResource(R.drawable.ic_statu_end);
                 break;
         }
-        voteHolder.tvStaus.setText(staus);
         voteHolder.rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,14 +84,16 @@ public class VoteListAdapter extends RecyclerView.Adapter {
 
     static class VoteHolder extends RecyclerView.ViewHolder{
 
-        TextView tvStaus;
+        ImageView ivStatus;
         TextView tvVoteName;
+        TextView tvVoteMode;
         TextView tvVoteDesc;
         View rootView;
         public VoteHolder(View itemView) {
             super(itemView);
-            tvStaus = itemView.findViewById(R.id.tv_vote_staus);
+            ivStatus = itemView.findViewById(R.id.iv_vote_status);
             tvVoteName = itemView.findViewById(R.id.tv_vote_name);
+            tvVoteMode = itemView.findViewById(R.id.tv_vote_mode);
             tvVoteDesc = itemView.findViewById(R.id.tv_vote_desc);
             rootView = itemView.findViewById(R.id.ll_rootview);
         }

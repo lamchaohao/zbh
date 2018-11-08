@@ -3,13 +3,14 @@ package com.gzz100.zbh.home.meetingadmin.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 
 import com.gzz100.zbh.R;
+import com.gzz100.zbh.base.BaseBackFragment;
 import com.gzz100.zbh.base.BaseFragment;
-import com.gzz100.zbh.home.meetingadmin.adapter.MeetingTabAdapter;
-import com.qmuiteam.qmui.widget.QMUITabSegment;
+import com.gzz100.zbh.home.meetingadmin.adapter.InfoTabAdapter;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.qmuiteam.qmui.widget.QMUIViewPager;
 
@@ -20,13 +21,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class MeetingParentFragment extends BaseFragment {
+public class MeetingParentFragment extends BaseBackFragment {
 
 
     @BindView(R.id.topbar)
     QMUITopBar mTopbar;
     @BindView(R.id.tabSegment_parent)
-    QMUITabSegment mTabSegment;
+    TabLayout mTabSegment;
     @BindView(R.id.contentViewPager)
     QMUIViewPager mContentViewPager;
     Unbinder unbinder;
@@ -55,8 +56,19 @@ public class MeetingParentFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         initVar();
+        initTopbar();
         initTabs();
         mContentViewPager.setOffscreenPageLimit(2);
+    }
+
+    private void initTopbar() {
+        mTopbar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pop();
+            }
+        });
+
     }
 
     private void initVar() {
@@ -69,25 +81,12 @@ public class MeetingParentFragment extends BaseFragment {
     }
 
     private void initTabs() {
-//        int normalColor = QMUIResHelper.getAttrColor(getActivity(), R.attr.qmui_config_color_gray_6);
-//        int selectColor = QMUIResHelper.getAttrColor(getActivity(), R.attr.qmui_config_color_blue);
-//        mTabSegment.setDefaultNormalColor(normalColor);
-//        mTabSegment.setDefaultSelectedColor(selectColor);
-        QMUITabSegment.Tab msgTab = new QMUITabSegment.Tab("会议信息");
-        QMUITabSegment.Tab showTab = new QMUITabSegment.Tab("文件演示");
-        QMUITabSegment.Tab chatTab = new QMUITabSegment.Tab("讨论");
-
-        mTabSegment.addTab(msgTab)
-                .addTab(showTab)
-                .addTab(chatTab);
-        mTabSegment.setHasIndicator(true);
         List<BaseFragment> fragmentList = new ArrayList<>();
-        fragmentList.add(MeetingInfoFragment.getNewInstance(mMeetingId));
+        fragmentList.add(MeetingInfoFragment.getNewInstance(mMeetingId,mMeetingName));
         fragmentList.add(ShowFragment.getNewInstance(mMeetingId,mGroupId));
         fragmentList.add(MimcMsgFragment.newInstance(mGroupId));
-        mContentViewPager.setAdapter(new MeetingTabAdapter(getChildFragmentManager(),fragmentList));
+        mContentViewPager.setAdapter(new InfoTabAdapter(getChildFragmentManager(),fragmentList));
         mTabSegment.setupWithViewPager(mContentViewPager,false);
-//        mTabSegment.
     }
 
     @Override

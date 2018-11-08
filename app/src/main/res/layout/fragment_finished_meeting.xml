@@ -1,139 +1,243 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
+              xmlns:tools="http://schemas.android.com/tools"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context="com.gzz100.zbh.home.meetingadmin.fragment.FinishedMeetingFragment">
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              tools:context="com.gzz100.zbh.home.meetingadmin.fragment.FinishedMeetingFragment">
 
     <include layout="@layout/widget_topbar"/>
 
-    <TextView
+    <android.support.v7.widget.CardView
         android:layout_margin="8dp"
-        android:drawableLeft="@drawable/ic_person_black_24dp"
-        android:id="@+id/tv_meetingName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        app:cardCornerRadius="6px"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:orientation="vertical"
+            android:paddingLeft="10dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:paddingRight="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_marginBottom="18dp"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:src="@drawable/ic_meeting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:textSize="14sp"
+                    android:layout_marginLeft="20dp"
+                    android:id="@+id/tv_meetingName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
 
-    <TextView
-        android:layout_margin="8dp"
-        android:drawableLeft="@drawable/ic_pause_circle_filled_black_24dp"
-        android:id="@+id/tv_meetingTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+            <LinearLayout
+                android:layout_marginBottom="18dp"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:src="@drawable/ic_clock"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:textSize="14sp"
+                    android:layout_marginLeft="20dp"
+                    android:id="@+id/tv_meetingTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
 
-    <TextView
-        android:layout_margin="8dp"
-        android:drawableLeft="@drawable/ic_mode_edit_black_24dp"
-        android:id="@+id/tv_meetingHost"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:src="@drawable/ic_green_host"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:textSize="14sp"
+                    android:layout_marginLeft="20dp"
+                    android:id="@+id/tv_meetingHost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
 
     <LinearLayout
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="4dp"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <RelativeLayout
-            android:id="@+id/rlSummary"
+        <android.support.v7.widget.CardView
+            app:cardCornerRadius="6px"
+            android:layout_marginRight="16dp"
             android:layout_weight="1"
-            android:background="#2196F3"
-            android:layout_margin="16dp"
             android:layout_width="0dp"
             android:layout_height="96dp">
-            <TextView
-                android:text="纪要"
-                android:layout_centerInParent="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <TextView
-                android:id="@+id/tvSummaryStaus"
-                android:text="未上传"
-                android:layout_margin="5dp"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/rlSummary"
+                android:background="#138FCF"
+                android:layout_width="match_parent"
+                android:layout_height="96dp">
+                <TextView
+                    android:text="纪要"
+                    android:textSize="16sp"
+                    android:textColor="#B2FFFFFF"
+                    android:layout_centerInParent="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <ImageView
+                    android:id="@+id/iv_summaryStaus"
+                    android:src="@drawable/ic_tag_not_upload"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </RelativeLayout>
 
-        <RelativeLayout
-            android:id="@+id/rlFile"
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            app:cardCornerRadius="6px"
             android:layout_weight="1"
-            android:background="#2196F3"
-            android:layout_margin="16dp"
             android:layout_width="0dp"
             android:layout_height="96dp">
-            <TextView
-                android:id="@+id/tvdownloadFile"
-                android:text="可下载文件"
-                android:layout_centerInParent="true"
-                android:gravity="center"
+
+            <RelativeLayout
+                android:id="@+id/rlFile"
+                android:background="#D6866D"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-            <TextView
-                android:id="@+id/tvFileCount"
-                android:text="1"
-                android:layout_below="@id/tvdownloadFile"
-                android:layout_centerInParent="true"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-        </RelativeLayout>
+                android:layout_height="96dp">
+
+                <LinearLayout
+                    android:layout_centerInParent="true"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/tvdownloadFile"
+                        android:text="可下载文件"
+                        android:textColor="#DDFFFFFF"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                    <TextView
+                        android:id="@+id/tvFileCount"
+                        android:text="1"
+                        android:textColor="#B2FFFFFF"
+                        android:textSize="24sp"
+                        android:layout_marginTop="10dp"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
     </LinearLayout>
 
     <LinearLayout
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="16dp"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
-        <RelativeLayout
-            android:id="@+id/rlVote"
+        <android.support.v7.widget.CardView
+            app:cardCornerRadius="6px"
             android:layout_weight="1"
-            android:background="#2196F3"
-            android:layout_margin="16dp"
+            android:layout_marginRight="16dp"
             android:layout_width="0dp"
             android:layout_height="96dp">
-            <TextView
-                android:id="@+id/tvVote"
-                android:text="投票"
-                android:layout_centerInParent="true"
-                android:gravity="center"
+            <RelativeLayout
+                android:id="@+id/rlVote"
+                android:background="#E3D558"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-            <TextView
-                android:id="@+id/tvVoteCount"
-                android:text="2"
-                android:layout_below="@id/tvVote"
-                android:layout_centerInParent="true"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-        </RelativeLayout>
+                android:layout_height="match_parent">
+                <LinearLayout
+                    android:layout_centerInParent="true"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/tvVote"
+                        android:text="投票"
+                        android:textColor="#DDFFFFFF"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                    <TextView
+                        android:id="@+id/tvVoteCount"
+                        android:text="2"
+                        android:textColor="#B2FFFFFF"
+                        android:textSize="24sp"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
 
-        <RelativeLayout
-            android:id="@+id/rlDelegate"
+                </LinearLayout>
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            app:cardCornerRadius="6px"
             android:layout_weight="1"
-            android:background="#2196F3"
-            android:layout_margin="16dp"
             android:layout_width="0dp"
             android:layout_height="96dp">
-            <TextView
-                android:id="@+id/tvDelegate"
-                android:text="参会人数"
-                android:layout_centerInParent="true"
-                android:gravity="center"
+            <RelativeLayout
+                android:id="@+id/rlDelegate"
+                android:background="#5FAD79"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-            <TextView
-                android:id="@+id/tvDelegateCount"
-                android:text="12"
-                android:layout_below="@id/tvDelegate"
-                android:layout_centerInParent="true"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-        </RelativeLayout>
+                android:layout_height="96dp">
+                <LinearLayout
+                    android:layout_centerInParent="true"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/tvDelegate"
+                    android:text="参会人数"
+                    android:textColor="#DDFFFFFF"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/tvDelegateCount"
+                    android:text="12"
+                    android:textColor="#B2FFFFFF"
+                    android:textSize="24sp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                </LinearLayout>
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
     </LinearLayout>
 </LinearLayout>

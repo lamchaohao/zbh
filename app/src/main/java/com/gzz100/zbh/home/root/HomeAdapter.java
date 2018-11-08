@@ -16,11 +16,9 @@ import java.util.List;
 public class HomeAdapter extends FragmentPagerAdapter {
 
     private List<BaseFragment> mPages;
-    private FragmentManager mFragmentManager;
 
     public HomeAdapter(FragmentManager fm,List<BaseFragment> pages) {
         super(fm);
-        mFragmentManager = fm;
         mPages = pages;
     }
 

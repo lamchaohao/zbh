@@ -35,7 +35,7 @@ public class UpdateMeetingEntity {
     private String meetingStartTime;
     private int meetingApplyStatus;
     private String meetingPlaceId;
-    private List<StaffBean> summaryList;
+    private StaffBean summaryPerson;
     private List<StaffBean> copyList;
     private List<AgendaListBean> agendaList;
     private List<StaffBean> delegateList;
@@ -120,13 +120,6 @@ public class UpdateMeetingEntity {
         this.meetingPlaceId = meetingPlaceId;
     }
 
-    public List<StaffBean> getSummaryList() {
-        return summaryList;
-    }
-
-    public void setSummaryList(List<StaffBean> summaryList) {
-        this.summaryList = summaryList;
-    }
 
     public List<StaffBean> getCopyList() {
         return copyList;
@@ -152,7 +145,13 @@ public class UpdateMeetingEntity {
         this.delegateList = delegateList;
     }
 
+    public StaffBean getSummaryPerson() {
+        return summaryPerson;
+    }
 
+    public void setSummaryPerson(StaffBean summaryPerson) {
+        this.summaryPerson = summaryPerson;
+    }
 
     public static class StaffBean {
         /**
@@ -225,5 +224,23 @@ public class UpdateMeetingEntity {
         }
     }
 
-
+    @Override
+    public String toString() {
+        return "UpdateMeetingEntity{" +
+                "hostName='" + hostName + '\'' +
+                ", meetingStatus=" + meetingStatus +
+                ", notifyTime='" + notifyTime + '\'' +
+                ", hostId='" + hostId + '\'' +
+                ", meetingId='" + meetingId + '\'' +
+                ", meetingEndTime='" + meetingEndTime + '\'' +
+                ", meetingName='" + meetingName + '\'' +
+                ", meetingStartTime='" + meetingStartTime + '\'' +
+                ", meetingApplyStatus=" + meetingApplyStatus +
+                ", meetingPlaceId='" + meetingPlaceId + '\'' +
+                ", summaryPerson=" + summaryPerson +
+                ", copyList=" + copyList +
+                ", agendaList=" + agendaList +
+                ", delegateList=" + delegateList +
+                '}';
+    }
 }

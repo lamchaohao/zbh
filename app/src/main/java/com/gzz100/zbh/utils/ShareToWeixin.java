@@ -71,16 +71,16 @@ public class ShareToWeixin {
         Bitmap bitmapIcon=null;
         switch (fileType){
             case PDF:
-                bitmapIcon= BitmapFactory.decodeResource(context.getResources(), R.drawable.pdf_icon);
+                bitmapIcon= BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_pdf);
                 break;
             case PPT:
-                bitmapIcon=BitmapFactory.decodeResource(context.getResources(),R.drawable.power_point_2013);
+                bitmapIcon=BitmapFactory.decodeResource(context.getResources(),R.drawable.ic_power_point);
                 break;
             case WORD:
-                bitmapIcon=BitmapFactory.decodeResource(context.getResources(),R.drawable.word_2013);
+                bitmapIcon=BitmapFactory.decodeResource(context.getResources(),R.drawable.ic_word);
                 break;
             case EXCEL:
-                bitmapIcon=BitmapFactory.decodeResource(context.getResources(),R.drawable.excel_2013);
+                bitmapIcon=BitmapFactory.decodeResource(context.getResources(),R.drawable.ic_excel);
                 break;
             case UNKNOWN:
                 bitmapIcon=BitmapFactory.decodeResource(context.getResources(),R.drawable.ic_home_message_selected);

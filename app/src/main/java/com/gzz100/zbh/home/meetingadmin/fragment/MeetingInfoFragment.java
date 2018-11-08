@@ -18,15 +18,18 @@ import android.widget.TextView;
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.account.User;
 import com.gzz100.zbh.base.BaseFragment;
+import com.gzz100.zbh.data.ObserverImpl;
 import com.gzz100.zbh.data.entity.MeetingInfoEntity;
+import com.gzz100.zbh.data.entity.UnReadEntity;
+import com.gzz100.zbh.data.eventEnity.PushUpdateEntity;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.request.MeetingRequest;
+import com.gzz100.zbh.data.network.request.MessageRequest;
 import com.gzz100.zbh.home.meetingadmin.adapter.AgendaInfoAdapter;
-import com.gzz100.zbh.home.root.UpdateMsg;
+import com.gzz100.zbh.data.eventEnity.UpdateMsg;
 import com.gzz100.zbh.utils.DensityUtil;
 import com.gzz100.zbh.utils.TextHeadPicUtil;
 import com.gzz100.zbh.utils.TimeFormatUtil;
-import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 
@@ -41,21 +44,22 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import es.dmoral.toasty.Toasty;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
 
 import static com.gzz100.zbh.res.Common.ROLE_HOST;
 import static com.gzz100.zbh.res.Common.STATUS_END;
 import static com.gzz100.zbh.res.Common.STATUS_ON;
 import static com.gzz100.zbh.res.Common.STATUS_READY;
+import static com.gzz100.zbh.res.Common.TAG_FINISH_MEETING;
+import static com.gzz100.zbh.res.Common.TAG_NOT_START;
+import static com.gzz100.zbh.res.Common.TAG_SIGNED_UP;
+import static com.gzz100.zbh.res.Common.TAG_SIGN_UP;
+import static com.gzz100.zbh.res.Common.TAG_START_MEETING;
 
 public class MeetingInfoFragment extends BaseFragment {
-
-
+    @BindView(R.id.iv_info_sign)
+    ImageView mIvStartOrSign;
     @BindView(R.id.tv_info_meetingName)
     TextView mtvMeetingName;
-    @BindView(R.id.tv_info_startOrSign)
-    TextView mTvStartOrSign;
     @BindView(R.id.tv_info_hostName)
     TextView mTvHostName;
     @BindView(R.id.tv_info_meetingPlace)
@@ -85,11 +89,14 @@ public class MeetingInfoFragment extends BaseFragment {
     private User mUser;
     private MeetingRequest mRequest;
     private MeetingInfoEntity mMeetingInfoEntity;
+    private ObserverImpl<HttpResult<MeetingInfoEntity>> mInfoRequest;
+    private String mMeetingName;
 
-    public static MeetingInfoFragment getNewInstance(String meetingId){
+    public static MeetingInfoFragment getNewInstance(String meetingId,String meetingName){
         Bundle bundle=new Bundle();
         MeetingInfoFragment fragment=new MeetingInfoFragment();
         bundle.putString("meetingId",meetingId);
+        bundle.putString("meetingName",meetingName);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -113,41 +120,73 @@ public class MeetingInfoFragment extends BaseFragment {
     private void initVar() {
         if (getArguments()!=null) {
             mMeetingId = getArguments().getString("meetingId");
+            mMeetingName = getArguments().getString("meetingName");
         }
     }
 
     private void loadData() {
         mRequest = new MeetingRequest();
 
-        Observer<HttpResult<MeetingInfoEntity>> observer=new Observer<HttpResult<MeetingInfoEntity>>() {
+        mInfoRequest = new ObserverImpl<HttpResult<MeetingInfoEntity>>() {
+
             @Override
-            public void onSubscribe(Disposable d) {
+            public void onResponse(HttpResult<MeetingInfoEntity> result) {
+
+                if (result.getResult()==null) {
+                    Toasty.error(_mActivity,"你无权限查看次会议").show();
+                    if (getParentFragment()!=null) {
+                        ((BaseFragment)getParentFragment()).pop();
+                    }
+
+                }else {
+                    mMeetingInfoEntity = result.getResult();
+                    setTopInfo();
+                    mRoomId = mMeetingInfoEntity.getMeetingPlaceId();
+                    setAgendaListView(mMeetingInfoEntity.getAgendaList());
+                    setDelegatesInfo();
+                    setMeetingStatus(mMeetingInfoEntity);
+                    setVoteData();
+
+                    loadUnread();
+                }
 
             }
 
             @Override
-            public void onNext(HttpResult<MeetingInfoEntity> result) {
-                mMeetingInfoEntity = result.getResult();
-                setTopInfo();
-                mRoomId = mMeetingInfoEntity.getMeetingPlaceId();
-                setAgendaListView(mMeetingInfoEntity.getAgendaList());
-                setDelegatesInfo();
-                setMeetingStatus(mMeetingInfoEntity);
-                setVoteData();
+            public void onFailure(Throwable e) {
+                Toasty.error(_mActivity,e.getMessage()).show();
             }
 
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
         };
 
-        mRequest.getSingleMeetingInfo(observer,mMeetingId);
+        mRequest.getSingleMeetingInfo(mInfoRequest,mMeetingId);
+    }
+
+    private void loadUnread() {
+        MessageRequest request=new MessageRequest();
+        request.getUnreadCount(new ObserverImpl<HttpResult<UnReadEntity>>() {
+            @Override
+            protected void onResponse(HttpResult<UnReadEntity> result) {
+                UnReadEntity entity = result.getResult();
+                if (!TextUtils.isEmpty(entity.getMeetingUnread())) {
+                    PushUpdateEntity pushUpdateEntity = new PushUpdateEntity(PushUpdateEntity.PassthrougMsgType.updateUnreadMeeting);
+                    pushUpdateEntity.setMessageNum(entity.getMeetingUnread());
+                    EventBus.getDefault().post(pushUpdateEntity);
+
+                }
+                if (!TextUtils.isEmpty(entity.getMessageUnread())){
+                    PushUpdateEntity pushUpdateEntity = new PushUpdateEntity(PushUpdateEntity.PassthrougMsgType.updateUnreadMsg);
+                    pushUpdateEntity.setMessageNum(entity.getMessageUnread());
+                    EventBus.getDefault().post(pushUpdateEntity);
+                }
+
+            }
+
+            @Override
+            protected void onFailure(Throwable e) {
+
+            }
+        });
     }
 
     private void setVoteData() {
@@ -175,16 +214,19 @@ public class MeetingInfoFragment extends BaseFragment {
             case STATUS_READY://未开始
                 if (mUser.getUserId().equals(meetingInfo.getCreatorId())){
                     if (TextUtils.isEmpty(userDelegate.getSignInTime())) {
-                        mTvStartOrSign.setText("签到");
+                        mIvStartOrSign.setImageResource(R.drawable.btn_sign_up);
+                        mIvStartOrSign.setTag(TAG_SIGN_UP);
                     }else {
-                        mTvStartOrSign.setText("已签到");
+                        mIvStartOrSign.setImageResource(R.drawable.btn_signed_up);
+                        mIvStartOrSign.setTag(TAG_SIGNED_UP);
                     }
                     //会议创建人可在未开始时候编辑会议
                     mLlBtnNotStart.setVisibility(View.VISIBLE);
                 }
                 if (mUser.getUserId().equals(mHostId)){
                     //主持人身份
-                    mTvStartOrSign.setText("开始会议");
+                    mIvStartOrSign.setImageResource(R.drawable.btn_start_meeting);
+                    mIvStartOrSign.setTag(TAG_START_MEETING);
                     mLlBtnNotStart.setVisibility(View.VISIBLE);
                 }else {
                     //不是主持人
@@ -193,29 +235,38 @@ public class MeetingInfoFragment extends BaseFragment {
                     startTime -= 15*60*1000;
                     if (System.currentTimeMillis()>startTime) {
                         if (TextUtils.isEmpty(userDelegate.getSignInTime())) {
-                            mTvStartOrSign.setText("签到");
+                            mIvStartOrSign.setImageResource(R.drawable.btn_sign_up);
+                            mIvStartOrSign.setTag(TAG_SIGN_UP);
                         }else {
-                            mTvStartOrSign.setText("已签到");
+                            mIvStartOrSign.setImageResource(R.drawable.btn_signed_up);
+                            mIvStartOrSign.setTag(TAG_SIGNED_UP);
                         }
                     }else {
-                        mTvStartOrSign.setText("未开始");
+                        mIvStartOrSign.setImageResource(R.drawable.btn_statu_ready);
+                        mIvStartOrSign.setTag(TAG_NOT_START);
                     }
                 }
                 break;
             case STATUS_ON://进行中
                 if (TextUtils.isEmpty(userDelegate.getSignInTime())) {
-                    mTvStartOrSign.setText("签到");
+                    mIvStartOrSign.setImageResource(R.drawable.btn_sign_up);
+                    mIvStartOrSign.setTag(TAG_SIGN_UP);
                 }else {
-                    mTvStartOrSign.setText("已签到");
+                    mIvStartOrSign.setImageResource(R.drawable.btn_signed_up);
+                    mIvStartOrSign.setTag(TAG_SIGNED_UP);
                 }
                 if (mUser.getUserId().equals(mHostId)){
                     //主持人身份
-                    mTvStartOrSign.setText("结束会议");
+                    mIvStartOrSign.setImageResource(R.drawable.btn_finish_meeting);
+                    mIvStartOrSign.setTag(TAG_FINISH_MEETING);
                 }
                 break;
-            case STATUS_END://已结束
-                mTvStartOrSign.setText("已结束");
+            case STATUS_END:
+                ((BaseFragment)getParentFragment()).startWithPop(FinishedMeetingFragment.getNewInstance
+                        (mMeetingId,mMeetingName));
+
                 break;
+
         }
     }
 
@@ -233,10 +284,7 @@ public class MeetingInfoFragment extends BaseFragment {
         meetingPlaceSb.append("会议地点: ");
         meetingPlaceSb.append(mMeetingInfoEntity.getMeetingPlaceName());
         mTvMeetingPlace.setText(meetingPlaceSb.toString());
-        StringBuilder meetingNameSb=new StringBuilder();
-        meetingNameSb.append("会议主题: ");
-        meetingNameSb.append(mMeetingInfoEntity.getMeetingName());
-        mtvMeetingName.setText(meetingNameSb.toString());
+        mtvMeetingName.setText(mMeetingInfoEntity.getMeetingName());
         for (MeetingInfoEntity.DelegateListBean delegateListBean : mMeetingInfoEntity.getDelegateList()) {
             if (delegateListBean.getDelegateRole()==1) {
                 mTvHostName.setText("主持人: "+delegateListBean.getDelegateName());
@@ -272,21 +320,20 @@ public class MeetingInfoFragment extends BaseFragment {
             }
         }
         StringBuilder sb=new StringBuilder();
-        sb.append(signCount).append("/").append(delegateList.size()).append(" 签到");
+        sb.append("(").append(signCount).append("/").append(delegateList.size()).append(")");
        mTvSignInCount.setText(sb.toString());
     }
 
 
-    @OnClick({R.id.tv_info_startOrSign, R.id.btn_info_edit, R.id.btn_info_cancle,R.id.rl_info_vote,
-            R.id.rl_delegateBlock,R.id.ll_delegates,R.id.ll_info_delegates,R.id.rl_info_summary})
+    @OnClick({R.id.iv_info_sign, R.id.btn_info_edit, R.id.btn_info_cancle,R.id.rl_info_vote,
+            R.id.rl_delegateBlock,R.id.rl_delegates,R.id.rl_info_summary})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.rl_delegateBlock:
-            case R.id.ll_delegates:
-            case R.id.ll_info_delegates:
+            case R.id.rl_delegates:
                 startParentFragment(DelegateFragment.newInstance(mMeetingId,mMeetingInfoEntity.getMeetingStatus()));
                 break;
-            case R.id.tv_info_startOrSign:
+            case R.id.iv_info_sign:
                 startOrSignInMeeting();
                 break;
             case R.id.btn_info_edit:
@@ -305,77 +352,80 @@ public class MeetingInfoFragment extends BaseFragment {
     }
 
     private void startOrSignInMeeting() {
-        String infoStr = mTvStartOrSign.getText().toString();
+        int tag = (int) mIvStartOrSign.getTag();
+        switch (tag) {
+            case TAG_SIGN_UP:
+                ObserverImpl observer =new ObserverImpl<HttpResult>() {
 
-        if (infoStr.equals("签到")){
-            mRequest.signInMeeting(new Observer<HttpResult>() {
-                @Override
-                public void onSubscribe(Disposable d) {
+                    @Override
+                    protected void onResponse(HttpResult result) {
+                        mIvStartOrSign.setImageResource(R.drawable.btn_signed_up);
+                        mIvStartOrSign.setTag(TAG_SIGNED_UP);
+                        loadData();
+                    }
 
-                }
+                    @Override
+                    protected void onFailure(Throwable e) {
+                        Toasty.error(_mActivity,e.getMessage()).show();
+                    }
+                };
+                mRequest.signInMeeting(observer,mMeetingId);
 
-                @Override
-                public void onNext(HttpResult result) {
-                    mTvStartOrSign.setText("已签到");
-                    loadData();
-                }
+                break;
+            case TAG_START_MEETING:
+                ObserverImpl startObserver =new ObserverImpl<HttpResult>(){
 
-                @Override
-                public void onError(Throwable e) {
-                    Toasty.error(_mActivity,e.getMessage()).show();
-                }
+                    @Override
+                    protected void onResponse(HttpResult result) {
+                        mIvStartOrSign.setImageResource(R.drawable.btn_finish_meeting);
+                        mIvStartOrSign.setTag(TAG_FINISH_MEETING);
+                        loadData();
+                    }
 
-                @Override
-                public void onComplete() {
-
-                }
-            },mMeetingId);
-        }else if (infoStr.equals("开始会议")){
-            mRequest.startMeeting(new Observer<HttpResult>() {
-                @Override
-                public void onSubscribe(Disposable d) {
-
-                }
-
-                @Override
-                public void onNext(HttpResult result) {
-                    mTvStartOrSign.setText("结束会议");
-                    loadData();
-                }
-
-                @Override
-                public void onError(Throwable e) {
-                    Toasty.error(_mActivity,e.getMessage()).show();
-                }
-
-                @Override
-                public void onComplete() {
-
-                }
-            },mMeetingId);
-        }else if (infoStr.equals("结束会议")){
-            mRequest.endMeeting(new Observer<HttpResult>() {
-                @Override
-                public void onSubscribe(Disposable d) {
-
-                }
-
-                @Override
-                public void onNext(HttpResult result) {
-                    mTvStartOrSign.setText("已结束");
-                }
-
-                @Override
-                public void onError(Throwable e) {
-                    Toasty.error(_mActivity,e.getMessage()).show();
-                }
-
-                @Override
-                public void onComplete() {
-
-                }
-            },mMeetingId);
+                    @Override
+                    protected void onFailure(Throwable e) {
+                        Toasty.error(_mActivity,e.getMessage()).show();
+                    }
+                };
+                mRequest.startMeeting(startObserver,mMeetingId);
+                break;
+            case TAG_FINISH_MEETING:
+                new QMUIDialog.MessageDialogBuilder(getContext())
+                        .setMessage("确认结束会议?")
+                        .addAction("结束", new QMUIDialogAction.ActionListener() {
+                            @Override
+                            public void onClick(QMUIDialog dialog, int index) {
+                                dialog.dismiss();
+                                finishMeeting();
+                            }
+                        })
+                        .addAction("取消", new QMUIDialogAction.ActionListener() {
+                            @Override
+                            public void onClick(QMUIDialog dialog, int index) {
+                                dialog.dismiss();
+                            }
+                        }).show();
+                break;
         }
+
+    }
+
+    private void finishMeeting() {
+
+        ObserverImpl<HttpResult> finishObserver =new ObserverImpl<HttpResult>(){
+
+            @Override
+            protected void onResponse(HttpResult result) {
+                ((BaseFragment)getParentFragment()).pop();
+            }
+
+            @Override
+            protected void onFailure(Throwable e) {
+                Toasty.error(_mActivity,e.getMessage()).show();
+            }
+        };
+
+        mRequest.endMeeting(finishObserver,mMeetingId);
 
     }
 
@@ -399,26 +449,15 @@ public class MeetingInfoFragment extends BaseFragment {
     }
 
     private void cancleTheMeeting() {
-        Observer<HttpResult> observer=new Observer<HttpResult>() {
+        ObserverImpl<HttpResult> observer =new ObserverImpl<HttpResult>() {
             @Override
-            public void onSubscribe(Disposable d) {
-
-            }
-
-            @Override
-            public void onNext(HttpResult result) {
-                Logger.i("cancleTheMeeting pop");
+            protected void onResponse(HttpResult result) {
                 ((BaseFragment)getParentFragment()).pop();
             }
 
             @Override
-            public void onError(Throwable e) {
+            protected void onFailure(Throwable e) {
                 Toasty.normal(_mActivity,e.getMessage()).show();
-            }
-
-            @Override
-            public void onComplete() {
-
             }
         };
 
@@ -435,6 +474,7 @@ public class MeetingInfoFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        mInfoRequest.cancleRequest();
         EventBus.getDefault().unregister(this);
         unbinder.unbind();
     }

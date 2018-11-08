@@ -2,7 +2,7 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             tools:context="com.gzz100.zbh.account.GuideFragment">
+             tools:context="com.gzz100.zbh.account.fragment.GuideFragment">
 
 
     <LinearLayout

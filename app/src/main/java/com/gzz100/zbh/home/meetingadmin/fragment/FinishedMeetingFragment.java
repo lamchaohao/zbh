@@ -5,22 +5,23 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.base.BaseBackFragment;
+import com.gzz100.zbh.data.ObserverImpl;
 import com.gzz100.zbh.data.entity.FinishedInfoEntity;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.request.MeetingRequest;
 import com.gzz100.zbh.res.Common;
+import com.gzz100.zbh.utils.TimeFormatUtil;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
 
 public class FinishedMeetingFragment extends BaseBackFragment {
 
@@ -33,8 +34,8 @@ public class FinishedMeetingFragment extends BaseBackFragment {
     TextView mTvMeetingTime;
     @BindView(R.id.tv_meetingHost)
     TextView mTvMeetingHost;
-    @BindView(R.id.tvSummaryStaus)
-    TextView mTvSummaryStaus;
+    @BindView(R.id.iv_summaryStaus)
+    ImageView mTvSummaryStaus;
     @BindView(R.id.tvFileCount)
     TextView mTvFileCount;
     @BindView(R.id.tvVoteCount)
@@ -86,26 +87,17 @@ public class FinishedMeetingFragment extends BaseBackFragment {
     private void loadData() {
         MeetingRequest mRequest = new MeetingRequest();
 
-        Observer<HttpResult<FinishedInfoEntity>> observer=new Observer<HttpResult<FinishedInfoEntity>>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-
-            }
+        ObserverImpl<HttpResult<FinishedInfoEntity>> observer=new ObserverImpl<HttpResult<FinishedInfoEntity>>() {
 
             @Override
-            public void onNext(HttpResult<FinishedInfoEntity> result) {
+            protected void onResponse(HttpResult<FinishedInfoEntity> result) {
                 mFinishedInfoEntity = result.getResult();
 
                 updateView();
             }
 
             @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onComplete() {
+            protected void onFailure(Throwable e) {
 
             }
         };
@@ -117,12 +109,17 @@ public class FinishedMeetingFragment extends BaseBackFragment {
         mHostId = mFinishedInfoEntity.getHostId();
         String meetingEndTime = mFinishedInfoEntity.getMeetingEndTime();
         mTvMeetingName.setText(mFinishedInfoEntity.getMeetingName());
-        mTvMeetingTime.setText(mFinishedInfoEntity.getMeetingStartTime()+"-"+meetingEndTime);
+        StringBuilder sb=new StringBuilder();
+        sb.append(TimeFormatUtil.formatDateAndTime(Long.parseLong(mFinishedInfoEntity.getMeetingStartTime())));
+        sb.append("-");
+        sb.append(TimeFormatUtil.formatTime(Long.parseLong(meetingEndTime)));
+
+        mTvMeetingTime.setText(sb.toString());
         mTvMeetingHost.setText(mFinishedInfoEntity.getHost());
         if (mFinishedInfoEntity.getMeetingSummary()) {
-            mTvSummaryStaus.setText("已上传");
+            mTvSummaryStaus.setVisibility(View.GONE);
         }else {
-            mTvSummaryStaus.setText("未上传");
+            mTvSummaryStaus.setVisibility(View.VISIBLE);
         }
         mTvFileCount.setText(mFinishedInfoEntity.getFileNum());
         mTvVoteCount.setText(mFinishedInfoEntity.getVoteNum());

@@ -46,18 +46,18 @@ public class CloudFileAdapter extends RecyclerView.Adapter {
         FilePickerConst.FILE_TYPE fileType = FileUtils.getFileType(documentEntity.getDocumentName());
         switch (fileType){
             case PDF:
-                viewHolder.ivFileIcon.setImageResource(R.drawable.pdf_icon);
+                viewHolder.ivFileIcon.setImageResource(R.drawable.ic_pdf);
                 break;
             case PPT:
-                viewHolder.ivFileIcon.setImageResource(R.drawable.power_point_2013);
+                viewHolder.ivFileIcon.setImageResource(R.drawable.ic_power_point);
                 break;
             case TXT:
                 viewHolder.ivFileIcon.setImageResource(droidninja.filepicker.R.drawable.icon_file_unknown);
             case WORD:
-                viewHolder.ivFileIcon.setImageResource(R.drawable.word_2013);
+                viewHolder.ivFileIcon.setImageResource(R.drawable.ic_word);
                 break;
             case EXCEL:
-                viewHolder.ivFileIcon.setImageResource(R.drawable.excel_2013);
+                viewHolder.ivFileIcon.setImageResource(R.drawable.ic_excel);
                 break;
             case UNKNOWN:
                 viewHolder.ivFileIcon.setImageResource(droidninja.filepicker.R.drawable.icon_file_unknown);

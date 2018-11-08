@@ -11,12 +11,11 @@
         <ImageView
             android:id="@+id/iv_docIcon"
             android:layout_gravity="center"
-            android:layout_width="56dp"
-            android:layout_height="56dp"/>
+            android:layout_width="36dp"
+            android:layout_height="36dp"/>
         <ImageView
             android:id="@+id/ivClose"
-            android:src="@drawable/ic_close_white_18dp"
-            android:background="@drawable/bg_round_translucent"
+            android:src="@drawable/ic_close"
             android:padding="3dp"
             android:layout_gravity="right"
             android:layout_width="wrap_content"

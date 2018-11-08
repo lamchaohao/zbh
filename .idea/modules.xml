@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/floatingsearchview/floatingsearchview.iml" filepath="$PROJECT_DIR$/floatingsearchview/floatingsearchview.iml" />
       <module fileurl="file://$PROJECT_DIR$/qmui/qmui.iml" filepath="$PROJECT_DIR$/qmui/qmui.iml" />
       <module fileurl="file://$PROJECT_DIR$/zbh.iml" filepath="$PROJECT_DIR$/zbh.iml" />
     </modules>

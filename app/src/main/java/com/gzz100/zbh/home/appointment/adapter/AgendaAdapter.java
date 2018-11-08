@@ -9,12 +9,11 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.data.entity.Staff;
 import com.gzz100.zbh.home.appointment.entity.Agenda;
-import com.gzz100.zbh.utils.DensityUtil;
-import com.gzz100.zbh.utils.TextHeadPicUtil;
 import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
@@ -34,8 +33,6 @@ public class AgendaAdapter extends RecyclerView.Adapter {
     private Context mContext;
     private OnItemClickListener mOnItemClickListener;
     private OnSelectCountChangeListener mOnSelectCountChangeListener;
-    private int headPicFontSize;
-    private int headPicSize;
     private Map<Integer,EditText> titleMap;
     private static final int TYPE_ADD_BUTTON =1;
     private static final int TYPE_NORMAL=2;
@@ -43,8 +40,6 @@ public class AgendaAdapter extends RecyclerView.Adapter {
     public AgendaAdapter(Context context) {
         mAgendaList = new ArrayList<>();
         mContext = context;
-        headPicFontSize = DensityUtil.dp2px(mContext, 16);
-        headPicSize = DensityUtil.dp2px(mContext, 36);
         titleMap = new HashMap<>();
     }
 
@@ -79,10 +74,9 @@ public class AgendaAdapter extends RecyclerView.Adapter {
         final Agenda agenda = mAgendaList.get(position);
         //设置主讲人头像
         if (agenda.getStaff()!=null){
-            viewHolder.ivSpeakerPic.setImageDrawable(TextHeadPicUtil.getHeadPic(agenda.getStaff().getUserName(),
-                    headPicFontSize,headPicSize));
+            viewHolder.tvSpeakerName.setText(agenda.getStaff().getUserName());
         }else {
-            viewHolder.ivSpeakerPic.setImageResource(R.drawable.ic_add_circle_outline_black_24dp);
+            viewHolder.tvSpeakerName.setText("请选择");
         }
         //设置议程标题
         EditText editText = titleMap.get(agenda.hashCode());
@@ -129,13 +123,13 @@ public class AgendaAdapter extends RecyclerView.Adapter {
 
     static class AgendaHolder extends RecyclerView.ViewHolder {
         EditText etAgendaTitle;
-        ImageView ivSpeakerPic;
+        TextView tvSpeakerName;
         RelativeLayout rlSelectSpeaker;
         ImageView ivDelete;
         public AgendaHolder(View itemView) {
             super(itemView);
             etAgendaTitle = itemView.findViewById(R.id.et_agendaTitle);
-            ivSpeakerPic = itemView.findViewById(R.id.iv_speakerPic);
+            tvSpeakerName = itemView.findViewById(R.id.tv_speakeName);
             rlSelectSpeaker = itemView.findViewById(R.id.rl_selectSpeaker);
             ivDelete = itemView.findViewById(R.id.iv_delete);
         }

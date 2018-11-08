@@ -1,6 +1,7 @@
 package com.gzz100.zbh.home.meetingadmin.fragment;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DividerItemDecoration;
@@ -9,26 +10,35 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.account.User;
 import com.gzz100.zbh.base.BaseBackFragment;
+import com.gzz100.zbh.data.ObserverImpl;
 import com.gzz100.zbh.data.entity.VoteDetailEntity;
+import com.gzz100.zbh.data.eventEnity.LoadVoteEvent;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.request.VoteRequest;
+import com.gzz100.zbh.home.appointment.entity.VoteOption;
+import com.gzz100.zbh.home.appointment.entity.VoteWrap;
+import com.gzz100.zbh.home.meetingadmin.activity.PhotoActivity;
 import com.gzz100.zbh.home.meetingadmin.adapter.VoteOptionAdapter;
+import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import es.dmoral.toasty.Toasty;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
 
 import static com.gzz100.zbh.res.Common.STATUS_END;
 import static com.gzz100.zbh.res.Common.STATUS_ON;
@@ -49,8 +59,8 @@ public class VoteFragment extends BaseBackFragment {
     TextView mTvVoteMode;
     @BindView(R.id.tv_vote_hideName)
     TextView mTvVoteHideName;
-    @BindView(R.id.tv_vote_staus)
-    TextView mTvVoteStaus;
+    @BindView(R.id.iv_vote_status)
+    ImageView mIvVoteStaus;
     @BindView(R.id.tv_vote_start)
     TextView mTvVoteStart;
     @BindView(R.id.tv_vote_summary)
@@ -68,6 +78,10 @@ public class VoteFragment extends BaseBackFragment {
     private VoteDetailEntity mVoteEntity;
     private VoteOptionAdapter mAdapter;
     private VoteRequest mRequest;
+    private ObserverImpl<HttpResult<VoteDetailEntity>> mDataObserver;
+    private ObserverImpl mUploadResultObserver;
+    private ObserverImpl mStartVoteObserver;
+    private ObserverImpl mEndVoteObserver;
 
 
     public static VoteFragment newInstance(String meetingId,String voteId,String hostId){
@@ -112,70 +126,92 @@ public class VoteFragment extends BaseBackFragment {
 
     private void loadData() {
 
-        Observer<HttpResult<VoteDetailEntity>> observer = new Observer<HttpResult<VoteDetailEntity>>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-
-            }
+        mDataObserver = new ObserverImpl<HttpResult<VoteDetailEntity>>() {
 
             @Override
-            public void onNext(HttpResult<VoteDetailEntity> result) {
+            protected void onResponse(HttpResult<VoteDetailEntity> result) {
                 mVoteEntity = result.getResult();
                 initView(mVoteEntity);
             }
 
             @Override
-            public void onError(Throwable e) {
+            protected void onFailure(Throwable e) {
                 Toasty.error(_mActivity,e.getMessage()).show();
-            }
-
-            @Override
-            public void onComplete() {
-
             }
         };
 
         mRequest = new VoteRequest();
-        mRequest.getVoteInfo(observer,mMeetingId,mVoteId);
+        mRequest.getVoteInfo(mDataObserver,mMeetingId,mVoteId);
 
     }
 
     private void initView(VoteDetailEntity vote) {
+        initDelete();
         initRecyclerView();
         initBottomButton();
         mTvVoteName.setText(vote.getVoteName());
-//        mTvVoteStaus.setText();
         if (vote.getVoteAnonymous()==1) {
-            mTvVoteHideName.setText("匿名");
+            mTvVoteHideName.setText("【匿名】");
         }else {
-            mTvVoteHideName.setText("公开");
+            mTvVoteHideName.setText("【公开】");
         }
         if (vote.getVoteSelectableNum()==1) {
-            mTvVoteMode.setText("单选");
+            mTvVoteMode.setText("【单选】");
         }else {
-            mTvVoteMode.setText("多选");
+            mTvVoteMode.setText("【多选】");
         }
 //	投票状态，1表示进行中，2表示未开始，3表示已结束
         switch (vote.getVoteStatus()) {
             case 1:
-                mTvVoteStaus.setText("进行中");
+               mIvVoteStaus.setImageResource(R.drawable.ic_statu_on_meeting);
                 break;
             case 2:
-                mTvVoteStaus.setText("未开始");
+                mIvVoteStaus.setImageResource(R.drawable.ic_statu_on_ready);
                 break;
             case 3:
-                mTvVoteStaus.setText("已结束");
+                mIvVoteStaus.setImageResource(R.drawable.ic_statu_end);
                 break;
         }
         StringBuilder sb=new StringBuilder();
         sb.append(vote.getVoterNum());
         sb.append("人 已投");
         StringBuffer selectSB=new StringBuffer();
-        selectSB.append("可选项:");
-        selectSB.append(vote.getVoteSelectableNum());
+        selectSB.append("【可选项:");
+        selectSB.append(vote.getVoteSelectableNum()).append("】");
         tvMaxSelection.setText(selectSB.toString());
         mTvVoteSummary.setText(sb.toString());
 
+    }
+
+    private void initDelete() {
+        User user = User.getUserFromCache();
+        if (user.getUserId().equals(mHostId)&&mVoteEntity.getVoteStatus()==STATUS_READY){
+            mTopbar.addRightTextButton("删除",R.id.textButtonId).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    deleteVote();
+                }
+            });
+
+        }
+
+    }
+
+    private void deleteVote() {
+        VoteRequest request=new VoteRequest();
+        request.deleteVote(new ObserverImpl<HttpResult>() {
+            @Override
+            protected void onResponse(HttpResult result) {
+                Toasty.success(getContext(),"投票已删除").show();
+                EventBus.getDefault().post(new LoadVoteEvent());
+                pop();
+            }
+
+            @Override
+            protected void onFailure(Throwable e) {
+                Toasty.error(getContext(),e.getMessage()).show();
+            }
+        },mVoteId);
 
     }
 
@@ -211,10 +247,9 @@ public class VoteFragment extends BaseBackFragment {
                     if (user.getUserId().equals(id)){
                         //1.如果已投票id列表存在用户id
                         hasVoted = true;
-                        mVoteEntity.setVoteStatus(STATUS_END);
-                        mAdapter.notifyDataSetChanged();
                         mBtnVoteComfirm.setText("已投票");
-                        mVoteEntity.setVoteStatus(STATUS_END);
+                        mTvVoteStart.setVisibility(View.GONE);
+
                     }
                 }
                 if (!hasVoted) {
@@ -251,42 +286,47 @@ public class VoteFragment extends BaseBackFragment {
     void onComfirmBtnClick(View view){
         String btnText = mBtnVoteComfirm.getText().toString();
         if (btnText.equals("投票")){
-            StringBuilder optionIdSb=new StringBuilder();
-            optionIdSb.append("[");
-            ArrayList<VoteDetailEntity.VoteOptionListBean> selectedItem = mAdapter.getSelectedItem();
-            int i =0;
-            for (VoteDetailEntity.VoteOptionListBean voteOption : selectedItem) {
-                i++;
-                optionIdSb.append(voteOption.getVoteOptionId());
-                if (i!=selectedItem.size()){
-                    optionIdSb.append(",");
-                }
+
+            String[] voteIdArr=new String[mAdapter.getSelectedItem().size()];
+            for (int i = 0; i < mAdapter.getSelectedItem().size(); i++) {
+                voteIdArr[i] = mAdapter.getSelectedItem().get(i).getVoteOptionId();
             }
-            optionIdSb.append("]");
 
-            mRequest.uploadVoteResult(new Observer<HttpResult>() {
+            Gson gson=new Gson();
+            String optionIdJson = gson.toJson(voteIdArr);
+            Logger.i("optionJson="+optionIdJson);
+            mUploadResultObserver = new ObserverImpl() {
                 @Override
-                public void onSubscribe(Disposable d) {
-
-                }
-
-                @Override
-                public void onNext(HttpResult result) {
+                protected void onResponse(Object o) {
                     mBtnVoteComfirm.setText("已投票");
                     loadData();
                 }
 
                 @Override
-                public void onError(Throwable e) {
+                protected void onFailure(Throwable e) {
                     Toasty.error(_mActivity,e.getMessage()).show();
                 }
+            };
+            mRequest.uploadVoteResult(mUploadResultObserver,optionIdJson,mVoteId);
 
-                @Override
-                public void onComplete() {
-
-                }
-            },optionIdSb.toString(),mVoteId);
-
+        }else if (btnText.equals("编辑投票")){
+            VoteWrap voteWrap=new VoteWrap();
+            List<VoteOption> voteOptions = new ArrayList<>();
+            for (VoteDetailEntity.VoteOptionListBean optionBean : mVoteEntity.getVoteOptionList()) {
+                VoteOption option = new VoteOption();
+                option.setOptionName(optionBean.getVoteOptionName());
+                option.setPicFile(optionBean.getVoteDocumentPath());
+                voteOptions.add(option);
+            }
+            voteWrap.setVoteName(mVoteEntity.getVoteName());
+            voteWrap.setVoteDespc(mVoteEntity.getVoteDescription());
+            voteWrap.setMaxCount(mVoteEntity.getVoteSelectableNum());
+            voteWrap.setSingle(mVoteEntity.getVoteSelectableNum()==1);
+            voteWrap.setMaxCount(mVoteEntity.getVoteSelectableNum());
+            voteWrap.setHideName(mVoteEntity.getVoteAnonymous()==1);
+            voteWrap.setAutoStart(mVoteEntity.getVoteModel()==1);
+            voteWrap.setOptionList(voteOptions);
+            startFragment(UpdateVoteFragment.newInstance(voteWrap,mVoteId,mMeetingId));
         }
     }
 
@@ -295,53 +335,34 @@ public class VoteFragment extends BaseBackFragment {
 
         String tvStr = mTvVoteStart.getText().toString();
         if (tvStr.equals("开始投票")) {
-
-            mRequest.startVote(new Observer<HttpResult>() {
+            mStartVoteObserver = new ObserverImpl() {
                 @Override
-                public void onSubscribe(Disposable d) {
-
-                }
-
-                @Override
-                public void onNext(HttpResult result) {
+                protected void onResponse(Object o) {
                     mTvVoteStart.setText("结束投票");
                     mBtnVoteComfirm.setText("投票");
                 }
 
                 @Override
-                public void onError(Throwable e) {
+                protected void onFailure(Throwable e) {
                     Toasty.error(_mActivity,e.getMessage()).show();
                 }
-
-                @Override
-                public void onComplete() {
-
-                }
-            },mVoteId);
+            };
+            mRequest.startVote(mStartVoteObserver,mVoteId);
 
 
         }else if (tvStr.equals("结束投票")){
-            mRequest.endVote(new Observer<HttpResult>() {
+            mEndVoteObserver = new ObserverImpl<HttpResult>() {
                 @Override
-                public void onSubscribe(Disposable d) {
-
-                }
-
-                @Override
-                public void onNext(HttpResult result) {
+                protected void onResponse(HttpResult o) {
                     mTvVoteStart.setText("已结束");
                 }
 
                 @Override
-                public void onError(Throwable e) {
+                protected void onFailure(Throwable e) {
                     Toasty.error(_mActivity,e.getMessage()).show();
                 }
-
-                @Override
-                public void onComplete() {
-
-                }
-            },mVoteId);
+            };
+            mRequest.endVote(mEndVoteObserver,mVoteId);
 
         }
 
@@ -349,26 +370,33 @@ public class VoteFragment extends BaseBackFragment {
 
     private void transition(String url, View view) {
 
-        Intent intent = new Intent(_mActivity, PhotoActivity.class);
-        intent.putExtra("picUrl",url);
-        startActivity(intent);
-
-//        if (Build.VERSION.SDK_INT < 21) {
-//            Intent intent = new Intent(_mActivity, PhotoActivity.class);
-//            intent.putExtra("picUrl",url);
-//            startActivity(intent);
-//        } else {
-//            Intent intent = new Intent(_mActivity, PhotoActivity.class);
-//            intent.putExtra("picUrl",url);
+        if (Build.VERSION.SDK_INT < 21) {
+            Intent intent = new Intent(_mActivity, PhotoActivity.class);
+            intent.putExtra("picUrl",url);
+            startActivity(intent);
+        } else {
+            Intent intent = new Intent(_mActivity, PhotoActivity.class);
+            intent.putExtra("picUrl",url);
 //            ActivityOptionsCompat options = ActivityOptionsCompat.
-//                    makeSceneTransitionAnimation(_mActivity, view, getString(R.string.transition));
+//                    makeScaleUpAnimation(view, 0,0, DensityUtil.getScreenWidth(_mActivity),DensityUtil.getScreenHeight(_mActivity));
 //            startActivity(intent, options.toBundle());
-//        }
+            startActivity(intent);
+        }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        mDataObserver.cancleRequest();
+        if (mUploadResultObserver!=null){
+            mUploadResultObserver.cancleRequest();
+        }
+        if (mStartVoteObserver!=null){
+            mStartVoteObserver.cancleRequest();
+        }
+        if (mEndVoteObserver!=null) {
+            mEndVoteObserver.cancleRequest();
+        }
     }
 }

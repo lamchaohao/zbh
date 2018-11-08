@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
+              android:background="#FFFFFF"
               android:layout_width="match_parent"
               android:layout_height="wrap_content">
 
@@ -11,23 +12,51 @@
         android:layout_height="wrap_content">
         <ImageView
             android:id="@+id/iv_deleteOption"
-            android:src="@drawable/ic_remove_circle_red_500_36dp"
+            android:src="@drawable/ic_remove_circle_red_500_24dp"
             android:layout_gravity="center"
+            android:layout_marginRight="16dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-        <ImageView
-            android:id="@+id/iv_addOptionPic"
-            android:src="@mipmap/ic_launcher"
-            android:layout_width="64dp"
-            android:layout_height="64dp"/>
+
         <EditText
             android:id="@+id/et_voteOption"
             android:layout_gravity="center"
-            android:hint="选项"
+            android:hint="请输入选项"
+            android:background="@null"
             android:padding="8dp"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/tv_addPic"
+            android:text="添加图片"
+            android:layout_marginLeft="8dp"
+            android:layout_gravity="center"
+            android:textSize="12sp"
+            android:textColor="@color/colorPrimary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/fl_vote_pic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/iv_addOptionPic"
+            android:src="@mipmap/ic_launcher"
+            android:layout_marginLeft="56dp"
+            android:layout_width="64dp"
+            android:layout_height="64dp"/>
+        <ImageView
+            android:id="@+id/ivClose"
+            android:src="@drawable/ic_close"
+            android:background="@drawable/bg_round_translucent"
+            android:padding="3dp"
+            android:layout_gravity="right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </FrameLayout>
+
 
 </LinearLayout>

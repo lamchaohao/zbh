@@ -23,6 +23,8 @@ public class MeetingEntity {
     private String meetingPlaceName;
     private String meetingEndTime;
     private String mimcTopicId;
+    private int meetingRole;
+    private String unread;//unread":"5153913603351"
     /**
      * meetingApplyStatus : 4
      */
@@ -85,11 +87,27 @@ public class MeetingEntity {
         this.meetingApplyStatus = meetingApplyStatus;
     }
 
+    public String getUnread() {
+        return unread;
+    }
+
+    public void setUnread(String unread) {
+        this.unread = unread;
+    }
+
     public String getMimcTopicId() {
         return mimcTopicId;
     }
 
     public void setMimcTopicId(String mimcTopicId) {
         this.mimcTopicId = mimcTopicId;
+    }
+
+    public int getMeetingRole() {
+        return meetingRole;
+    }
+
+    public void setMeetingRole(int meetingRole) {
+        this.meetingRole = meetingRole;
     }
 }

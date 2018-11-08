@@ -1,6 +1,5 @@
 package com.gzz100.zbh.home.meetingadmin.fragment;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DividerItemDecoration;
@@ -9,9 +8,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
+import com.google.gson.Gson;
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.base.BaseBackFragment;
+import com.gzz100.zbh.data.ObserverImpl;
 import com.gzz100.zbh.data.entity.DelegateEntity;
 import com.gzz100.zbh.data.entity.Staff;
 import com.gzz100.zbh.data.network.HttpResult;
@@ -20,7 +22,6 @@ import com.gzz100.zbh.home.appointment.entity.StaffWrap;
 import com.gzz100.zbh.home.appointment.fragment.MultiChosePersonFragment;
 import com.gzz100.zbh.home.meetingadmin.adapter.DelegatesAdapter;
 import com.gzz100.zbh.res.Common;
-import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 
 import org.greenrobot.eventbus.EventBus;
@@ -33,8 +34,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
+import es.dmoral.toasty.Toasty;
 
 import static com.gzz100.zbh.home.appointment.fragment.ApmDetailFragment.RC_DELEGATE;
 import static com.gzz100.zbh.home.appointment.fragment.MultiChosePersonFragment.MultiChoices;
@@ -50,12 +50,16 @@ public class DelegateFragment extends BaseBackFragment {
     Unbinder unbinder;
     @BindView(R.id.topbar)
     QMUITopBar mTopbar;
+    @BindView(R.id.ll_add_delegate)
+    LinearLayout llAddDelegate;
     private String mMeetingId;
     private Button mTextButton;
     private MeetingRequest mRequest;
     private List<DelegateEntity> mDelegates;
     private DelegatesAdapter mAdapter;
     private int mMeetingStatus;
+    private ObserverImpl<HttpResult<List<DelegateEntity>>> mDataObserver;
+    private ObserverImpl<HttpResult> mAddDelegateObserver;
 
     public static DelegateFragment newInstance(String meetingId,int status) {
         DelegateFragment fragment = new DelegateFragment();
@@ -97,7 +101,6 @@ public class DelegateFragment extends BaseBackFragment {
             }
         });
         mTextButton = mTopbar.addRightTextButton("新增人员", R.id.textButtonId);
-        mTextButton.setTextColor(Color.WHITE);
         if (mMeetingStatus== Common.STATUS_END) {
             mTextButton.setVisibility(View.GONE);
         }
@@ -113,15 +116,10 @@ public class DelegateFragment extends BaseBackFragment {
 
     private void loadData() {
 
-        Observer<HttpResult<List<DelegateEntity>>> observer = new Observer<HttpResult<List<DelegateEntity>>>() {
+        mDataObserver = new ObserverImpl<HttpResult<List<DelegateEntity>>>() {
 
             @Override
-            public void onSubscribe(Disposable d) {
-
-            }
-
-            @Override
-            public void onNext(HttpResult<List<DelegateEntity>> result) {
+            protected void onResponse(HttpResult<List<DelegateEntity>> result) {
                 if (result.getResult()!=null){
                     mDelegates.clear();
                     mDelegates.addAll(result.getResult());
@@ -131,20 +129,16 @@ public class DelegateFragment extends BaseBackFragment {
             }
 
             @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onComplete() {
-
+            protected void onFailure(Throwable e) {
+                Toasty.error(getContext().getApplicationContext(),e.getMessage()).show();
             }
         };
 
 
-        mRequest.getDelegates(observer, mMeetingId);
+        mRequest.getDelegates(mDataObserver, mMeetingId);
 
     }
+
 
     private void loadDataIntoView(List<DelegateEntity> delegates) {
 
@@ -159,6 +153,12 @@ public class DelegateFragment extends BaseBackFragment {
             @Override
             public void onClick(View v) {
 
+                startFragment(MultiChosePersonFragment.newInstance(MultiChoices,RC_DELEGATE,delegatesIds));
+            }
+        });
+        llAddDelegate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 startFragment(MultiChosePersonFragment.newInstance(MultiChoices,RC_DELEGATE,delegatesIds));
             }
         });
@@ -179,51 +179,32 @@ public class DelegateFragment extends BaseBackFragment {
         }
         //未添加的id
         needToAddIds.removeAll(delegateIds);
+        Gson gson=new Gson();
+        String addIdJson = gson.toJson(needToAddIds);
 
-        StringBuilder sb=new StringBuilder();
-        sb.append("[");
-        for (int i = 0; i < needToAddIds.size(); i++) {
-            sb.append(needToAddIds.get(i));
-            if (i!=needToAddIds.size()-1){
-                sb.append(",");
-            }
-        }
-        sb.append("]");
-        Logger.i("userIdList="+sb.toString());
-        addDelegate(sb.toString());
-    }
-
-
-    public void addDelegate(String userIdList){
-        Observer<HttpResult> observer = new Observer<HttpResult>() {
+        mAddDelegateObserver = new ObserverImpl<HttpResult>() {
             @Override
-            public void onSubscribe(Disposable d) {
-
-            }
-
-            @Override
-            public void onNext(HttpResult result) {
+            protected void onResponse(HttpResult result) {
                 loadData();
             }
 
             @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onComplete() {
+            protected void onFailure(Throwable e) {
 
             }
         };
-        mRequest.addDelegate(observer,mMeetingId,userIdList);
-
+        mRequest.addDelegate(mAddDelegateObserver,mMeetingId,addIdJson);
     }
+
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         EventBus.getDefault().unregister(this);
         unbinder.unbind();
+        mDataObserver.cancleRequest();
+        if (mAddDelegateObserver!=null) {
+            mAddDelegateObserver.cancleRequest();
+        }
     }
 }

@@ -3,17 +3,36 @@
              android:orientation="vertical"
               android:layout_width="match_parent"
              android:layout_height="wrap_content">
-    <ImageButton
-        android:id="@+id/imageButton"
-        android:layout_gravity="center"
-        android:src="@drawable/ic_add_circle_outline_black_24dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
 
+    <LinearLayout
+        android:id="@+id/ll_addOption"
+        android:padding="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="#FFFFFF"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/imageButton"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_add_circle_outline_blue_500_24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:text="添加选项"
+            android:layout_marginLeft="16dp"
+            android:textColor="@color/colorTextSelected"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/rl_multiSelect"
+        android:background="#FFFFFF"
         android:padding="8dp"
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -28,13 +47,15 @@
             android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
-            <Button
+            <TextView
                 android:id="@+id/bt_add"
                 android:text="+"
-                android:textSize="22sp"
-                android:background="@color/colorWhite"
-                android:layout_width="48dp"
-                android:layout_height="48dp"/>
+                android:textSize="18sp"
+                android:padding="8dp"
+                android:layout_marginRight="4dp"
+                android:background="@drawable/recycler_bg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
             <TextView
                 android:id="@+id/tv_maxSelcted"
                 android:text="1"
@@ -44,18 +65,22 @@
                 android:background="@null"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
-            <Button
+            <TextView
                 android:id="@+id/bt_minus"
                 android:text="-"
-                android:textSize="22sp"
-                android:background="@color/colorWhite"
-                android:layout_width="48dp"
-                android:layout_height="48dp"/>
+                android:textSize="18sp"
+                android:padding="8dp"
+                android:layout_marginLeft="4dp"
+                android:gravity="center"
+                android:background="@drawable/recycler_bg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
     </RelativeLayout>
 
     <RelativeLayout
+        android:background="#FFFFFF"
         android:padding="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -73,16 +98,19 @@
             <RadioButton
                 android:id="@+id/rdbtn_atMeetingStart"
                 android:text="会议开始"
+                android:textColor="@color/colorSecondaryText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
             <RadioButton
                 android:id="@+id/rdbtn_byHandle"
                 android:text="手动"
+                android:textColor="@color/colorSecondaryText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
         </RadioGroup>
     </RelativeLayout>
     <RelativeLayout
+        android:background="#FFFFFF"
         android:padding="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -98,11 +126,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
     </RelativeLayout>
+
     <Button
         android:id="@+id/btn_submit"
         android:text="提交"
         android:textColor="@color/colorWhite"
-        android:background="@color/colorTopbar"
+        android:background="@drawable/bg_btn_round_conner"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="64dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+
 </LinearLayout>

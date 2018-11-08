@@ -108,6 +108,10 @@ public abstract class QMUIItemViewsAdapter<T, V extends View> {
         return mItemData.get(position);
     }
 
+    public List<T> getItems(){
+        return mItemData;
+    }
+
     public void replaceItem(int position, T data) throws IllegalAccessException {
         if (position < mItemData.size() && position >= 0) {
             mItemData.set(position, data);

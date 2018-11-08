@@ -1,6 +1,5 @@
 package com.gzz100.zbh.home.appointment.fragment;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DividerItemDecoration;
@@ -92,7 +91,6 @@ public class AddAgendaFragment extends BaseBackFragment {
         });
 
         Button textButton = mTopbar.addRightTextButton("保存", R.id.textButtonId);
-        textButton.setTextColor(Color.WHITE);
 
         textButton.setOnClickListener(new View.OnClickListener() {
             @Override

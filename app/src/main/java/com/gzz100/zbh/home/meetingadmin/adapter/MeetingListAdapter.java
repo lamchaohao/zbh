@@ -1,11 +1,12 @@
 package com.gzz100.zbh.home.meetingadmin.adapter;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -55,37 +56,48 @@ public class MeetingListAdapter extends RecyclerView.Adapter {
 
         switch (meeting.getMeetingStatus()) {
             case 1:
-                holder.tvStatus.setText("进行中");
-                holder.tvStatus.setBackgroundColor(Color.parseColor("#29B6F6"));
+                holder.ivStatus.setImageResource(R.drawable.ic_statu_on_meeting);
                 break;
             case 2:
-                holder.tvStatus.setText("未开始");
-                holder.tvStatus.setBackgroundColor(Color.parseColor("#616161"));
+                holder.ivStatus.setImageResource(R.drawable.ic_statu_on_ready);
                 break;
             case 3:
-                holder.tvStatus.setText("已结束");
-                holder.tvStatus.setBackgroundColor(Color.parseColor("#BDBDBD"));
+                holder.ivStatus.setImageResource(R.drawable.ic_statu_end);
                 break;
         }
         //1表示待审核，2表示通过，3表示不通过，4表示不用审核'
         if (meeting.getMeetingApplyStatus()!=4) {
-            holder.tvApplyStatus.setVisibility(View.VISIBLE);
             switch (meeting.getMeetingApplyStatus()) {
                 case 1:
-                    holder.tvApplyStatus.setText("待审核");
-                    holder.tvApplyStatus.setBackgroundColor(Color.parseColor("#29B6F6"));
+                    holder.ivStatus.setImageResource(R.drawable.ic_statu_checking);
                     break;
                 case 2:
-                    holder.tvApplyStatus.setText("通过");
-                    holder.tvApplyStatus.setBackgroundColor(Color.parseColor("#29B6F6"));
+                    holder.ivStatus.setImageResource(R.drawable.ic_statu_check_success);
                     break;
                 case 3:
-                    holder.tvApplyStatus.setText("不通过");
-                    holder.tvApplyStatus.setBackgroundColor(Color.parseColor("#BDBDBD"));
+                    holder.ivStatus.setImageResource(R.drawable.ic_statu_check_fail);
                     break;
             }
+        }
+
+        if (TextUtils.isEmpty(meeting.getUnread())) {
+            holder.ivUnreadSign.setVisibility(View.GONE);
         }else {
-            holder.tvApplyStatus.setVisibility(View.GONE);
+            holder.ivUnreadSign.setVisibility(View.VISIBLE);
+        }
+
+        switch (meeting.getMeetingRole()) {
+            case 1:
+                holder.ivRole.setVisibility(View.VISIBLE);
+                holder.ivRole.setImageResource(R.drawable.ic_microphone);
+                break;
+            case 2:
+                holder.ivRole.setVisibility(View.VISIBLE);
+                holder.ivRole.setImageResource(R.drawable.ic_summary);
+                break;
+            default:
+                holder.ivRole.setVisibility(View.GONE);
+                    break;
         }
 
         holder.rootView.setOnClickListener(new View.OnClickListener() {
@@ -94,6 +106,16 @@ public class MeetingListAdapter extends RecyclerView.Adapter {
                 if (mOnItemClickListener!=null) {
                     mOnItemClickListener.onItemClick(position);
                 }
+            }
+        });
+
+        holder.rootView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (mOnItemClickListener!=null){
+                    mOnItemClickListener.onItemLongClick(position);
+                }
+                return true;
             }
         });
     }
@@ -109,21 +131,25 @@ public class MeetingListAdapter extends RecyclerView.Adapter {
 
     public interface OnItemClickListener{
         void onItemClick(int pos);
+        void onItemLongClick(int pos);
     }
 
     class MeetingHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.tv_meetingStatus)
-        TextView tvStatus;
+
+        @BindView(R.id.iv_meetingStatus)
+        ImageView ivStatus;
+        @BindView(R.id.iv_meetingRole)
+        ImageView ivRole;
         @BindView(R.id.tv_meetingName)
         TextView mTvMeetingName;
         @BindView(R.id.tv_meetingTime)
         TextView mTvMeetingTime;
         @BindView(R.id.tv_meetingPlace)
         TextView mTvMeetingPlace;
-        @BindView(R.id.tv_meetingApplyStatus)
-        TextView tvApplyStatus;
         @BindView(R.id.item_root)
         LinearLayout rootView;
+        @BindView(R.id.iv_unread_sign)
+        ImageView ivUnreadSign;
         public MeetingHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);

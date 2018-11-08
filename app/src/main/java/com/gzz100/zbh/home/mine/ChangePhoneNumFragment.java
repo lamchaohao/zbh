@@ -17,7 +17,8 @@ import com.gzz100.zbh.account.User;
 import com.gzz100.zbh.base.BaseBackFragment;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.request.AccountRequest;
-import com.gzz100.zbh.home.root.UpdateMsg;
+import com.gzz100.zbh.data.network.service.AccountService;
+import com.gzz100.zbh.data.eventEnity.UpdateMsg;
 import com.gzz100.zbh.res.Common;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 
@@ -40,7 +41,7 @@ public class ChangePhoneNumFragment extends BaseBackFragment {
     @BindView(R.id.et_newPhone)
     EditText mEtNewPhone;
     @BindView(R.id.btn_getCheckCode)
-    Button mBtnGetCheckCode;
+    TextView mBtnGetCheckCode;
     @BindView(R.id.et_checkcode)
     EditText mEtCheckCode;
     @BindView(R.id.btn_confirm)
@@ -158,7 +159,7 @@ public class ChangePhoneNumFragment extends BaseBackFragment {
 
             @Override
             public void onError(Throwable e) {
-
+                Toasty.error(getContext(),e.getMessage()).show();
             }
 
             @Override
@@ -205,7 +206,7 @@ public class ChangePhoneNumFragment extends BaseBackFragment {
             public void onComplete() {
 
             }
-        },mCheckedPhone,Common.CheckCode_UpdatePhone);
+        },mCheckedPhone, AccountService.Method.Modify_Phone);
     }
 
     private void updateCountDown() {

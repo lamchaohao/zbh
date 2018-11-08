@@ -3,26 +3,27 @@ package com.gzz100.zbh.home.appointment.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bigkoo.pickerview.OptionsPickerView;
 import com.bigkoo.pickerview.TimePickerView;
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.base.BaseFragment;
+import com.gzz100.zbh.data.ObserverImpl;
 import com.gzz100.zbh.data.entity.MeetingRoomEntity;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.request.MeetingRoomRequest;
 import com.gzz100.zbh.home.appointment.adapter.RoomAdapter;
 import com.gzz100.zbh.utils.TimeFormatUtil;
-import com.qmuiteam.qmui.widget.QMUIEmptyView;
+import com.gzz100.zbh.widget.LineDecoration;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
-import com.scwang.smartrefresh.layout.header.FalsifyHeader;
+import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import java.util.ArrayList;
@@ -35,8 +36,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
+import es.dmoral.toasty.Toasty;
 
 
 public class AppointmentFragment extends BaseFragment {
@@ -52,13 +52,13 @@ public class AppointmentFragment extends BaseFragment {
     SmartRefreshLayout mRefreshLayout;
     @BindView(R.id.rcv_apm_room)
     RecyclerView mRcvRoom;
-    @BindView(R.id.empty_view)
-    QMUIEmptyView mEmptyView;
+    @BindView(R.id.iv_empty_room)
+    ImageView mEmptyView;
     private RoomAdapter mAdapter;
     private Unbinder unbinder;
     private List<String> mHourList;
     private List<List<String>> mMinuteWrapList;
-
+    List<MeetingRoomEntity> mRoomList;
 
     @Override
     protected View onCreateView(LayoutInflater inflater) {
@@ -86,32 +86,29 @@ public class AppointmentFragment extends BaseFragment {
         Date time = Calendar.getInstance().getTime();
         String dateStr = TimeFormatUtil.formatDate(time);
 
-        request.getMeetingRooms(new Observer<HttpResult<List<MeetingRoomEntity>>>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-
-            }
-
-            @Override
-            public void onNext(HttpResult<List<MeetingRoomEntity>> result) {
-                loadData(result.getResult());
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                mRefreshLayout.finishRefresh(false);
-            }
+        request.getMeetingRooms(new ObserverImpl<HttpResult<List<MeetingRoomEntity>>>() {
 
             @Override
             public void onComplete() {
                 mRefreshLayout.finishRefresh();
+            }
+
+            @Override
+            protected void onResponse(HttpResult<List<MeetingRoomEntity>> result) {
+                loadData(result.getResult());
+            }
+
+            @Override
+            protected void onFailure(Throwable e) {
+                mRefreshLayout.finishRefresh(false);
+                Toasty.error(_mActivity,e.getMessage()).show();
             }
         });
 
     }
 
     private void initView() {
-        mRcvRoom.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
+        mRcvRoom.addItemDecoration(new LineDecoration(getContext()));
         mRcvRoom.setLayoutManager(new LinearLayoutManager(getContext()));
         mAdapter = new RoomAdapter(getContext());
         mAdapter.setOnItemClickListener(new RoomAdapter.OnItemClickListener() {
@@ -121,7 +118,7 @@ public class AppointmentFragment extends BaseFragment {
                     ((BaseFragment) getParentFragment())
                             .startParentFragment(ApmDetailFragment.newInstance(room.getMeetingPlaceId(),
                                     room.getMeetingPlaceName(), room.getMeetingPlaceCapacity(),
-                                    room.getMeetingPlaceTab(), room.getMeetingPlacePic()));
+                                    room.getMeetingPlaceTab(), room.getMeetingPlacePic(),room.getNeedApply()));
                 } else {
                     int i = mAdapter.showTimetable(position);
                     if (i != -1) {
@@ -133,11 +130,14 @@ public class AppointmentFragment extends BaseFragment {
         });
         mRcvRoom.setAdapter(mAdapter);
 
-        mRefreshLayout.setRefreshHeader(new FalsifyHeader(getContext()));
+        mRefreshLayout.setRefreshHeader(new ClassicsHeader(getContext()));
         mRefreshLayout.setEnableLoadMore(false);
         mRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(RefreshLayout refreshLayout) {
+                mTvApmSelectDate.setText("会议日期");
+                mTvApmDuration.setText("会议时长");
+                mTvApmSelectPeople.setText("会议人数");
                 loadRoomData();
             }
         });
@@ -146,28 +146,29 @@ public class AppointmentFragment extends BaseFragment {
     private void loadData(List<MeetingRoomEntity> roomList) {
         if (roomList!=null){
             mAdapter.refreshData(roomList);
+            mRoomList = roomList;
             if (roomList.size()==0){
-                mEmptyView.show();
+                mEmptyView.setVisibility(View.VISIBLE);
             }else {
-                mEmptyView.hide();
+                mEmptyView.setVisibility(View.GONE);
             }
         }else{
-            mEmptyView.show();
+            mEmptyView.setVisibility(View.VISIBLE);
         }
     }
 
 
-    @OnClick({R.id.tv_apm_select_date, R.id.tv_apm_select_time, R.id.tv_apm_select_people})
+    @OnClick({R.id.rl_apm_date, R.id.rl_apm_last, R.id.rl_apm_people})
     public void onViewClicked(View view) {
-        boolean[] option = new boolean[]{false, true, true, false, false, false};//显示类型 默认全部显示
+        final boolean[] option = new boolean[]{false, true, true, false, false, false};//显示类型 默认全部显示
         switch (view.getId()) {
-            case R.id.tv_apm_select_date:
+            case R.id.rl_apm_date:
 
                 TimePickerView pvTime = new TimePickerView.Builder(getContext(), new TimePickerView.OnTimeSelectListener() {
                     @Override
                     public void onTimeSelect(Date date, View v) {//选中事件回调
                         mTvApmSelectDate.setText(TimeFormatUtil.formatMonth(date));
-                        showSelectTimeDialog();
+                        showSelectTimeDialog(date.getDate());
                     }
                 }).setType(option)
                         .build();
@@ -175,11 +176,11 @@ public class AppointmentFragment extends BaseFragment {
                 pvTime.setDate(Calendar.getInstance());
                 pvTime.show();
                 break;
-            case R.id.tv_apm_select_time:
+            case R.id.rl_apm_last:
                 showDurationDialog();
                 break;
-            case R.id.tv_apm_select_people:
-                List<String> peopleList = new ArrayList<>();
+            case R.id.rl_apm_people:
+                final List<String> peopleList = new ArrayList<>();
                 peopleList.add("1-10人");
                 peopleList.add("11-20人");
                 peopleList.add("21-30人");
@@ -188,12 +189,48 @@ public class AppointmentFragment extends BaseFragment {
                     @Override
                     public void onOptionsSelect(int options1, int options2, int options3, View v) {
 
+
+                        mTvApmSelectPeople.setText(peopleList.get(options1));
+                        int maxCapacity=0;
+                        switch (options1) {
+                            case 0:
+                                maxCapacity=10;
+                                break;
+                            case 1:
+                                maxCapacity=20;
+                                break;
+                            case 2:
+                                maxCapacity=30;
+                                break;
+                            case 3:
+                                maxCapacity=40;
+                                break;
+                        }
+                        filter("",maxCapacity);
                     }
                 }).build();
                 picker.setPicker(peopleList);
                 picker.show();
                 break;
         }
+    }
+
+    private void filter(String time ,int maxCapacity) {
+
+        List<MeetingRoomEntity> datas = mAdapter.getDatas();
+        List<MeetingRoomEntity> filterData = new ArrayList<>();
+        if (datas!=null) {
+            for (MeetingRoomEntity roomEntity : datas) {
+                if (roomEntity.getMeetingPlaceCapacity()<maxCapacity) {
+                    roomEntity.setEnable(false);
+                }else {
+                    roomEntity.setEnable(true);
+                    filterData.add(roomEntity);
+                }
+            }
+            mAdapter.notifyDataSetChanged();
+        }
+
     }
 
     private void showDurationDialog() {
@@ -214,43 +251,58 @@ public class AppointmentFragment extends BaseFragment {
         picker.show();
     }
 
-    private void showSelectTimeDialog() {
+    private void showSelectTimeDialog(int selectedDate) {
         mHourList.clear();
         mMinuteWrapList.clear();
+
+        int date = Calendar.getInstance().get(Calendar.DATE);
 
         Calendar instance = Calendar.getInstance(Locale.CHINESE);
         int hour = instance.get(Calendar.HOUR_OF_DAY);
         int minute = instance.get(Calendar.MINUTE);
-        for (int i = minute < 45 ? hour : hour + 1; i < 24; i++) {
-            mHourList.add(i + "");
-            if (i == hour) {
-                List<String> spMinuteList = new ArrayList<>();
-                if (minute > 30) {
-                    spMinuteList.add("45");//前面已经判断了>45
-                    mMinuteWrapList.add(spMinuteList);
-                } else {
-                    if (minute > 15) {
-                        spMinuteList.add("30");
-                        spMinuteList.add("45");
-                        mMinuteWrapList.add(spMinuteList);
-                    } else {
-                        spMinuteList.add("15");
-                        spMinuteList.add("30");
-                        spMinuteList.add("45");
-                        mMinuteWrapList.add(spMinuteList);
-                    }
-                }
-            } else {
-                List<String> minuteList = new ArrayList<>();
-                minuteList.add("00");
-                minuteList.add("15");
-                minuteList.add("30");
-                minuteList.add("45");
+
+        if (selectedDate != date) {
+            List<String> minuteList = new ArrayList<>();
+            minuteList.add("00");
+            minuteList.add("15");
+            minuteList.add("30");
+            minuteList.add("45");
+            for (int i=7;i<23;i++){
+                mHourList.add(i + "");
                 mMinuteWrapList.add(minuteList);
             }
 
+        }else {
+            for (int i = minute < 45 ? hour : hour + 1; i < 24; i++) {
+                mHourList.add(i + "");
+                if (i == hour) {
+                    List<String> spMinuteList = new ArrayList<>();
+                    if (minute > 30) {
+                        spMinuteList.add("45");//前面已经判断了>45
+                        mMinuteWrapList.add(spMinuteList);
+                    } else {
+                        if (minute > 15) {
+                            spMinuteList.add("30");
+                            spMinuteList.add("45");
+                            mMinuteWrapList.add(spMinuteList);
+                        } else {
+                            spMinuteList.add("15");
+                            spMinuteList.add("30");
+                            spMinuteList.add("45");
+                            mMinuteWrapList.add(spMinuteList);
+                        }
+                    }
+                } else {
+                    List<String> minuteList = new ArrayList<>();
+                    minuteList.add("00");
+                    minuteList.add("15");
+                    minuteList.add("30");
+                    minuteList.add("45");
+                    mMinuteWrapList.add(minuteList);
+                }
+            }
+
         }
-//
         OptionsPickerView pvOptions = new OptionsPickerView.Builder(getContext(), new OptionsPickerView.OnOptionsSelectListener() {
             @Override
             public void onOptionsSelect(int options1, int option2, int options3, View v) {
@@ -275,30 +327,20 @@ public class AppointmentFragment extends BaseFragment {
     }
 
     private void startQueryData(final String startTime) {
-        // TODO: 2018/3/20
-        //不能预约的会议室,要显示当天一整天的所有预约会议情况,而不是从指定的时间开始,不然前面的会议都看不到
+
         MeetingRoomRequest request = new MeetingRoomRequest();
         final String date = startTime.substring(0, 11);//截取日期 2018-05-26
-        request.getAvailableMeetingRooms(new Observer<HttpResult<List<MeetingRoomEntity>>>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-
-            }
+        request.getAvailableMeetingRooms(new ObserverImpl<HttpResult<List<MeetingRoomEntity>>>() {
 
             @Override
-            public void onNext(HttpResult<List<MeetingRoomEntity>> result) {
+            protected void onResponse(HttpResult<List<MeetingRoomEntity>> result) {
                 List<MeetingRoomEntity> unaviailbleRooms = result.getResult();
                 mAdapter.setUnableRoomData(unaviailbleRooms, startTime);
             }
 
             @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onComplete() {
-
+            protected void onFailure(Throwable e) {
+                Toasty.error(getContext(),e.getMessage()).show();
             }
         }, date);
 

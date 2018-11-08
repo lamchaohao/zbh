@@ -42,8 +42,8 @@ public class DocumentAdapter extends RecyclerView.Adapter{
         DocHolder docHolder = (DocHolder) holder;
 
         if (position==mDocumentList.size()){
-            docHolder.ivIcon.setImageResource(R.drawable.ic_add_circle_outline_black_24dp);
-            docHolder.tvName.setText("添加文件");
+            docHolder.ivIcon.setImageResource(R.drawable.ic_round_add);
+            docHolder.tvName.setText("管理文件");
             docHolder.rootView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -57,18 +57,18 @@ public class DocumentAdapter extends RecyclerView.Adapter{
             FilePickerConst.FILE_TYPE fileType = FileUtils.getFileType(documentEntity.getDocumentName());
             switch (fileType){
                 case PDF:
-                    docHolder.ivIcon.setImageResource(R.drawable.pdf_icon);
+                    docHolder.ivIcon.setImageResource(R.drawable.ic_pdf);
                     break;
                 case PPT:
-                    docHolder.ivIcon.setImageResource(R.drawable.power_point_2013);
+                    docHolder.ivIcon.setImageResource(R.drawable.ic_power_point);
                     break;
                 case TXT:
                     docHolder.ivIcon.setImageResource(droidninja.filepicker.R.drawable.icon_file_unknown);
                 case WORD:
-                    docHolder.ivIcon.setImageResource(R.drawable.word_2013);
+                    docHolder.ivIcon.setImageResource(R.drawable.ic_word);
                     break;
                 case EXCEL:
-                    docHolder.ivIcon.setImageResource(R.drawable.excel_2013);
+                    docHolder.ivIcon.setImageResource(R.drawable.ic_excel);
                     break;
                 case UNKNOWN:
                     docHolder.ivIcon.setImageResource(droidninja.filepicker.R.drawable.icon_file_unknown);

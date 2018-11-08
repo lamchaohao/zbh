@@ -7,6 +7,7 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.Shape;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,11 +45,6 @@ public class MessageAdapter extends RecyclerView.Adapter {
         });
     }
 
-
-    static {
-
-    }
-
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.item_msg, parent, false);
@@ -56,7 +52,7 @@ public class MessageAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         MsgViewHodler viewHodler = (MsgViewHodler) holder;
         final MessageEntity messageEntity = mMsgEntityList.get(position);
         final String msgBody = messageEntity.getMessageDescription();
@@ -64,16 +60,22 @@ public class MessageAdapter extends RecyclerView.Adapter {
 //        ssb.setSpan(new ForegroundColorSpan(0xFF2196F3),0,3, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         viewHodler.tvMsgBody.setText(ssb);
         viewHodler.tvTitle.setText(messageEntity.getMessageTitle());
-        String time = TimeFormatUtil.formatDateAndTime(messageEntity.getCreateTime());
+        String time = TimeFormatUtil.formatDateAndTime(messageEntity.getSendTime());
         viewHodler.tvMsgTimeStamp.setText(time);
         viewHodler.rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mOnItemClickListener!=null){
-                    mOnItemClickListener.onItemClick(v,messageEntity);
+                    mOnItemClickListener.onItemClick(position,messageEntity);
                 }
             }
         });
+        if (!TextUtils.isEmpty(messageEntity.getUnread())) {
+            viewHodler.tvReadStatus.setText("未读");
+
+        }else {
+            viewHodler.tvReadStatus.setText("已读");
+        }
 
         ShapeDrawable shapeDrawable = new ShapeDrawable(mShapeDrawable.getShape());
 
@@ -83,7 +85,7 @@ public class MessageAdapter extends RecyclerView.Adapter {
 
 
     public interface OnItemClickListener{
-        void onItemClick(View view,MessageEntity msgEntity);
+        void onItemClick(int pos,MessageEntity msgEntity);
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
@@ -99,6 +101,7 @@ public class MessageAdapter extends RecyclerView.Adapter {
         TextView tvTitle;
         TextView tvMsgBody;
         TextView tvMsgTimeStamp;
+        TextView tvReadStatus;
         View rootView;
         ImageView ivDot;
         public MsgViewHodler(View itemView) {
@@ -107,6 +110,7 @@ public class MessageAdapter extends RecyclerView.Adapter {
             tvMsgBody = itemView.findViewById(R.id.tv_msg_body);
             tvMsgTimeStamp = itemView.findViewById(R.id.tv_msg_timeStamp);
             ivDot = itemView.findViewById(R.id.iv_msgDot);
+            tvReadStatus = itemView.findViewById(R.id.tv_msg_readStatus);
             rootView = itemView.findViewById(R.id.rootView);
         }
     }

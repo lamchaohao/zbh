@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.base.BaseBackFragment;
+import com.gzz100.zbh.data.ObserverImpl;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.request.AttachRequest;
 import com.qmuiteam.qmui.widget.QMUITopBar;
@@ -24,8 +25,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import es.dmoral.toasty.Toasty;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
 
 /**
  * Created by Lam on 2018/5/10.
@@ -39,6 +38,7 @@ public class FeedbackFragment extends BaseBackFragment {
     @BindView(R.id.tv_textCount)
     TextView mTvCount;
     Unbinder unbinder;
+    private ObserverImpl<HttpResult> mFeedbackObserver;
 
     @Override
     protected View onCreateView(LayoutInflater inflater) {
@@ -106,15 +106,12 @@ public class FeedbackFragment extends BaseBackFragment {
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
+
             AttachRequest request=new AttachRequest();
-            request.submitFeedback(new Observer<HttpResult>() {
-                @Override
-                public void onSubscribe(Disposable d) {
-
-                }
+            mFeedbackObserver = new ObserverImpl<HttpResult>() {
 
                 @Override
-                public void onNext(HttpResult result) {
+                protected void onResponse(HttpResult result) {
                     final QMUITipDialog dialog = new QMUITipDialog.Builder(getContext())
                             .setIconType(QMUITipDialog.Builder.ICON_TYPE_SUCCESS)
                             .setTipWord("感谢您的反馈,我们会努力完善")
@@ -130,15 +127,12 @@ public class FeedbackFragment extends BaseBackFragment {
                 }
 
                 @Override
-                public void onError(Throwable e) {
+                protected void onFailure(Throwable e) {
                     Toasty.error(getContext().getApplicationContext(),e.getMessage()).show();
                 }
+            };
 
-                @Override
-                public void onComplete() {
-
-                }
-            },packageInfo.versionCode+"",mEtFeedback.getText().toString());
+            request.submitFeedback(mFeedbackObserver,packageInfo.versionCode+"",mEtFeedback.getText().toString());
 
         }
 
@@ -149,5 +143,8 @@ public class FeedbackFragment extends BaseBackFragment {
         super.onDestroyView();
         hideSoftInput();
         unbinder.unbind();
+        if (mFeedbackObserver!=null) {
+            mFeedbackObserver.cancleRequest();
+        }
     }
 }

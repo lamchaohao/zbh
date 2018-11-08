@@ -11,7 +11,7 @@ import java.util.List;
 public class Department {
     private long departmentId;
     private String departmentName;
-    private List<Staff> staffs;
+    private List<Staff> userList;
     private boolean isSelect;
 
     public long getDepartmentId() {
@@ -31,11 +31,11 @@ public class Department {
     }
 
     public List<Staff> getStaffs() {
-        return staffs;
+        return userList;
     }
 
     public void setStaffs(List<Staff> staffs) {
-        this.staffs = staffs;
+        this.userList = staffs;
     }
 
     public boolean isSelect() {

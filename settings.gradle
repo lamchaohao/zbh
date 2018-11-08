@@ -1,1 +1,1 @@
-include ':app', ':qmui', ':floatingsearchview'
+include ':app', ':qmui'

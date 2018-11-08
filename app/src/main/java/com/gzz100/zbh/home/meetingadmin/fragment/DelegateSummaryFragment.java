@@ -1,8 +1,8 @@
 package com.gzz100.zbh.home.meetingadmin.fragment;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.gzz100.zbh.R;
 import com.gzz100.zbh.base.BaseBackFragment;
+import com.gzz100.zbh.data.ObserverImpl;
 import com.gzz100.zbh.data.entity.DelegateSummaryEntity;
 import com.gzz100.zbh.data.network.HttpResult;
 import com.gzz100.zbh.data.network.request.MeetingRequest;
@@ -23,11 +24,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import butterknife.Unbinder;
 import es.dmoral.toasty.Toasty;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
 
 /**
  * Created by Lam on 2018/5/23.
@@ -41,12 +39,10 @@ public class DelegateSummaryFragment extends BaseBackFragment {
     TextView mTvDelegatesum;
     @BindView(R.id.tv_delegateArrived)
     TextView mTvDelegateArrived;
-    @BindView(R.id.tv_normals)
-    TextView mTvNormals;
-    @BindView(R.id.tv_absents)
-    TextView mTvAbsents;
-    @BindView(R.id.tv_personCount)
-    TextView mTvPerson;
+    @BindView(R.id.tv_arrived_percent)
+    TextView tvArrivedPercent;
+    @BindView(R.id.tablayout_delegate_summary)
+    TabLayout mTabLayout;
     @BindView(R.id.rcv_delegates)
     RecyclerView mRcvDelegates;
     Unbinder unbinder;
@@ -54,6 +50,7 @@ public class DelegateSummaryFragment extends BaseBackFragment {
     private List<DelegateSummaryEntity.DelegateBean> mDelegateList;
     private DelegateSummaryAdapter mAdapter;
     private DelegateSummaryEntity mEntity;
+    private ObserverImpl<HttpResult<DelegateSummaryEntity>> mObserver;
 
     public static DelegateSummaryFragment newInstance(String meetingId) {
         DelegateSummaryFragment fragment = new DelegateSummaryFragment();
@@ -76,46 +73,79 @@ public class DelegateSummaryFragment extends BaseBackFragment {
         initVar();
         initTopbar();
         initView();
+        initTablayout();
         loadData();
     }
 
-    private void loadData() {
-        Observer<HttpResult<DelegateSummaryEntity>> observer=new Observer<HttpResult<DelegateSummaryEntity>>() {
+    private void initTablayout() {
+        mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void onSubscribe(Disposable d) {
+            public void onTabSelected(TabLayout.Tab tab) {
+                switch (tab.getPosition()) {
+                    case 0:
+                        mDelegateList.clear();
+                        if (mEntity.getNormal()!=null) {
+                            mDelegateList.addAll(mEntity.getNormal());
+                        }
+                        mAdapter.notifyDataSetChanged();
+                        break;
+                    case 1:
+                        mDelegateList.clear();
+                        if (mEntity.getAbsent()!=null) {
+                            mDelegateList.addAll(mEntity.getAbsent());
+                        }
+                        mAdapter.notifyDataSetChanged();
+                        break;
+                    case 2:
+                        mDelegateList.clear();
+                        if (mEntity.getAbsent()!=null) {
+                            mDelegateList.addAll(mEntity.getAbsent());
+                        }
+                        mAdapter.notifyDataSetChanged();
+                        break;
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
 
             }
 
             @Override
-            public void onNext(HttpResult<DelegateSummaryEntity> result) {
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
+    }
+
+    private void loadData() {
+        mObserver = new ObserverImpl<HttpResult<DelegateSummaryEntity>>() {
+
+            @Override
+            protected void onResponse(HttpResult<DelegateSummaryEntity> result) {
                 mEntity = result.getResult();
                 setToView();
-
             }
 
             @Override
-            public void onError(Throwable e) {
+            protected void onFailure(Throwable e) {
                 Toasty.error(getContext().getApplicationContext(),e.getMessage()).show();
-            }
-
-            @Override
-            public void onComplete() {
-
             }
         };
         MeetingRequest request=new MeetingRequest();
-        request.getDelegateSummary(observer,mMeetingId);
+        request.getDelegateSummary(mObserver,mMeetingId);
     }
 
     private void setToView() {
-        mTvDelegateArrived.setText("到场率:"+mEntity.getAttendance());
-        mTvDelegatesum.setText("总参会人数:"+mEntity.getDelegateNum());
+        mTvDelegateArrived.setText("总参会人数:"+mEntity.getDelegateNum());
+        mTvDelegatesum.setText("到场人数: "+mEntity.getNormal().size());
+        tvArrivedPercent.setText("到场率："+mEntity.getAttendance());
         mDelegateList.clear();
         if (mEntity.getNormal()!=null) {
             mDelegateList.addAll(mEntity.getNormal());
         }
         mAdapter.notifyDataSetChanged();
-        mTvPerson.setText(mDelegateList.size()+"人");
     }
 
     private void initView() {
@@ -124,9 +154,6 @@ public class DelegateSummaryFragment extends BaseBackFragment {
         mRcvDelegates.setLayoutManager(new LinearLayoutManager(getContext()));
         mRcvDelegates.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
         mRcvDelegates.setAdapter(mAdapter);
-
-        mTvNormals.setTextColor(Color.WHITE);
-        mTvNormals.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
 
     }
 
@@ -146,41 +173,12 @@ public class DelegateSummaryFragment extends BaseBackFragment {
         }
     }
 
-    @OnClick({R.id.tv_normals,R.id.tv_absents})
-    void onClick(View v){
-        switch (v.getId()) {
-            case R.id.tv_absents:
-                mTvNormals.setTextColor(Color.BLACK);
-                mTvNormals.setBackgroundColor(0);
-                mTvAbsents.setTextColor(Color.WHITE);
-                mTvAbsents.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-                mDelegateList.clear();
-                if (mEntity.getAbsent()!=null) {
-                    mDelegateList.addAll(mEntity.getAbsent());
-                }
-                mAdapter.notifyDataSetChanged();
-                mTvPerson.setText(mDelegateList.size()+"人");
-                break;
-            case R.id.tv_normals:
-                mTvAbsents.setTextColor(Color.BLACK);
-                mTvAbsents.setBackgroundColor(0);
-                mTvNormals.setTextColor(Color.WHITE);
-                mTvNormals.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-                mDelegateList.clear();
-                if (mEntity.getNormal()!=null) {
-                    mDelegateList.addAll(mEntity.getNormal());
-                }
-                mAdapter.notifyDataSetChanged();
-                mTvPerson.setText(mDelegateList.size()+"人");
-                break;
-        }
-
-    }
 
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        mObserver.cancleRequest();
     }
 }

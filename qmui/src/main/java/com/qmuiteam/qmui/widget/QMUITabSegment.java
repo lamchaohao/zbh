@@ -291,6 +291,7 @@ public class QMUITabSegment extends HorizontalScrollView {
         return this;
     }
 
+
     private TabAdapter getAdapter() {
         return mContentLayout.getTabAdapter();
     }
@@ -866,6 +867,14 @@ public class QMUITabSegment extends HorizontalScrollView {
     public int getSignCount(int index) {
         Tab tab = getAdapter().getItem(index);
         return tab.getSignCount();
+    }
+
+    public void setup(){
+        getAdapter().setup();
+    }
+
+    public List<Tab> getTabs(){
+        return getAdapter().getItems();
     }
 
     @IntDef(value = {MODE_SCROLLABLE, MODE_FIXED})

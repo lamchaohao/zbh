@@ -31,6 +31,7 @@ public class MeetingInfoEntity {
     private String meetingPlaceName;
     private String meetingPlaceId;
     private String meetingEndTime;
+    private String unread;
     private List<DelegateListBean> delegateList;
     private List<AgendaListBean> agendaList;
     private List<VoteListBean> voteList;
@@ -57,6 +58,10 @@ public class MeetingInfoEntity {
 
     public void setMeetingStartTime(String meetingStartTime) {
         this.meetingStartTime = meetingStartTime;
+    }
+
+    public String getUnread() {
+        return unread;
     }
 
     public String getCreatorId() {

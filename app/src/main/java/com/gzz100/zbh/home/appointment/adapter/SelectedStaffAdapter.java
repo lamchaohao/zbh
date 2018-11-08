@@ -29,8 +29,8 @@ public class SelectedStaffAdapter extends RecyclerView.Adapter {
     public SelectedStaffAdapter(Context context) {
         mStaffList = new ArrayList<>();
         mContext = context;
-        headPicFontSize = DensityUtil.dp2px(mContext,16);
-        headPicSize = DensityUtil.dp2px(mContext,36);
+        headPicFontSize = DensityUtil.dp2px(mContext,10);
+        headPicSize = DensityUtil.dp2px(mContext,30);
     }
 
     @Override

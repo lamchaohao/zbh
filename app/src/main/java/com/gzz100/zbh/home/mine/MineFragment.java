@@ -9,18 +9,20 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.gzz100.zbh.R;
-import com.gzz100.zbh.account.LoginFragment;
-import com.gzz100.zbh.account.SearchCompFragment;
+import com.gzz100.zbh.account.fragment.LoginFragment;
+import com.gzz100.zbh.account.fragment.SearchCompFragment;
 import com.gzz100.zbh.account.User;
 import com.gzz100.zbh.base.BaseFragment;
+import com.gzz100.zbh.data.ObserverImpl;
 import com.gzz100.zbh.data.entity.ApplyEntity;
+import com.gzz100.zbh.data.network.HttpResult;
+import com.gzz100.zbh.data.network.request.UserLoginRequest;
 import com.gzz100.zbh.utils.DensityUtil;
 import com.gzz100.zbh.utils.TextHeadPicUtil;
 import com.orhanobut.logger.Logger;
@@ -35,6 +37,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import es.dmoral.toasty.Toasty;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
 import permissions.dispatcher.OnPermissionDenied;
@@ -51,21 +54,14 @@ public class MineFragment extends BaseFragment {
     TextView mTvUserName;
     @BindView(R.id.tv_job_mine)
     TextView mTvjob;
-    @BindView(R.id.tv_statu_mine)
-    TextView mTvStatu;
-    @BindView(R.id.tv_file_mine)
-    TextView mTvFile;
+    @BindView(R.id.tv_mine_companyName)
+    TextView tvCompanyName;
     Unbinder unbinder;
     @BindView(R.id.btn_joinCompany_mine)
-    Button mBtnJoinCompany;
+    TextView mBtnJoinCompany;
     @BindView(R.id.iv_mine_compPic)
     ImageView mIvCompPic;
-    @BindView(R.id.tv_star_mine)
-    TextView mTvStar;
-    @BindView(R.id.tv_about_mine)
-    TextView mTvAbout;
-    @BindView(R.id.tv_setting_mine)
-    TextView mTvSetting;
+
     private View mRootView;
 
     public MineFragment() {
@@ -104,16 +100,18 @@ public class MineFragment extends BaseFragment {
                 sb.append(user.getApply()
                         .getCompanyNameX())
                         .append("审核");
-                mTvStatu.setText(sb.toString());
+                mTvjob.setText(sb.toString());
                 mBtnJoinCompany.setVisibility(View.GONE);
-                mTvjob.setVisibility(View.GONE);
+                tvCompanyName.setVisibility(View.GONE);
             }else {
-                mTvStatu.setText("你还没加入企业");
+                mTvjob.setText("你还没加入企业");
                 mBtnJoinCompany.setVisibility(View.VISIBLE);
+                tvCompanyName.setVisibility(View.GONE);
             }
         }else {
             mBtnJoinCompany.setVisibility(View.GONE);
-            mTvStatu.setText(user.getCompanyName());
+            tvCompanyName.setVisibility(View.VISIBLE);
+            tvCompanyName.setText(user.getCompanyName());
             mTvjob.setVisibility(View.VISIBLE);
             mTvjob.setText(user.getPositionName());
         }
@@ -158,13 +156,13 @@ public class MineFragment extends BaseFragment {
     // 用户拒绝授权回调（可选）
     @OnPermissionDenied({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE})
     void showDeniedForCamera() {
-        Toast.makeText(getContext(), "用户拒绝了授权并向你扔了一条狗", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "很抱歉,无法读取存储信息", Toast.LENGTH_SHORT).show();
     }
 
     // 用户勾选了“不再提醒”时调用（可选）
     @OnNeverAskAgain({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE})
     void showNeverAskForCamera() {
-        Toast.makeText(getContext(), "用户把你打入冷宫", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "如需打开请前往手机设置开启权限", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -174,29 +172,31 @@ public class MineFragment extends BaseFragment {
         unbinder.unbind();
     }
 
-    @OnClick({R.id.tv_star_mine,R.id.rl_nameCard_mine,R.id.tv_about_mine, R.id.tv_setting_mine, R.id.tv_file_mine,R.id.tv_logout_mine,R.id.btn_joinCompany_mine})
+    @OnClick({R.id.ll_star_mine,R.id.cv_nameCard_mine,R.id.ll_about_mine, R.id.ll_setting_mine,
+            R.id.ll_download_mine,R.id.ll_logout_mine,R.id.btn_joinCompany_mine})
     public void onViewClicked(View view) {
         switch (view.getId()) {
-            case R.id.tv_about_mine:
+            case R.id.ll_about_mine:
                 startParentFragment(new AboutFragment());
                 break;
-            case R.id.tv_setting_mine:
+            case R.id.ll_setting_mine:
                 startParentFragment(new SettingFragment());
                 break;
-            case R.id.tv_file_mine:
+            case R.id.ll_download_mine:
                 //点击后开始权限询问,同意后执行showFile()
                 MineFragmentPermissionsDispatcher.showFileWithPermissionCheck(MineFragment.this);
                 break;
-            case R.id.tv_logout_mine:
+            case R.id.ll_logout_mine:
+//                startParentFragment(new RefectFragment());
                 logout();
                 break;
             case R.id.btn_joinCompany_mine:
                 startParentFragment(new SearchCompFragment());
                 break;
-            case R.id.rl_nameCard_mine:
+            case R.id.cv_nameCard_mine:
                 startParentFragment(new NameCardFragment());
                 break;
-            case R.id.tv_star_mine:
+            case R.id.ll_star_mine:
                 startParentFragment(new MineStarFragment());
                 break;
 
@@ -224,13 +224,29 @@ public class MineFragment extends BaseFragment {
                 .addAction(0, "退出", QMUIDialogAction.ACTION_PROP_NEGATIVE, new QMUIDialogAction.ActionListener() {
                     @Override
                     public void onClick(QMUIDialog dialog, int index) {
-                        if (User.logout()) {
-                            dialog.dismiss();
-                            ((BaseFragment)getParentFragment()).startWithPop(new LoginFragment());
-                        }
+                        dialog.dismiss();
+                        requestLogout();
                     }
                 })
                 .show();
+    }
+
+    private void requestLogout() {
+        UserLoginRequest request = UserLoginRequest.getInstance();
+        request.logout(new ObserverImpl<HttpResult>() {
+            @Override
+            protected void onResponse(HttpResult result) {
+                if (User.logout()) {
+
+                    ((BaseFragment)getParentFragment()).startWithPop(new LoginFragment());
+                }
+            }
+
+            @Override
+            protected void onFailure(Throwable e) {
+                Toasty.error(_mActivity,e.getMessage()).show();
+            }
+        });
     }
 
 

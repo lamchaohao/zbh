@@ -9,4 +9,33 @@
         <attr name="metaButtonBarButtonStyle" format="reference"/>
     </declare-styleable>
 
+    <attr format="reference" name="floatingSearchViewStyle"/>
+
+    <declare-styleable name="FloatingSearchView">
+        <attr name="fsv_searchBarWidth" format="dimension|reference"/>
+        <attr name="fsv_menu" format="reference"/>
+        <attr name="fsv_contentBackgroundColor" format="color|reference"/>
+        <attr name="fsv_cornerRadius" format="dimension|reference"/>
+        <attr name="fsv_icon" format="reference"/>
+        <attr name="logo"/>
+        <attr name="contentInsetStart"/>
+        <attr name="contentInsetEnd"/>
+        <attr name="android:divider"/>
+        <attr name="android:dividerHeight"/>
+        <attr name="android:hint"/>
+        <attr name="popupTheme"/>
+    </declare-styleable>
+
+    <declare-styleable name="GroupRecyclerView">
+        <attr name="group_height" format="dimension" />
+        <attr name="group_child_offset" format="dimension" />
+        <attr name="group_background" format="color" />
+        <attr name="group_text_color" format="color" />
+        <attr name="group_text_size" format="dimension" />
+        <attr name="group_center" format="boolean" />
+        <attr name="group_padding_left" format="dimension" />
+        <attr name="group_padding_right" format="dimension" />
+        <attr name="group_has_header" format="boolean" />
+    </declare-styleable>
+
 </resources>
